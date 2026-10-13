@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      DO_NOT_TRACK: "1"
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - run: uv sync --locked
+
+      - name: lint
+        run: uv run ruff check .
+
+      - name: format
+        run: uv run ruff format --check .
+
+      - name: types
+        run: uv run mypy
+
+      # No model server: the description model is stubbed in tests, and every type, key,
+      # rule and SQL statement is produced by deterministic code.
+      - name: tests
+        run: uv run pytest -q
+
+      - name: end-to-end, full-size drop through dbt build
+        run: make e2e
+
+      - name: stress runs
+        run: make stress
