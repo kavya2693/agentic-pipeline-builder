@@ -51,8 +51,18 @@ METHODS = ["card", "wallet", "cod", "bank_transfer"]
 METHOD_P = [0.58, 0.22, 0.15, 0.05]
 CURRENCIES = ["AED", "SAR", "USD"]
 RETURN_REASONS = ["damaged", "wrong_size", "not_as_described", "changed_mind", "late_delivery"]
-FIRST = ["Aisha", "Omar", "Fatima", "Ravi", "Priya", "John", "Maria", "Ahmed", "Sara", "Li", "Noor", "Yusuf"]
-LAST = ["Khan", "Patel", "Haddad", "Smith", "Garcia", "Nair", "Rahman", "Chen", "Ali", "Fernandes", "Iyer"]
+FIRST = [
+    "Aisha", "Omar", "Fatima", "Ravi", "Priya", "John", "Maria", "Ahmed", "Sara", "Li", "Noor", "Yusuf",
+    "Hassan", "Layla", "Khalid", "Mariam", "Arjun", "Deepa", "Anil", "Sneha", "Michael", "Emma", "David",
+    "Sophia", "Ali", "Zainab", "Ibrahim", "Huda", "Wei", "Mei", "Carlos", "Ana", "Joseph", "Grace",
+    "Tariq", "Rania", "Vikram", "Kavya", "Samuel", "Leah", "Faisal", "Amal", "Rohan", "Meera",
+]
+LAST = [
+    "Khan", "Patel", "Haddad", "Smith", "Garcia", "Nair", "Rahman", "Chen", "Ali", "Fernandes", "Iyer",
+    "Hussain", "Mansour", "Reddy", "Sharma", "Brown", "Wilson", "Lopez", "Wang", "Liu", "Kumar", "Saleh",
+    "Hamdan", "Qureshi", "Das", "Menon", "Taylor", "Martin", "Silva", "Costa", "Yousef", "Nasser",
+    "Pillai", "Joshi", "Thomas", "George", "Mathew", "Rao", "Shah", "Abbas",
+]
 
 # Retail calendar peaks: (month, day, length in days, lift).
 EVENTS = [
