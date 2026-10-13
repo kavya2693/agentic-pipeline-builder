@@ -114,8 +114,9 @@ def type_accuracy(guess: dict[str, dict[str, str]], truth: dict[str, Any]) -> di
 def score_schema(catalog: Catalog, truth: dict[str, Any], raw: Path) -> dict[str, Any]:
     agent_types = {t: {c.name: c.logical_type for c in s.columns} for t, s in catalog.tables.items()}
     pk_hits = [
-        t for t, spec in truth["tables"].items() if t in catalog.tables
-        and catalog.tables[t].primary_key == spec["primary_key"]
+        t
+        for t, spec in truth["tables"].items()
+        if t in catalog.tables and catalog.tables[t].primary_key == spec["primary_key"]
     ]
     true_fk = {(f["table"], f["column"], f["ref_table"], f["ref_column"]) for f in truth["foreign_keys"]}
     found_fk = {(f.table, f.column, f.ref_table, f.ref_column) for f in catalog.foreign_keys}
@@ -159,7 +160,9 @@ def score_flags(flags: pd.DataFrame, defects: pd.DataFrame) -> dict[str, Any]:
     d = defects.copy()
     d["caught"] = d.apply(caught, axis=1) if len(d) else []
     by_type = (
-        d.groupby("defect")["caught"].agg(["sum", "count"]).rename(columns={"sum": "caught", "count": "injected"})
+        d.groupby("defect")["caught"]
+        .agg(["sum", "count"])
+        .rename(columns={"sum": "caught", "count": "injected"})
     )
     by_type["recall"] = (by_type["caught"] / by_type["injected"]).round(4)
 

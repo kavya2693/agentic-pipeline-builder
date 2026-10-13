@@ -52,16 +52,92 @@ METHOD_P = [0.58, 0.22, 0.15, 0.05]
 CURRENCIES = ["AED", "SAR", "USD"]
 RETURN_REASONS = ["damaged", "wrong_size", "not_as_described", "changed_mind", "late_delivery"]
 FIRST = [
-    "Aisha", "Omar", "Fatima", "Ravi", "Priya", "John", "Maria", "Ahmed", "Sara", "Li", "Noor", "Yusuf",
-    "Hassan", "Layla", "Khalid", "Mariam", "Arjun", "Deepa", "Anil", "Sneha", "Michael", "Emma", "David",
-    "Sophia", "Ali", "Zainab", "Ibrahim", "Huda", "Wei", "Mei", "Carlos", "Ana", "Joseph", "Grace",
-    "Tariq", "Rania", "Vikram", "Kavya", "Samuel", "Leah", "Faisal", "Amal", "Rohan", "Meera",
+    "Aisha",
+    "Omar",
+    "Fatima",
+    "Ravi",
+    "Priya",
+    "John",
+    "Maria",
+    "Ahmed",
+    "Sara",
+    "Li",
+    "Noor",
+    "Yusuf",
+    "Hassan",
+    "Layla",
+    "Khalid",
+    "Mariam",
+    "Arjun",
+    "Deepa",
+    "Anil",
+    "Sneha",
+    "Michael",
+    "Emma",
+    "David",
+    "Sophia",
+    "Ali",
+    "Zainab",
+    "Ibrahim",
+    "Huda",
+    "Wei",
+    "Mei",
+    "Carlos",
+    "Ana",
+    "Joseph",
+    "Grace",
+    "Tariq",
+    "Rania",
+    "Vikram",
+    "Kavya",
+    "Samuel",
+    "Leah",
+    "Faisal",
+    "Amal",
+    "Rohan",
+    "Meera",
 ]
 LAST = [
-    "Khan", "Patel", "Haddad", "Smith", "Garcia", "Nair", "Rahman", "Chen", "Ali", "Fernandes", "Iyer",
-    "Hussain", "Mansour", "Reddy", "Sharma", "Brown", "Wilson", "Lopez", "Wang", "Liu", "Kumar", "Saleh",
-    "Hamdan", "Qureshi", "Das", "Menon", "Taylor", "Martin", "Silva", "Costa", "Yousef", "Nasser",
-    "Pillai", "Joshi", "Thomas", "George", "Mathew", "Rao", "Shah", "Abbas",
+    "Khan",
+    "Patel",
+    "Haddad",
+    "Smith",
+    "Garcia",
+    "Nair",
+    "Rahman",
+    "Chen",
+    "Ali",
+    "Fernandes",
+    "Iyer",
+    "Hussain",
+    "Mansour",
+    "Reddy",
+    "Sharma",
+    "Brown",
+    "Wilson",
+    "Lopez",
+    "Wang",
+    "Liu",
+    "Kumar",
+    "Saleh",
+    "Hamdan",
+    "Qureshi",
+    "Das",
+    "Menon",
+    "Taylor",
+    "Martin",
+    "Silva",
+    "Costa",
+    "Yousef",
+    "Nasser",
+    "Pillai",
+    "Joshi",
+    "Thomas",
+    "George",
+    "Mathew",
+    "Rao",
+    "Shah",
+    "Abbas",
 ]
 
 # Retail calendar peaks: (month, day, length in days, lift).
@@ -152,12 +228,16 @@ def make_customers(rng: np.random.Generator, n: int) -> pd.DataFrame:
     last = rng.choice(LAST, n)
     domains = rng.choice(["mail.com", "inbox.ae", "post.sa", "webmail.net"], n)
     email = [
-        f"{f.lower()}.{la.lower()}{i % 9973}@{d}" for f, la, i, d in zip(first, last, ids, domains, strict=True)
+        f"{f.lower()}.{la.lower()}{i % 9973}@{d}"
+        for f, la, i, d in zip(first, last, ids, domains, strict=True)
     ]
     signup = pd.to_datetime(START) - pd.to_timedelta(rng.integers(-700, 1500, n), unit="D")
     # The CRM migration left older records in US date format.
     alt = signup < pd.Timestamp(2023, 1, 1)
-    phone = np.array([f"+971 5{rng.integers(0, 9)} {rng.integers(100, 999)} {rng.integers(1000, 9999)}" for _ in range(n)], dtype=object)
+    phone = np.array(
+        [f"+971 5{rng.integers(0, 9)} {rng.integers(100, 999)} {rng.integers(1000, 9999)}" for _ in range(n)],
+        dtype=object,
+    )
     phone[rng.random(n) < 0.35] = ""
     birth = rng.integers(1950, 2007, n).astype(object)
     birth[rng.random(n) < 0.22] = ""
@@ -170,7 +250,7 @@ def make_customers(rng: np.random.Generator, n: int) -> pd.DataFrame:
             "email": email,
             "first_name": first,
             "last_name": last,
-            "signup_date": [_fmt_date(d, a) for d, a in zip(signup, alt, strict=True)],
+            "signup_date": [_fmt_date(d, bool(a)) for d, a in zip(signup, alt, strict=True)],
             "country": rng.choice(COUNTRIES, n, p=COUNTRY_P),
             "loyalty_tier": rng.choice(TIERS, n, p=TIER_P),
             "phone": phone,
@@ -198,7 +278,10 @@ def make_products(rng: np.random.Generator, n: int) -> list[dict[str, Any]]:
                 "category": cat,
                 # Half the catalogue service sends prices as formatted strings.
                 "list_price": price if rng.random() < 0.5 else f"{price:,.2f}",
-                "attributes": {"brand": str(rng.choice(BRANDS)), "color": rng.choice(np.array(COLORS, dtype=object))},
+                "attributes": {
+                    "brand": str(rng.choice(BRANDS)),
+                    "color": rng.choice(np.array(COLORS, dtype=object)),
+                },
                 "launched_on": launched.isoformat(),
                 "is_active": bool(rng.random() < 0.93),
                 "weight_kg": weight,
@@ -230,7 +313,9 @@ def make_orders(
     cust = rng.choice(cust_ids, n, p=freq / freq.sum())
     discount = np.array([""] * n, dtype=object)
     has_code = rng.random(n) < 0.2
-    discount[has_code] = rng.choice(["WELCOME10", "RAMADAN15", "BF25", "FREESHIP", "VIP20"], int(has_code.sum()))
+    discount[has_code] = rng.choice(
+        ["WELCOME10", "RAMADAN15", "BF25", "FREESHIP", "VIP20"], int(has_code.sum())
+    )
     return pd.DataFrame(
         {
             "order_id": np.arange(50_000_001, 50_000_001 + n),
@@ -261,7 +346,10 @@ def make_order_items(
     # Business buyers: legitimate bulk lines, rare.
     bulk = rng.random(len(order_ids)) < 0.0004
     qty[bulk] = rng.integers(40, 250, int(bulk.sum()))
-    disc = np.round(np.where(rng.random(len(order_ids)) < 0.25, rng.choice([0.05, 0.1, 0.15, 0.25], len(order_ids)), 0.0), 2)
+    disc = np.round(
+        np.where(rng.random(len(order_ids)) < 0.25, rng.choice([0.05, 0.1, 0.15, 0.25], len(order_ids)), 0.0),
+        2,
+    )
     unit = np.round(prices[idx] * rng.normal(1.0, 0.03, len(order_ids)), 2)
     return pd.DataFrame(
         {
@@ -284,7 +372,9 @@ def make_payments(rng: np.random.Generator, orders: pd.DataFrame, totals: pd.Ser
     n = len(rows_order)
     base = paid.loc[rows_order]
     amount = totals.loc[base.order_id].to_numpy() * np.where(np.isin(rows_order, paid.index[split]), 0.5, 1.0)
-    when = pd.to_datetime(base.ordered_at, format="mixed") + pd.to_timedelta(rng.integers(0, 3600 * 30, n), unit="s")
+    when = pd.to_datetime(base.ordered_at, format="mixed") + pd.to_timedelta(
+        rng.integers(0, 3600 * 30, n), unit="s"
+    )
     currency = rng.choice(CURRENCIES, n, p=[0.8, 0.15, 0.05])
     return pd.DataFrame(
         {
@@ -304,17 +394,17 @@ def make_returns(rng: np.random.Generator, orders: pd.DataFrame, items: pd.DataF
     lines = items.merge(returned, on="order_id")
     lines = lines.groupby("order_id").head(1).reset_index(drop=True)
     out = []
-    for i, r in enumerate(lines.itertuples(index=False), start=900_001):
-        placed = pd.to_datetime(r.ordered_at, format="mixed")
+    for i, r in enumerate(lines.to_dict(orient="records"), start=900_001):
+        placed = pd.to_datetime(str(r["ordered_at"]), format="mixed")
         reason = rng.choice(RETURN_REASONS) if rng.random() > 0.1 else None
         out.append(
             {
                 "return_id": i,
-                "order_id": int(r.order_id),
-                "sku": r.sku,
+                "order_id": int(r["order_id"]),
+                "sku": r["sku"],
                 "returned_on": (placed + pd.Timedelta(days=int(rng.integers(2, 30)))).strftime("%d %b %Y"),
                 "reason": reason,
-                "refund_amount": round(float(r.unit_price) * int(r.quantity), 2),
+                "refund_amount": round(float(r["unit_price"]) * int(r["quantity"]), 2),
             }
         )
     return out
@@ -455,7 +545,7 @@ def _inject(
     used: dict[str, set[int]] = {t: set() for t in frames}
     for table, col, kind in DEFECT_SPECS:
         df = frames[table]
-        k = max(1, int(round(rate * len(df))))
+        k = max(1, round(rate * len(df)))
         free = np.setdiff1d(np.arange(len(df)), np.fromiter(used[table], dtype=int))
         rows = rng.choice(free, min(k, len(free)), replace=False)
         used[table].update(int(r) for r in rows)
@@ -473,14 +563,18 @@ def _inject(
                     values[r] = "2031-01-15" if "-" in str(v) else "01/15/2031"
             elif kind == "orphan_fk":
                 values[r] = (
-                    f"SKU-9{rng.integers(0, 99999):05d}" if col == "sku" else int(99_000_000 + rng.integers(0, 999_999))
+                    f"SKU-9{rng.integers(0, 99999):05d}"
+                    if col == "sku"
+                    else int(99_000_000 + rng.integers(0, 999_999))
                 )
             elif kind == "invalid_enum":
                 values[r] = rng.choice(TYPOS[col])
             elif kind == "type_corruption":
                 values[r] = rng.choice(["two", "1O", "12..50", "#REF!", "3 pcs"])
             elif kind == "negative_value":
-                values[r] = f"-{str(v).lstrip('$')}" if col == "amount" else str(-int(v) if str(v).isdigit() else -1)
+                values[r] = (
+                    f"-{str(v).lstrip('$')}" if col == "amount" else str(-int(v) if str(v).isdigit() else -1)
+                )
             elif kind == "outlier_value":
                 values[r] = round(float(v) * 100, 2)
             truth.defects.append({"table": table, "row": int(r), "column": col, "defect": kind})
@@ -488,7 +582,7 @@ def _inject(
 
     for table in DUPLICATE_TABLES:
         df = frames[table]
-        k = max(1, int(round(rate * len(df))))
+        k = max(1, round(rate * len(df)))
         free = np.setdiff1d(np.arange(len(df)), np.fromiter(used[table], dtype=int))
         src = np.sort(rng.choice(free, k, replace=False))
         # Re-sent records arrive at the end of the extract, as a late retry would append them.
@@ -538,8 +632,11 @@ def generate(out: Path, scale: float = 1.0, defect_rate: float = 0.005, seed: in
     prod = frames["products"]
     nested = [
         {
-            **{k: _json_value(v) for k, v in row.items() if not k.startswith("attributes_")},
-            "attributes": {"brand": _json_value(row["attributes_brand"]), "color": _json_value(row["attributes_color"])},
+            **{k: _json_value(v) for k, v in row.items() if not str(k).startswith("attributes_")},
+            "attributes": {
+                "brand": _json_value(row["attributes_brand"]),
+                "color": _json_value(row["attributes_color"]),
+            },
         }
         for row in prod.to_dict(orient="records")
     ]

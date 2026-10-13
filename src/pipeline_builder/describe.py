@@ -26,7 +26,13 @@ def ollama_client(model: str = "llama3.2", host: str | None = None, timeout: flo
 
     def generate(prompt: str) -> str:
         body = json.dumps(
-            {"model": model, "prompt": prompt, "stream": False, "format": "json", "options": {"temperature": 0}}
+            {
+                "model": model,
+                "prompt": prompt,
+                "stream": False,
+                "format": "json",
+                "options": {"temperature": 0},
+            }
         ).encode()
         req = urllib.request.Request(f"{base}/api/generate", body, {"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -90,9 +96,8 @@ def describe(catalog: Catalog, rules: list[Rule], generate: Generate | None = No
     for t, schema in catalog.tables.items():
         refs = [f"{f.ref_table}" for f in catalog.parents_of(t)]
         key = ", ".join(schema.primary_key) or "none found"
-        d.tables[t] = (
-            f"{schema.row_count:,} source rows from {schema.file}. Key: {key}."
-            + (f" Points to {', '.join(sorted(set(refs)))}." if refs else "")
+        d.tables[t] = f"{schema.row_count:,} source rows from {schema.file}. Key: {key}." + (
+            f" Points to {', '.join(sorted(set(refs)))}." if refs else ""
         )
         leads: dict[str, str] = {}
         if generate is not None:

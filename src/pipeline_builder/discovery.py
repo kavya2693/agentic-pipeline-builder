@@ -128,9 +128,11 @@ def load_raw(path: Path) -> pd.DataFrame:
         df = pd.read_csv(path, dtype=str, keep_default_na=False, na_filter=False)
     elif suffix in {".json", ".jsonl"}:
         text = path.read_text()
-        records = json.loads(text) if text.lstrip().startswith("[") else [
-            json.loads(line) for line in text.splitlines() if line.strip()
-        ]
+        records = (
+            json.loads(text)
+            if text.lstrip().startswith("[")
+            else [json.loads(line) for line in text.splitlines() if line.strip()]
+        )
         df = pd.json_normalize(records, sep="_").map(_to_text)
     elif suffix == ".parquet":
         table = pq.read_table(path)
@@ -200,9 +202,7 @@ def _key_text(values: pd.Series, logical: str) -> pd.Series:
 def infer_primary_key(name: str, df: pd.DataFrame, cols: dict[str, ColumnSchema]) -> list[str]:
     n = len(df)
     eligible = [
-        c
-        for c, s in cols.items()
-        if s.logical_type in ("integer", "string") and s.null_rate <= KEY_MAX_NULL
+        c for c, s in cols.items() if s.logical_type in ("integer", "string") and s.null_rate <= KEY_MAX_NULL
     ]
     singles = [c for c in eligible if cols[c].distinct_ratio >= KEY_MIN_DISTINCT]
 
@@ -227,9 +227,7 @@ def infer_primary_key(name: str, df: pd.DataFrame, cols: dict[str, ColumnSchema]
     return best[2] if best else []
 
 
-def infer_foreign_keys(
-    frames: dict[str, pd.DataFrame], tables: dict[str, TableSchema]
-) -> list[ForeignKey]:
+def infer_foreign_keys(frames: dict[str, pd.DataFrame], tables: dict[str, TableSchema]) -> list[ForeignKey]:
     parent_keys: dict[str, tuple[str, str, set[str]]] = {}
     for t, schema in tables.items():
         if len(schema.primary_key) == 1:

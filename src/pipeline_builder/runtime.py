@@ -18,7 +18,7 @@ from pipeline_builder.discovery import Catalog, load_raw, table_name
 from pipeline_builder.validation import read_rules, run_rules, summarise
 
 
-class QuarantineThresholdExceeded(RuntimeError):
+class QuarantineThresholdError(RuntimeError):
     """A table would lose more rows to quarantine than the run allows."""
 
 
@@ -27,7 +27,9 @@ def land_frame(con: duckdb.DuckDBPyConnection, table: str, df: pd.DataFrame) -> 
     frame.insert(0, "_row_id", range(len(frame)))
     con.execute("create schema if not exists raw")
     con.register("landing", frame)
-    cols = ", ".join(['cast(_row_id as bigint) as _row_id'] + [f'cast("{c}" as varchar) as "{c}"' for c in df.columns])
+    cols = ", ".join(
+        ["cast(_row_id as bigint) as _row_id"] + [f'cast("{c}" as varchar) as "{c}"' for c in df.columns]
+    )
     con.execute(f"create or replace table raw.{table} as select {cols} from landing")
     con.unregister("landing")
     return len(frame)
@@ -48,5 +50,5 @@ def validate_drop(
     summary = summarise(run_rules(rules, catalog, frames), catalog)
     over = summary[summary["quarantine_rate"] > max_quarantine_rate]
     if len(over):
-        raise QuarantineThresholdExceeded(json.dumps(over.to_dict(orient="records")))
-    return list(summary.to_dict(orient="records"))
+        raise QuarantineThresholdError(json.dumps(over.to_dict(orient="records")))
+    return [{str(k): v for k, v in row.items()} for row in summary.to_dict(orient="records")]

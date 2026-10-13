@@ -58,14 +58,27 @@ def plan_marts(catalog: Catalog) -> BuildPlan:
 
 
 def categorical_columns(rules: list[Rule], table: str) -> set[str]:
-    return {r.column for r in rules if r.table == table and r.expectation == "expect_column_values_to_be_in_set"}
+    return {
+        r.column for r in rules if r.table == table and r.expectation == "expect_column_values_to_be_in_set"
+    }
 
 
 def checked_model(schema: TableSchema, rules: list[Rule], catalog: Catalog) -> str:
     t_rules = [r for r in rules if r.table == schema.name]
-    lines = ["{{ config(materialized='table') }}", "", "with source as (", f"    select * from {{{{ source('raw', '{schema.name}') }}}}", "),", ""]
+    lines = [
+        "{{ config(materialized='table') }}",
+        "",
+        "with source as (",
+        f"    select * from {{{{ source('raw', '{schema.name}') }}}}",
+        "),",
+        "",
+    ]
     lines.append("cleaned as (\n    select\n        _row_id,")
-    lines.append(",\n".join(f"        {{{{ clean_text('{c.name}') }}}} as {sql.text_col(c.name)}" for c in schema.columns))
+    lines.append(
+        ",\n".join(
+            f"        {{{{ clean_text('{c.name}') }}}} as {sql.text_col(c.name)}" for c in schema.columns
+        )
+    )
     lines.append("    from source\n),\n")
     pk = schema.primary_key
     lines.append("typed as (\n    select\n        *,")
@@ -116,7 +129,8 @@ def checked_model(schema: TableSchema, rules: list[Rule], catalog: Catalog) -> s
 
 def staging_model(schema: TableSchema, categorical: set[str]) -> str:
     cols = ",\n".join(
-        f"    lower({c.name}) as {c.name}" if c.name in categorical else f"    {c.name}" for c in schema.columns
+        f"    lower({c.name}) as {c.name}" if c.name in categorical else f"    {c.name}"
+        for c in schema.columns
     )
     return (
         f"-- Rows of {schema.file} that pass every blocking rule, typed and standardised.\n"
@@ -147,10 +161,12 @@ def fact_model(table: str, catalog: Catalog, plan: BuildPlan) -> str:
         carry = [
             c.name
             for c in parent.columns
-            if c.name not in own and c.name not in parent.primary_key
-            and (c.logical_type in ("date", "timestamp") or any(
-                p.column == c.name for p in catalog.parents_of(parent.name)
-            ))
+            if c.name not in own
+            and c.name not in parent.primary_key
+            and (
+                c.logical_type in ("date", "timestamp")
+                or any(p.column == c.name for p in catalog.parents_of(parent.name))
+            )
         ]
         if not carry:
             continue
@@ -158,7 +174,8 @@ def fact_model(table: str, catalog: Catalog, plan: BuildPlan) -> str:
         own.update(carry)
         select.extend(f"    {alias}.{c}" for c in carry)
         joins.append(
-            f"left join {{{{ ref('stg_{parent.name}') }}}} as {alias} on {alias}.{fk.ref_column} = f.{fk.column}"
+            f"left join {{{{ ref('stg_{parent.name}') }}}} as {alias} "
+            f"on {alias}.{fk.ref_column} = f.{fk.column}"
         )
     body = ",\n".join(select)
     join_sql = ("\n" + "\n".join(joins)) if joins else ""
@@ -181,7 +198,7 @@ def daily_model(table: str, date_col: str, measures: list[str]) -> str:
     )
 
 
-def _test(name: str, severity: str | None = None, **arguments: object) -> dict[str, object] | str:
+def _test(name: str, severity: str | None = None, **arguments: object) -> object:
     if not arguments and not severity:
         return name
     body: dict[str, object] = {}
@@ -254,8 +271,8 @@ def marts_schema(catalog: Catalog, plan: BuildPlan, desc: Descriptions) -> dict[
     models: list[dict[str, object]] = []
     for t in plan.dims:
         schema = catalog.tables[t]
-        cols = [{"name": k, "data_tests": ["unique", "not_null"]} for k in schema.primary_key[:1]]
-        models.append({"name": f"dim_{_singular(t)}", "description": desc.table(t), "columns": cols})
+        dim_cols = [{"name": k, "data_tests": ["unique", "not_null"]} for k in schema.primary_key[:1]]
+        models.append({"name": f"dim_{_singular(t)}", "description": desc.table(t), "columns": dim_cols})
     for t in plan.facts:
         schema = catalog.tables[t]
         cols: list[dict[str, object]] = []
@@ -301,7 +318,7 @@ def sources_yaml(catalog: Catalog, desc: Descriptions) -> dict[str, object]:
             {
                 "name": "raw",
                 "schema": "raw",
-                "description": "Raw files landed as text, one table per file, with the file row position in _row_id.",
+                "description": "Raw files landed as text, one table per file, file row position in _row_id.",
                 "tables": [
                     {"name": t, "description": f"Landed from {s.file}. {desc.table(t)}"}
                     for t, s in catalog.tables.items()
@@ -462,7 +479,8 @@ def write_airflow_dag(
             f"    {var} = PythonOperator(\n"
             f'        task_id="{var}",\n'
             "        python_callable=land_source,\n"
-            f'        op_kwargs={{"path": f"{{RAW_DIR}}/{schema.file}", "table": "{t}", "warehouse": WAREHOUSE}},\n'
+            f'        op_kwargs={{"path": f"{{RAW_DIR}}/{schema.file}", "table": "{t}", '
+            '"warehouse": WAREHOUSE},\n'
             "    )"
         )
     code = DAG_TEMPLATE.format(

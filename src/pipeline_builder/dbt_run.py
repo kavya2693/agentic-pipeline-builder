@@ -22,7 +22,10 @@ class DbtResult:
 def run_dbt(project: Path, warehouse: Path) -> DbtResult:
     from dbt.cli.main import dbtRunner  # imported late: dbt is slow to import and not needed elsewhere
 
+    # dbt resolves --target-path against the project directory, so every path is made absolute.
+    project = project.resolve()
     os.environ["WAREHOUSE_PATH"] = str(warehouse.resolve())
+    os.environ.setdefault("DO_NOT_TRACK", "1")
     args = [
         "build",
         "--project-dir",

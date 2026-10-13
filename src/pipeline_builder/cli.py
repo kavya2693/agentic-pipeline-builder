@@ -25,7 +25,9 @@ def sql_vs_pandas(ctx: RunContext) -> dict[str, Any]:
     out: dict[str, Any] = {}
     with duckdb.connect(str(ctx.warehouse.resolve())) as con:
         for t in ctx.catalog.tables:
-            sql_rows = {int(r[0]) for r in con.execute(f"select _row_id from main.stg_{t}__rejected").fetchall()}
+            sql_rows = {
+                int(r[0]) for r in con.execute(f"select _row_id from main.stg_{t}__rejected").fetchall()
+            }
             pd_rows = set(blocked.loc[blocked["table"] == t, "row"].astype(int))
             out[t] = {
                 "sql": len(sql_rows),
@@ -70,23 +72,35 @@ def score(ctx: RunContext, truth_dir: Path) -> dict[str, Any]:
     )
     freq_only_rules = validation.build_rules(ctx.catalog, ctx.frames, ctx.cfg.as_of, typo_check=False)
     freq_only = evaluate.score_flags(validation.run_rules(freq_only_rules, ctx.catalog, ctx.frames), defects)
-    return {"schema": schema, "dq": {"agent": agent, "naive_baseline": naive, "agent_without_typo_check": freq_only}}
+    return {
+        "schema": schema,
+        "dq": {"agent": agent, "naive_baseline": naive, "agent_without_typo_check": freq_only},
+    }
 
 
 def write_report(metrics: dict[str, Any], path: Path) -> None:
     lines = ["# Run report", "", f"Final state: **{metrics['final_state']}**", ""]
     lines += ["## State log", "", "| state | attempt | event | seconds |", "|---|---|---|---|"]
-    lines += [f"| {e['state']} | {e['attempt']} | {e['event']} | {e['seconds']} |" for e in metrics["state_log"]]
+    lines += [
+        f"| {e['state']} | {e['attempt']} | {e['event']} | {e['seconds']} |" for e in metrics["state_log"]
+    ]
     if "schema" in metrics:
         s = metrics["schema"]
-        lines += ["", "## Schema inference vs answer key", "", "| method | columns typed correctly |", "|---|---|"]
+        lines += [
+            "",
+            "## Schema inference vs answer key",
+            "",
+            "| method | columns typed correctly |",
+            "|---|---|",
+        ]
         for k, v in s["types"].items():
             lines.append(f"| {k} | {v['correct']}/{v['total']} ({v['accuracy']:.1%}) |")
         pk, fk = s["primary_keys"], s["foreign_keys"]
         lines += [
             "",
             f"Primary keys: {pk['correct']}/{pk['total']}. Foreign keys: {fk['correct']}/{fk['true']} found, "
-            f"{fk['found'] - fk['correct']} spurious (precision {fk['precision']:.0%}, recall {fk['recall']:.0%}).",
+            f"{fk['found'] - fk['correct']} spurious "
+            f"(precision {fk['precision']:.0%}, recall {fk['recall']:.0%}).",
         ]
         lines += ["", "## Defects caught vs injected", ""]
         lines += ["| rule set | recall | flagged rows | row precision |", "|---|---|---|---|"]
@@ -108,11 +122,15 @@ def write_report(metrics: dict[str, Any], path: Path) -> None:
             "| table | rejected by dbt SQL | blocked by pandas | both | only SQL | only pandas |",
             "|---|---|---|---|---|---|",
         ]
-        for t, v in metrics["sql_vs_pandas"].items():
+        for t, v in metrics.get("sql_vs_pandas", {}).items():
             lines.append(
-                f"| {t} | {v['sql']:,} | {v['pandas']:,} | {v['both']:,} | {v['only_sql']} | {v['only_pandas']} |"
+                f"| {t} | {v['sql']:,} | {v['pandas']:,} | {v['both']:,} "
+                f"| {v['only_sql']} | {v['only_pandas']} |"
             )
-        lines += ["", "Mart row counts: " + ", ".join(f"{k} {v:,}" for k, v in metrics["marts"].items())]
+        lines += [
+            "",
+            "Mart row counts: " + ", ".join(f"{k} {v:,}" for k, v in metrics.get("marts", {}).items()),
+        ]
     path.write_text("\n".join(lines) + "\n")
 
 

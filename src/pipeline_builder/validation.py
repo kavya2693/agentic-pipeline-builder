@@ -107,9 +107,9 @@ def _looks_like_typo(value: str, share: pd.Series) -> bool:
     if not any(ch.isalnum() for ch in value):
         return True
     for other, s in share.items():
-        if other != value and s >= 10 * share[value]:
-            if _edit_distance(value, str(other)) <= max(1, len(str(other)) // 4):
-                return True
+        close = _edit_distance(value, str(other)) <= max(1, len(str(other)) // 4)
+        if other != value and s >= 10 * share[value] and close:
+            return True
     return False
 
 
@@ -119,7 +119,6 @@ def _rules_for_column(
     rules: list[Rule] = []
     rid = f"{table}__{col.name}"
     present = values.dropna()
-    n = max(len(values), 1)
 
     if col.null_rate <= NOT_NULL_MAX or in_pk:
         rules.append(
@@ -215,16 +214,28 @@ def _rules_for_column(
         text = present.astype(str)
         if "email" in col.name.lower() or text.str.fullmatch(EMAIL_RE).mean() >= 0.95:
             rules.append(
-                Rule(f"{rid}__pattern", table, "expect_column_values_to_match_regex", [col.name],
-                     {"regex": EMAIL_RE}, evidence="email address")
+                Rule(
+                    f"{rid}__pattern",
+                    table,
+                    "expect_column_values_to_match_regex",
+                    [col.name],
+                    {"regex": EMAIL_RE},
+                    evidence="email address",
+                )
             )
         elif text.nunique() >= PATTERN_MIN_DISTINCT:
             sample = text.sample(min(len(text), 20_000), random_state=0)
             shapes = sample.map(_shape_regex).value_counts(normalize=True)
             if shapes.iloc[0] >= PATTERN_MIN_SHARE:
                 rules.append(
-                    Rule(f"{rid}__pattern", table, "expect_column_values_to_match_regex", [col.name],
-                         {"regex": shapes.index[0]}, evidence=f"one shape covers {shapes.iloc[0]:.2%}")
+                    Rule(
+                        f"{rid}__pattern",
+                        table,
+                        "expect_column_values_to_match_regex",
+                        [col.name],
+                        {"regex": shapes.index[0]},
+                        evidence=f"one shape covers {shapes.iloc[0]:.2%}",
+                    )
                 )
     return rules
 
@@ -269,7 +280,9 @@ def naive_rules(catalog: Catalog) -> list[Rule]:
         first = schema.columns[0].name
         rules.append(Rule(f"{t}__{first}__unique", t, "expect_column_values_to_be_unique", [first]))
         for col in schema.columns:
-            rules.append(Rule(f"{t}__{col.name}__not_null", t, "expect_column_values_to_not_be_null", [col.name]))
+            rules.append(
+                Rule(f"{t}__{col.name}__not_null", t, "expect_column_values_to_not_be_null", [col.name])
+            )
     return rules
 
 
@@ -311,9 +324,9 @@ def _evaluate(rule: Rule, df: pd.DataFrame, catalog: Catalog, frames: dict[str, 
         parent = catalog.tables[rule.kwargs["ref_table"]]
         ref = rule.kwargs["ref_column"]
         logical = parent.column(ref).logical_type
-        keys = set(_key_text(frames[parent.name][ref], logical).dropna())
+        parent_keys = set(_key_text(frames[parent.name][ref], logical).dropna())
         child = _key_text(values, logical)
-        return child.notna() & ~child.isin(keys)
+        return child.notna() & ~child.isin(parent_keys)
     raise ValueError(f"unknown expectation {exp}")
 
 

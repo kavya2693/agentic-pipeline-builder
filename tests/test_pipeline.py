@@ -1,5 +1,6 @@
 """End to end on a small drop: the generated dbt project must build and agree with pandas."""
 
+import itertools
 import json
 import sys
 import types
@@ -66,7 +67,7 @@ def _airflow_stub() -> dict[str, Any]:
             tasks[task_id] = self
 
     def chain(*ops: Any) -> None:
-        for a, b in zip(ops, ops[1:], strict=False):
+        for a, b in itertools.pairwise(ops):
             edges.append((a.task_id, b.task_id))
 
     class DAG:
@@ -90,7 +91,9 @@ def _airflow_stub() -> dict[str, Any]:
     return {"modules": mods, "edges": edges, "tasks": tasks}
 
 
-def test_generated_dag_wires_land_then_validate_then_dbt(built: RunContext, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_generated_dag_wires_land_then_validate_then_dbt(
+    built: RunContext, monkeypatch: pytest.MonkeyPatch
+) -> None:
     stub = _airflow_stub()
     for name, mod in stub["modules"].items():
         monkeypatch.setitem(sys.modules, name, mod)
@@ -110,7 +113,9 @@ def test_gate_halts_before_building_when_quarantine_is_too_high(drop: Path, tmp_
 
 
 def test_broken_model_output_falls_back_to_rule_text(drop: Path, tmp_path: Path) -> None:
-    ctx = run(RunConfig(raw=drop / "raw", out=tmp_path, as_of=AS_OF, generate=lambda p: "not json", run_dbt=False))
+    ctx = run(
+        RunConfig(raw=drop / "raw", out=tmp_path, as_of=AS_OF, generate=lambda p: "not json", run_dbt=False)
+    )
     assert final_state(ctx) == "DONE"
     assert ctx.descriptions is not None
     assert ctx.descriptions.model_leads == 0 and ctx.descriptions.model_rejected > 0
