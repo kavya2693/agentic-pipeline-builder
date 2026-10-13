@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import duckdb
+import pandas as pd
 import pytest
 
 from pipeline_builder.cli import sql_vs_pandas
@@ -119,3 +120,23 @@ def test_broken_model_output_falls_back_to_rule_text(drop: Path, tmp_path: Path)
     assert final_state(ctx) == "DONE"
     assert ctx.descriptions is not None
     assert ctx.descriptions.model_leads == 0 and ctx.descriptions.model_rejected > 0
+
+
+def test_frozen_contract_still_catches_defects_on_a_much_dirtier_drop(
+    built: RunContext, tmp_path_factory: pytest.TempPathFactory
+) -> None:
+    """Rules re-learned on a 5% drop absorb the defects; the reviewed contract does not."""
+    from pipeline_builder.datagen import generate
+    from pipeline_builder.evaluate import score_flags
+
+    dirty = tmp_path_factory.mktemp("dirty")
+    generate(dirty, scale=0.03, defect_rate=0.05, seed=12)
+    defects = pd.read_csv(dirty / "ground_truth" / "defects.csv")
+    common = {"raw": dirty / "raw", "as_of": AS_OF, "force": True, "run_dbt": False}
+    relearned = run(RunConfig(out=tmp_path_factory.mktemp("relearn"), **common))  # type: ignore[arg-type]
+    enforced = run(RunConfig(out=tmp_path_factory.mktemp("enforce"), contract=built.cfg.out, **common))  # type: ignore[arg-type]
+    r_relearned = score_flags(relearned.flags, defects)  # type: ignore[arg-type]
+    r_enforced = score_flags(enforced.flags, defects)  # type: ignore[arg-type]
+    assert r_enforced["by_defect"]["null_required"]["recall"] == 1.0
+    assert r_relearned["by_defect"]["null_required"]["recall"] == 0.0
+    assert r_enforced["recall"] > r_relearned["recall"] + 0.3

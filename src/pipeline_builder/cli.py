@@ -144,6 +144,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         force=args.force,
         generate=generate,
         run_dbt=not args.no_dbt,
+        contract=args.contract,
     )
     ctx = run(cfg)
     state = final_state(ctx)
@@ -198,6 +199,12 @@ def main(argv: list[str] | None = None) -> None:
     r.add_argument("--force", action="store_true", help="build even if a table exceeds the quarantine limit")
     r.add_argument("--llm", default=None, help="optional Ollama model for column description leads")
     r.add_argument("--no-dbt", action="store_true")
+    r.add_argument(
+        "--contract",
+        type=Path,
+        default=None,
+        help="folder with a reviewed catalog.yml and rules.yml to enforce instead of re-inferring",
+    )
     args = ap.parse_args(argv)
     pd.set_option("display.width", 140)
     sys.exit(cmd_run(args))

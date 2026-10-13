@@ -19,10 +19,11 @@ from typing import Any
 
 import duckdb
 import pandas as pd
+import yaml
 
 from pipeline_builder import builder, describe, validation
 from pipeline_builder.dbt_run import DbtResult, run_dbt
-from pipeline_builder.discovery import Catalog, discover
+from pipeline_builder.discovery import Catalog, discover, load_raw
 from pipeline_builder.runtime import land_frame
 
 
@@ -35,6 +36,9 @@ class RunConfig:
     force: bool = False
     generate: describe.Generate | None = None
     run_dbt: bool = True
+    # Folder holding a reviewed catalog.yml and rules.yml from an earlier run. When set, the
+    # run enforces that contract instead of re-learning it from today's (possibly dirty) drop.
+    contract: Path | None = None
 
 
 @dataclass
@@ -63,14 +67,26 @@ Handler = Callable[[RunContext], str]
 
 
 def discover_state(ctx: RunContext) -> str:
-    ctx.catalog, ctx.frames = discover(ctx.cfg.raw)
+    if ctx.cfg.contract is not None:
+        ctx.catalog = Catalog.from_dict(yaml.safe_load((ctx.cfg.contract / "catalog.yml").read_text()))
+        missing = [s.file for s in ctx.catalog.tables.values() if not (ctx.cfg.raw / s.file).exists()]
+        if missing:
+            return "empty"
+        ctx.frames = {t: load_raw(ctx.cfg.raw / s.file) for t, s in ctx.catalog.tables.items()}
+        for t, df in ctx.frames.items():
+            ctx.catalog.tables[t].row_count = len(df)
+    else:
+        ctx.catalog, ctx.frames = discover(ctx.cfg.raw)
     ctx.catalog.write(ctx.cfg.out / "catalog.yml")
     return "ok" if ctx.catalog.tables else "empty"
 
 
 def validate_state(ctx: RunContext) -> str:
     assert ctx.catalog is not None
-    ctx.rules = validation.build_rules(ctx.catalog, ctx.frames, ctx.cfg.as_of)
+    if ctx.cfg.contract is not None:
+        ctx.rules = validation.read_rules(ctx.cfg.contract / "rules.yml")
+    else:
+        ctx.rules = validation.build_rules(ctx.catalog, ctx.frames, ctx.cfg.as_of)
     validation.write_rules(ctx.rules, ctx.cfg.out / "rules.yml")
     ctx.flags = validation.run_rules(ctx.rules, ctx.catalog, ctx.frames)
     ctx.summary = validation.summarise(ctx.flags, ctx.catalog)
