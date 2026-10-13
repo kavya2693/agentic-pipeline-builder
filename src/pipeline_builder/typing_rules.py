@@ -24,7 +24,10 @@ FALSE_TOKENS = frozenset({"false", "f", "no", "n", "0"})
 # A leading zero on a multi-digit value means a code (postal code, account number), not a number.
 INTEGER_RE = r"^[+-]?(?:0|[1-9]\d*|[1-9]\d{0,2}(?:,\d{3})+)$"
 # Currency symbols or codes and thousands separators are formatting, not part of the value.
-DECIMAL_RE = r"^(?:[A-Z]{3}\s?|\$)?[+-]?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$"
+# Codes are listed rather than matched as any three capitals, or "SKU-000123" reads as a
+# negative amount in a currency called SKU.
+CURRENCY_PREFIX = r"(?:(?:AED|SAR|USD|EUR|GBP|INR|QAR|OMR|KWD|BHD)\s?|\$)"
+DECIMAL_RE = rf"^{CURRENCY_PREFIX}?[+-]?(?:0|[1-9]\d*|[1-9]\d{{0,2}}(?:,\d{{3}})+)(?:\.\d+)?$"
 
 DATE_FORMATS = ("%Y-%m-%d", "%m/%d/%Y", "%d %b %Y", "%Y/%m/%d")
 TIMESTAMP_FORMATS = (
@@ -64,7 +67,7 @@ def parse_integer(values: pd.Series) -> tuple[pd.Series, pd.Series]:
 
 def parse_decimal(values: pd.Series) -> tuple[pd.Series, pd.Series]:
     ok = _matches(values, DECIMAL_RE)
-    cleaned = values.astype(str).str.replace(r"^(?:[A-Z]{3}\s?|\$)|,", "", regex=True)
+    cleaned = values.astype(str).str.replace(rf"^{CURRENCY_PREFIX}|,", "", regex=True)
     parsed = pd.to_numeric(cleaned.where(ok), errors="coerce")
     return parsed, ok & parsed.notna()
 
