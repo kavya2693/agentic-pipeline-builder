@@ -36,6 +36,8 @@ packages = ["src/pipeline_builder"]
 [tool.ruff]
 line-length = 110
 target-version = "py311"
+# Generated output kept for readers; it is produced by the builder, not edited by hand.
+extend-exclude = ["examples", "generated"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
