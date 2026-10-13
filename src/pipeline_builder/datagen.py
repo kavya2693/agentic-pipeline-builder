@@ -23,6 +23,8 @@ import pandas as pd
 
 START = date(2024, 1, 1)
 END = date(2025, 12, 31)
+# The drop is extracted a month after the last order, so late returns and payments are in it.
+EXTRACT_DATE = date(2026, 2, 1)
 
 REGIONS = ["north", "south", "east", "west", "central", "online"]
 COUNTRIES = ["AE", "SA", "OM", "QA", "KW", "BH"]
