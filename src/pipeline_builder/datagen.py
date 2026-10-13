@@ -555,7 +555,7 @@ def _inject(
             if kind == "null_required":
                 values[r] = ""
             elif kind == "malformed_email":
-                values[r] = str(v).replace("@", rng.choice(["@@", " at ", ""]), 1)
+                values[r] = str(v).replace("@", str(rng.choice(["@@", " at ", ""])), 1)
             elif kind == "future_date":
                 values[r] = str(v).replace("2024", "2031").replace("2025", "2031")
                 values[r] = values[r].replace("2023", "2031").replace("2022", "2031")
