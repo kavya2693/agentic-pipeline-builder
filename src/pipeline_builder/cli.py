@@ -75,6 +75,7 @@ def score(ctx: RunContext, truth_dir: Path) -> dict[str, Any]:
     return {
         "schema": schema,
         "dq": {"agent": agent, "naive_baseline": naive, "agent_without_typo_check": freq_only},
+        "false_alarms_by_rule": evaluate.false_alarms_by_rule(ctx.flags, defects),
     }
 
 
@@ -109,6 +110,8 @@ def write_report(metrics: dict[str, Any], path: Path) -> None:
         lines += ["", "| defect | injected | agent caught | recall |", "|---|---|---|---|"]
         for k, v in metrics["dq"]["agent"]["by_defect"].items():
             lines.append(f"| {k} | {v['injected']:,} | {v['caught']:,} | {v['recall']:.1%} |")
+        lines += ["", "| rule | rows flagged with no injected defect |", "|---|---|"]
+        lines += [f"| {k} | {v:,} |" for k, v in metrics["false_alarms_by_rule"].items()]
     if "dbt" in metrics:
         d = metrics["dbt"]
         lines += [

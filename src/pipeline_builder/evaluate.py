@@ -181,3 +181,11 @@ def score_flags(flags: pd.DataFrame, defects: pd.DataFrame) -> dict[str, Any]:
             for k, v in by_type.iterrows()
         },
     }
+
+
+def false_alarms_by_rule(flags: pd.DataFrame, defects: pd.DataFrame) -> dict[str, int]:
+    """Rows a rule flagged that carry no injected defect, per rule. These are the cost side."""
+    defect_rows = set(zip(defects["table"], defects["row"].astype(int), strict=True))
+    clean = [(t, int(r)) not in defect_rows for t, r in zip(flags["table"], flags["row"], strict=True)]
+    counts = flags.loc[clean].drop_duplicates(["table", "row", "rule_id"])["rule_id"].value_counts()
+    return {str(k): int(v) for k, v in counts.items()}

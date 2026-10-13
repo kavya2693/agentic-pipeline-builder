@@ -1,0 +1,26 @@
+{
+  "model": "llama3.2 (3B, CPU, temperature 0)",
+  "final_state": "DONE",
+  "seconds": 502.9,
+  "columns": 54,
+  "model_leads_used": 28,
+  "model_leads_rejected": 26,
+  "sample": {
+    "orders.order_id": "Integer. Primary key.",
+    "orders.customer_id": "Integer. References customers.customer_id.",
+    "orders.store_id": "String. References stores.store_id.",
+    "orders.ordered_at": "Timestamp. Source formats: %Y-%m-%d %H:%M:%S, %m/%d/%Y %H:%M.",
+    "orders.status": "String. One of: cancelled, delivered, placed, returned, shipped.",
+    "orders.channel": "String. One of: app, store, web.",
+    "orders.order_total": "Decimal.",
+    "orders.discount_code": "String. One of: bf25, freeship, ramadan15, vip20, welcome10. Empty in 80% of source rows.",
+    "orders.is_gift": "Boolean.",
+    "payments.payment_id": "Unique identifier for the payment transaction. String. Primary key.",
+    "payments.order_ref": "Reference number of the associated order. Integer. References orders.order_id.",
+    "payments.paid_at": "Timestamp when the payment was made. Timestamp. Source formats: %Y-%m-%dT%H:%M:%S.",
+    "payments.method": "Payment method used to process the transaction. String. One of: bank_transfer, card, cod, paypal_x, wallet.",
+    "payments.amount": "Amount paid in the specified currency. Decimal.",
+    "payments.currency": "Currency in which the amount was paid. String. One of: aed, sar, usd.",
+    "payments.is_settled": "Indicates whether the payment has been fully settled. Boolean."
+  }
+}

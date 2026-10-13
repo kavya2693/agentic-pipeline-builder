@@ -1,0 +1,431 @@
+{
+  "final_state": "DONE",
+  "as_of": "2026-02-01",
+  "state_log": [
+    {
+      "state": "DISCOVER",
+      "attempt": 1,
+      "event": "ok",
+      "seconds": 38.67,
+      "detail": ""
+    },
+    {
+      "state": "VALIDATE",
+      "attempt": 1,
+      "event": "ok",
+      "seconds": 44.15,
+      "detail": ""
+    },
+    {
+      "state": "BUILD",
+      "attempt": 1,
+      "event": "ok",
+      "seconds": 0.14,
+      "detail": ""
+    },
+    {
+      "state": "LAND",
+      "attempt": 1,
+      "event": "ok",
+      "seconds": 5.93,
+      "detail": ""
+    },
+    {
+      "state": "DBT_BUILD",
+      "attempt": 1,
+      "event": "ok",
+      "seconds": 10.99,
+      "detail": ""
+    },
+    {
+      "state": "DONE",
+      "attempt": 1,
+      "event": "end",
+      "seconds": 0.0,
+      "detail": ""
+    }
+  ],
+  "quarantine": [
+    {
+      "table": "customers",
+      "rows": 60300,
+      "quarantined": 1200,
+      "quarantine_rate": 0.0199,
+      "warned": 0
+    },
+    {
+      "table": "order_items",
+      "rows": 972645,
+      "quarantined": 19452,
+      "quarantine_rate": 0.02,
+      "warned": 1421
+    },
+    {
+      "table": "orders",
+      "rows": 402000,
+      "quarantined": 11507,
+      "quarantine_rate": 0.02862,
+      "warned": 17
+    },
+    {
+      "table": "payments",
+      "rows": 405134,
+      "quarantined": 7409,
+      "quarantine_rate": 0.01829,
+      "warned": 17
+    },
+    {
+      "table": "products",
+      "rows": 4000,
+      "quarantined": 0,
+      "quarantine_rate": 0.0,
+      "warned": 0
+    },
+    {
+      "table": "returns",
+      "rows": 19575,
+      "quarantined": 98,
+      "quarantine_rate": 0.00501,
+      "warned": 2
+    },
+    {
+      "table": "stores",
+      "rows": 120,
+      "quarantined": 0,
+      "quarantine_rate": 0.0,
+      "warned": 0
+    }
+  ],
+  "rules": 136,
+  "descriptions": {
+    "model_leads": 0,
+    "model_rejected": 0
+  },
+  "dbt": {
+    "ok": true,
+    "models": {
+      "success": 31
+    },
+    "tests": {
+      "pass": 91,
+      "warn": 5
+    },
+    "warned_tests": {
+      "relationships_stg_returns_order_id__order_id__ref_stg_orders_": 467,
+      "relationships_stg_orders_customer_id__customer_id__ref_stg_customers_": 6086,
+      "relationships_stg_order_items_order_id__order_id__ref_stg_orders_": 22619,
+      "relationships_stg_payments_order_ref__order_id__ref_stg_orders_": 9416,
+      "relationships_fct_orders_customer_id__customer_id__ref_dim_customer_": 6086
+    },
+    "failed": [],
+    "seconds": 9.3
+  },
+  "sql_vs_pandas": {
+    "customers": {
+      "sql": 1200,
+      "pandas": 1200,
+      "both": 1200,
+      "only_sql": 0,
+      "only_pandas": 0
+    },
+    "order_items": {
+      "sql": 19452,
+      "pandas": 19452,
+      "both": 19452,
+      "only_sql": 0,
+      "only_pandas": 0
+    },
+    "orders": {
+      "sql": 11507,
+      "pandas": 11507,
+      "both": 11507,
+      "only_sql": 0,
+      "only_pandas": 0
+    },
+    "payments": {
+      "sql": 7409,
+      "pandas": 7409,
+      "both": 7409,
+      "only_sql": 0,
+      "only_pandas": 0
+    },
+    "products": {
+      "sql": 0,
+      "pandas": 0,
+      "both": 0,
+      "only_sql": 0,
+      "only_pandas": 0
+    },
+    "returns": {
+      "sql": 98,
+      "pandas": 98,
+      "both": 98,
+      "only_sql": 0,
+      "only_pandas": 0
+    },
+    "stores": {
+      "sql": 0,
+      "pandas": 0,
+      "both": 0,
+      "only_sql": 0,
+      "only_pandas": 0
+    }
+  },
+  "marts": {
+    "dim_customer": 59100,
+    "dim_product": 4000,
+    "dim_store": 120,
+    "fct_order_items": 953193,
+    "fct_orders": 390493,
+    "fct_payments": 397725,
+    "fct_returns": 19477,
+    "agg_orders_daily": 731,
+    "agg_payments_daily": 733,
+    "agg_returns_daily": 758
+  },
+  "generated": {
+    "dbt_files": 39,
+    "dbt_lines": 1340,
+    "dag_lines": 88,
+    "rules": 136
+  },
+  "seconds_raw_to_built": 99.9,
+  "schema": {
+    "types": {
+      "agent": {
+        "correct": 54,
+        "total": 54,
+        "accuracy": 1.0,
+        "wrong": []
+      },
+      "pandas_default": {
+        "correct": 37,
+        "total": 54,
+        "accuracy": 0.6852,
+        "wrong": [
+          "stores.opened_on: string (true date)",
+          "stores.is_online: string (true boolean)",
+          "stores.square_meters: decimal (true integer)",
+          "customers.signup_date: string (true date)",
+          "customers.postal_code: integer (true string)",
+          "customers.marketing_opt_in: string (true boolean)",
+          "customers.birth_year: decimal (true integer)",
+          "products.list_price: string (true decimal)",
+          "products.launched_on: string (true date)",
+          "orders.customer_id: decimal (true integer)",
+          "orders.ordered_at: string (true timestamp)",
+          "orders.order_total: string (true decimal)",
+          "orders.is_gift: string (true boolean)",
+          "order_items.quantity: string (true integer)",
+          "payments.paid_at: string (true timestamp)",
+          "payments.amount: string (true decimal)",
+          "returns.returned_on: string (true date)"
+        ]
+      },
+      "duckdb_sniff": {
+        "correct": 44,
+        "total": 54,
+        "accuracy": 0.8148,
+        "wrong": [
+          "stores.is_online: string (true boolean)",
+          "customers.signup_date: string (true date)",
+          "customers.marketing_opt_in: string (true boolean)",
+          "products.list_price: string (true decimal)",
+          "orders.ordered_at: string (true timestamp)",
+          "orders.order_total: string (true decimal)",
+          "orders.is_gift: string (true boolean)",
+          "order_items.quantity: string (true integer)",
+          "payments.amount: string (true decimal)",
+          "returns.returned_on: string (true date)"
+        ]
+      }
+    },
+    "primary_keys": {
+      "correct": 7,
+      "total": 7
+    },
+    "foreign_keys": {
+      "found": 7,
+      "true": 7,
+      "correct": 7,
+      "precision": 1.0,
+      "recall": 1.0,
+      "missed": [],
+      "spurious": []
+    }
+  },
+  "dq": {
+    "agent": {
+      "injected": 45677,
+      "caught": 40452,
+      "recall": 0.8856,
+      "flagged_rows": 41122,
+      "flagged_defect_rows": 40453,
+      "row_precision": 0.9837,
+      "by_defect": {
+        "duplicate_row": {
+          "injected": 4316,
+          "caught": 4316,
+          "recall": 1.0
+        },
+        "future_date": {
+          "injected": 2300,
+          "caught": 2300,
+          "recall": 1.0
+        },
+        "invalid_enum": {
+          "injected": 4016,
+          "caught": 2546,
+          "recall": 0.634
+        },
+        "malformed_email": {
+          "injected": 300,
+          "caught": 300,
+          "recall": 1.0
+        },
+        "negative_value": {
+          "injected": 6879,
+          "caught": 6879,
+          "recall": 1.0
+        },
+        "null_required": {
+          "injected": 9179,
+          "caught": 9179,
+          "recall": 1.0
+        },
+        "orphan_fk": {
+          "injected": 6961,
+          "caught": 6961,
+          "recall": 1.0
+        },
+        "outlier_value": {
+          "injected": 4863,
+          "caught": 1108,
+          "recall": 0.2278
+        },
+        "type_corruption": {
+          "injected": 6863,
+          "caught": 6863,
+          "recall": 1.0
+        }
+      }
+    },
+    "naive_baseline": {
+      "injected": 45677,
+      "caught": 13495,
+      "recall": 0.2954,
+      "flagged_rows": 934316,
+      "flagged_defect_rows": 31711,
+      "row_precision": 0.0339,
+      "by_defect": {
+        "duplicate_row": {
+          "injected": 4316,
+          "caught": 4316,
+          "recall": 1.0
+        },
+        "future_date": {
+          "injected": 2300,
+          "caught": 0,
+          "recall": 0.0
+        },
+        "invalid_enum": {
+          "injected": 4016,
+          "caught": 0,
+          "recall": 0.0
+        },
+        "malformed_email": {
+          "injected": 300,
+          "caught": 0,
+          "recall": 0.0
+        },
+        "negative_value": {
+          "injected": 6879,
+          "caught": 0,
+          "recall": 0.0
+        },
+        "null_required": {
+          "injected": 9179,
+          "caught": 9179,
+          "recall": 1.0
+        },
+        "orphan_fk": {
+          "injected": 6961,
+          "caught": 0,
+          "recall": 0.0
+        },
+        "outlier_value": {
+          "injected": 4863,
+          "caught": 0,
+          "recall": 0.0
+        },
+        "type_corruption": {
+          "injected": 6863,
+          "caught": 0,
+          "recall": 0.0
+        }
+      }
+    },
+    "agent_without_typo_check": {
+      "injected": 45677,
+      "caught": 38264,
+      "recall": 0.8377,
+      "flagged_rows": 38934,
+      "flagged_defect_rows": 38265,
+      "row_precision": 0.9828,
+      "by_defect": {
+        "duplicate_row": {
+          "injected": 4316,
+          "caught": 4316,
+          "recall": 1.0
+        },
+        "future_date": {
+          "injected": 2300,
+          "caught": 2300,
+          "recall": 1.0
+        },
+        "invalid_enum": {
+          "injected": 4016,
+          "caught": 358,
+          "recall": 0.0891
+        },
+        "malformed_email": {
+          "injected": 300,
+          "caught": 300,
+          "recall": 1.0
+        },
+        "negative_value": {
+          "injected": 6879,
+          "caught": 6879,
+          "recall": 1.0
+        },
+        "null_required": {
+          "injected": 9179,
+          "caught": 9179,
+          "recall": 1.0
+        },
+        "orphan_fk": {
+          "injected": 6961,
+          "caught": 6961,
+          "recall": 1.0
+        },
+        "outlier_value": {
+          "injected": 4863,
+          "caught": 1108,
+          "recall": 0.2278
+        },
+        "type_corruption": {
+          "injected": 6863,
+          "caught": 6863,
+          "recall": 1.0
+        }
+      }
+    }
+  },
+  "false_alarms_by_rule": {
+    "orders__status__in_set": 322,
+    "order_items__quantity__outlier": 311,
+    "orders__order_total__outlier": 17,
+    "payments__amount__outlier": 17,
+    "returns__refund_amount__outlier": 2
+  }
+}

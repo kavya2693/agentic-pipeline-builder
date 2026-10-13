@@ -1,0 +1,184 @@
+{
+  "scale": 0.1,
+  "sweep": {
+    "0.005": {
+      "type_accuracy": 1.0,
+      "types_wrong": [],
+      "primary_keys": "7/7",
+      "fk_recall": 1.0,
+      "fk_spurious": 0,
+      "dq_recall": 0.93,
+      "row_precision": 0.9835,
+      "by_defect": {
+        "duplicate_row": 1.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.6434,
+        "malformed_email": 1.0,
+        "negative_value": 1.0,
+        "null_required": 1.0,
+        "orphan_fk": 1.0,
+        "outlier_value": 0.6371,
+        "type_corruption": 1.0
+      }
+    },
+    "0.02": {
+      "type_accuracy": 0.9815,
+      "types_wrong": [
+        "order_items.quantity: string (true integer)"
+      ],
+      "primary_keys": "4/7",
+      "fk_recall": 0.429,
+      "fk_spurious": 0,
+      "dq_recall": 0.2075,
+      "row_precision": 0.9961,
+      "by_defect": {
+        "duplicate_row": 0.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.0,
+        "malformed_email": 1.0,
+        "negative_value": 0.0,
+        "null_required": 0.0,
+        "orphan_fk": 0.6977,
+        "outlier_value": 0.0021,
+        "type_corruption": 0.2921
+      }
+    },
+    "0.05": {
+      "type_accuracy": 0.963,
+      "types_wrong": [
+        "orders.order_total: string (true decimal)",
+        "order_items.quantity: string (true integer)"
+      ],
+      "primary_keys": "4/7",
+      "fk_recall": 0.429,
+      "fk_spurious": 0,
+      "dq_recall": 0.1634,
+      "row_precision": 0.9991,
+      "by_defect": {
+        "duplicate_row": 0.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.0,
+        "malformed_email": 1.0,
+        "negative_value": 0.0,
+        "null_required": 0.0,
+        "orphan_fk": 0.6977,
+        "outlier_value": 0.0,
+        "type_corruption": 0.0
+      }
+    },
+    "0.1": {
+      "type_accuracy": 0.963,
+      "types_wrong": [
+        "orders.order_total: string (true decimal)",
+        "order_items.quantity: string (true integer)"
+      ],
+      "primary_keys": "4/7",
+      "fk_recall": 0.429,
+      "fk_spurious": 0,
+      "dq_recall": 0.1634,
+      "row_precision": 0.9996,
+      "by_defect": {
+        "duplicate_row": 0.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.0,
+        "malformed_email": 1.0,
+        "negative_value": 0.0,
+        "null_required": 0.0,
+        "orphan_fk": 0.6976,
+        "outlier_value": 0.0,
+        "type_corruption": 0.0
+      }
+    }
+  },
+  "frozen_contract": {
+    "0.005": {
+      "dq_recall": 0.9197,
+      "row_precision": 0.9843,
+      "by_defect": {
+        "duplicate_row": 1.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.7456,
+        "malformed_email": 1.0,
+        "negative_value": 1.0,
+        "null_required": 1.0,
+        "orphan_fk": 1.0,
+        "outlier_value": 0.4557,
+        "type_corruption": 1.0
+      }
+    },
+    "0.02": {
+      "dq_recall": 0.9126,
+      "row_precision": 0.9965,
+      "by_defect": {
+        "duplicate_row": 1.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.7065,
+        "malformed_email": 1.0,
+        "negative_value": 1.0,
+        "null_required": 1.0,
+        "orphan_fk": 1.0,
+        "outlier_value": 0.4214,
+        "type_corruption": 1.0
+      }
+    },
+    "0.05": {
+      "dq_recall": 0.9159,
+      "row_precision": 0.9986,
+      "by_defect": {
+        "duplicate_row": 1.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.7371,
+        "malformed_email": 1.0,
+        "negative_value": 1.0,
+        "null_required": 1.0,
+        "orphan_fk": 1.0,
+        "outlier_value": 0.4268,
+        "type_corruption": 1.0
+      }
+    },
+    "0.1": {
+      "dq_recall": 0.9147,
+      "row_precision": 0.9995,
+      "by_defect": {
+        "duplicate_row": 1.0,
+        "future_date": 1.0,
+        "invalid_enum": 0.7333,
+        "malformed_email": 1.0,
+        "negative_value": 1.0,
+        "null_required": 1.0,
+        "orphan_fk": 1.0,
+        "outlier_value": 0.4189,
+        "type_corruption": 1.0
+      }
+    }
+  },
+  "format_shift": {
+    "type_accuracy": 0.9444,
+    "types_wrong": [
+      "customers.signup_date: string (true date)",
+      "orders.order_total: string (true decimal)",
+      "payments.paid_at: string (true timestamp)"
+    ],
+    "primary_keys": "7/7",
+    "fk_recall": 1.0,
+    "fk_spurious": 0,
+    "dq_recall": 0.8796,
+    "row_precision": 0.9845,
+    "by_defect": {
+      "duplicate_row": 1.0,
+      "future_date": 0.8696,
+      "invalid_enum": 0.6434,
+      "malformed_email": 1.0,
+      "negative_value": 1.0,
+      "null_required": 1.0,
+      "orphan_fk": 1.0,
+      "outlier_value": 0.6371,
+      "type_corruption": 0.708
+    },
+    "changes": [
+      "customers.signup_date -> 15.03.2024",
+      "orders.order_total -> 1.234,50",
+      "payments.paid_at -> +04:00"
+    ]
+  }
+}
