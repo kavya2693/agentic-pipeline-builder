@@ -1,0 +1,480 @@
+tables:
+  customers:
+    name: customers
+    file: customers.csv
+    row_count: 60300
+    columns:
+    - name: customer_id
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.995025
+      is_identifier: true
+      description: ''
+    - name: email
+      logical_type: string
+      formats: []
+      null_rate: 0.004975
+      distinct_ratio: 0.994717
+      is_identifier: false
+      description: ''
+    - name: first_name
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.00073
+      is_identifier: false
+      description: ''
+    - name: last_name
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.000663
+      is_identifier: false
+      description: ''
+    - name: signup_date
+      logical_type: date
+      formats:
+      - '%m/%d/%Y'
+      - '%Y-%m-%d'
+      null_rate: 0.0
+      distinct_ratio: 0.038955
+      is_identifier: false
+      description: ''
+    - name: country
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.0001
+      is_identifier: false
+      description: ''
+    - name: loyalty_tier
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 6.6e-05
+      is_identifier: false
+      description: ''
+    - name: phone
+      logical_type: string
+      formats: []
+      null_rate: 0.349851
+      distinct_ratio: 0.994669
+      is_identifier: false
+      description: ''
+    - name: postal_code
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.749138
+      is_identifier: false
+      description: ''
+    - name: marketing_opt_in
+      logical_type: boolean
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 6.6e-05
+      is_identifier: false
+      description: ''
+    - name: birth_year
+      logical_type: integer
+      formats: []
+      null_rate: 0.222504
+      distinct_ratio: 0.001216
+      is_identifier: false
+      description: ''
+    primary_key:
+    - customer_id
+  order_items:
+    name: order_items
+    file: order_items.parquet
+    row_count: 972645
+    columns:
+    - name: order_id
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.41125
+      is_identifier: true
+      description: ''
+    - name: line_number
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 8.0e-06
+      is_identifier: false
+      description: ''
+    - name: sku
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.008996
+      is_identifier: true
+      description: ''
+    - name: quantity
+      logical_type: integer
+      formats: []
+      null_rate: 0.005
+      distinct_ratio: 0.000193
+      is_identifier: false
+      description: ''
+    - name: unit_price
+      logical_type: decimal
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.126789
+      is_identifier: false
+      description: ''
+    - name: discount_pct
+      logical_type: decimal
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 5.0e-06
+      is_identifier: false
+      description: ''
+    primary_key:
+    - order_id
+    - line_number
+  orders:
+    name: orders
+    file: orders.csv
+    row_count: 402000
+    columns:
+    - name: order_id
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.995025
+      is_identifier: true
+      description: ''
+    - name: customer_id
+      logical_type: integer
+      formats: []
+      null_rate: 0.004975
+      distinct_ratio: 0.13671
+      is_identifier: true
+      description: ''
+    - name: store_id
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.000299
+      is_identifier: true
+      description: ''
+    - name: ordered_at
+      logical_type: timestamp
+      formats:
+      - '%Y-%m-%d %H:%M:%S'
+      - '%m/%d/%Y %H:%M'
+      null_rate: 0.0
+      distinct_ratio: 0.97845
+      is_identifier: false
+      description: ''
+    - name: status
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 2.7e-05
+      is_identifier: false
+      description: ''
+    - name: channel
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 7.0e-06
+      is_identifier: false
+      description: ''
+    - name: order_total
+      logical_type: decimal
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.593129
+      is_identifier: false
+      description: ''
+    - name: discount_code
+      logical_type: string
+      formats: []
+      null_rate: 0.799968
+      distinct_ratio: 6.2e-05
+      is_identifier: false
+      description: ''
+    - name: is_gift
+      logical_type: boolean
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 5.0e-06
+      is_identifier: false
+      description: ''
+    primary_key:
+    - order_id
+  payments:
+    name: payments
+    file: payments.csv
+    row_count: 405134
+    columns:
+    - name: payment_id
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.995024
+      is_identifier: true
+      description: ''
+    - name: order_ref
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.938877
+      is_identifier: true
+      description: ''
+    - name: paid_at
+      logical_type: timestamp
+      formats:
+      - '%Y-%m-%dT%H:%M:%S'
+      null_rate: 0.0
+      distinct_ratio: 0.991425
+      is_identifier: false
+      description: ''
+    - name: method
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.7e-05
+      is_identifier: false
+      description: ''
+    - name: amount
+      logical_type: decimal
+      formats: []
+      null_rate: 0.004976
+      distinct_ratio: 0.576395
+      is_identifier: false
+      description: ''
+    - name: currency
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 7.0e-06
+      is_identifier: false
+      description: ''
+    - name: is_settled
+      logical_type: boolean
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 5.0e-06
+      is_identifier: false
+      description: ''
+    primary_key:
+    - payment_id
+  products:
+    name: products
+    file: products.json
+    row_count: 4000
+    columns:
+    - name: sku
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.0
+      is_identifier: true
+      description: ''
+    - name: product_name
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.0
+      is_identifier: false
+      description: ''
+    - name: category
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.002
+      is_identifier: false
+      description: ''
+    - name: list_price
+      logical_type: decimal
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.934
+      is_identifier: false
+      description: ''
+    - name: launched_on
+      logical_type: date
+      formats:
+      - '%Y-%m-%d'
+      null_rate: 0.0
+      distinct_ratio: 0.467
+      is_identifier: false
+      description: ''
+    - name: is_active
+      logical_type: boolean
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.0005
+      is_identifier: false
+      description: ''
+    - name: weight_kg
+      logical_type: decimal
+      formats: []
+      null_rate: 0.144
+      distinct_ratio: 0.61361
+      is_identifier: false
+      description: ''
+    - name: attributes_brand
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.0025
+      is_identifier: false
+      description: ''
+    - name: attributes_color
+      logical_type: string
+      formats: []
+      null_rate: 0.13075
+      distinct_ratio: 0.002013
+      is_identifier: false
+      description: ''
+    primary_key:
+    - sku
+  returns:
+    name: returns
+    file: returns.jsonl
+    row_count: 19575
+    columns:
+    - name: return_id
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.0
+      is_identifier: true
+      description: ''
+    - name: order_id
+      logical_type: integer
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.0
+      is_identifier: true
+      description: ''
+    - name: sku
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.174202
+      is_identifier: true
+      description: ''
+    - name: returned_on
+      logical_type: date
+      formats:
+      - '%d %b %Y'
+      null_rate: 0.0
+      distinct_ratio: 0.038723
+      is_identifier: false
+      description: ''
+    - name: reason
+      logical_type: string
+      formats: []
+      null_rate: 0.103704
+      distinct_ratio: 0.000285
+      is_identifier: false
+      description: ''
+    - name: refund_amount
+      logical_type: decimal
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.802912
+      is_identifier: false
+      description: ''
+    primary_key:
+    - return_id
+  stores:
+    name: stores
+    file: stores.csv
+    row_count: 120
+    columns:
+    - name: store_id
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.0
+      is_identifier: true
+      description: ''
+    - name: store_name
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 1.0
+      is_identifier: false
+      description: ''
+    - name: region
+      logical_type: string
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.05
+      is_identifier: false
+      description: ''
+    - name: opened_on
+      logical_type: date
+      formats:
+      - '%Y-%m-%d'
+      null_rate: 0.0
+      distinct_ratio: 0.975
+      is_identifier: false
+      description: ''
+    - name: is_online
+      logical_type: boolean
+      formats: []
+      null_rate: 0.0
+      distinct_ratio: 0.016667
+      is_identifier: false
+      description: ''
+    - name: square_meters
+      logical_type: integer
+      formats: []
+      null_rate: 0.025
+      distinct_ratio: 0.991453
+      is_identifier: false
+      description: ''
+    primary_key:
+    - store_id
+foreign_keys:
+- table: order_items
+  column: order_id
+  ref_table: orders
+  ref_column: order_id
+  containment: 1.0
+  named_match: true
+- table: order_items
+  column: sku
+  ref_table: products
+  ref_column: sku
+  containment: 0.995
+  named_match: true
+- table: orders
+  column: customer_id
+  ref_table: customers
+  ref_column: customer_id
+  containment: 0.995
+  named_match: true
+- table: orders
+  column: store_id
+  ref_table: stores
+  ref_column: store_id
+  containment: 1.0
+  named_match: true
+- table: payments
+  column: order_ref
+  ref_table: orders
+  ref_column: order_id
+  containment: 1.0
+  named_match: true
+- table: returns
+  column: order_id
+  ref_table: orders
+  ref_column: order_id
+  containment: 0.995
+  named_match: true
+- table: returns
+  column: sku
+  ref_table: products
+  ref_column: sku
+  containment: 1.0
+  named_match: true

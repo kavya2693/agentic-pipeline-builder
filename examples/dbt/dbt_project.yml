@@ -1,0 +1,13 @@
+name: raw_drop_pipeline
+version: 1.0.0
+profile: raw_drop_pipeline
+model-paths:
+- models
+macro-paths:
+- macros
+models:
+  raw_drop_pipeline:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

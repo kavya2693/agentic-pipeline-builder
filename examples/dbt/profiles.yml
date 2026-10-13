@@ -1,0 +1,8 @@
+raw_drop_pipeline:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: '{{ env_var(''WAREHOUSE_PATH'', ''generated/warehouse.duckdb'')
+        }}'
+      threads: 4

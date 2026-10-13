@@ -1,0 +1,106 @@
+version: 2
+models:
+- name: dim_customer
+  description: '60,300 source rows from customers.csv. Key: customer_id.'
+  columns:
+  - name: customer_id
+    data_tests:
+    - unique
+    - not_null
+- name: dim_product
+  description: '4,000 source rows from products.json. Key: sku.'
+  columns:
+  - name: sku
+    data_tests:
+    - unique
+    - not_null
+- name: dim_store
+  description: '120 source rows from stores.csv. Key: store_id.'
+  columns:
+  - name: store_id
+    data_tests:
+    - unique
+    - not_null
+- name: fct_order_items
+  description: '972,645 source rows from order_items.parquet. Key: order_id, line_number. Points to orders, products.'
+  columns:
+  - name: sku
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_product')
+          field: sku
+        config:
+          severity: warn
+  data_tests:
+  - unique_combination:
+      arguments:
+        combination:
+        - order_id
+        - line_number
+- name: fct_orders
+  description: '402,000 source rows from orders.csv. Key: order_id. Points to customers, stores.'
+  columns:
+  - name: order_id
+    data_tests:
+    - unique
+    - not_null
+  - name: customer_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_customer')
+          field: customer_id
+        config:
+          severity: warn
+  - name: store_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_store')
+          field: store_id
+        config:
+          severity: warn
+- name: fct_payments
+  description: '405,134 source rows from payments.csv. Key: payment_id. Points to orders.'
+  columns:
+  - name: payment_id
+    data_tests:
+    - unique
+    - not_null
+- name: fct_returns
+  description: '19,575 source rows from returns.jsonl. Key: return_id. Points to orders, products.'
+  columns:
+  - name: return_id
+    data_tests:
+    - unique
+    - not_null
+  - name: sku
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_product')
+          field: sku
+        config:
+          severity: warn
+- name: agg_orders_daily
+  description: Daily totals of orders by ordered_at.
+  columns:
+  - name: day
+    data_tests:
+    - unique
+    - not_null
+- name: agg_payments_daily
+  description: Daily totals of payments by paid_at.
+  columns:
+  - name: day
+    data_tests:
+    - unique
+    - not_null
+- name: agg_returns_daily
+  description: Daily totals of returns by returned_on.
+  columns:
+  - name: day
+    data_tests:
+    - unique
+    - not_null

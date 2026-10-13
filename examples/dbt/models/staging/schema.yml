@@ -1,0 +1,421 @@
+version: 2
+models:
+- name: stg_customers
+  description: '60,300 source rows from customers.csv. Key: customer_id.'
+  columns:
+  - name: customer_id
+    description: Integer. Primary key.
+    data_tests:
+    - unique
+    - not_null
+  - name: email
+    description: String.
+    data_tests:
+    - not_null
+  - name: first_name
+    description: String.
+    data_tests:
+    - not_null
+  - name: last_name
+    description: String.
+    data_tests:
+    - not_null
+  - name: signup_date
+    description: 'Date. Source formats: %m/%d/%Y, %Y-%m-%d.'
+    data_tests:
+    - not_null
+  - name: country
+    description: 'String. One of: ae, bh, kw, om, qa, sa. Standardised to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - ae
+          - bh
+          - kw
+          - om
+          - qa
+          - sa
+  - name: loyalty_tier
+    description: 'String. One of: bronze, gold, platinum, silver. Standardised to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - bronze
+          - gold
+          - platinum
+          - silver
+  - name: phone
+    description: String. Empty in 35% of source rows.
+  - name: postal_code
+    description: String.
+    data_tests:
+    - not_null
+  - name: marketing_opt_in
+    description: Boolean.
+    data_tests:
+    - not_null
+  - name: birth_year
+    description: Integer. Empty in 22% of source rows.
+- name: stg_customers__rejected
+  description: Quarantined rows of customers.csv and the rule ids they failed.
+- name: stg_customers__checked
+  description: Every row of customers.csv, parsed, with failed and warned rule ids.
+- name: stg_order_items
+  description: '972,645 source rows from order_items.parquet. Key: order_id, line_number. Points to orders, products.'
+  columns:
+  - name: order_id
+    description: Integer. Part of the key (order_id, line_number). References orders.order_id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_orders')
+          field: order_id
+        config:
+          severity: warn
+  - name: line_number
+    description: Integer. Part of the key (order_id, line_number).
+    data_tests:
+    - not_null
+  - name: sku
+    description: String. References products.sku.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_products')
+          field: sku
+        config:
+          severity: warn
+  - name: quantity
+    description: Integer.
+    data_tests:
+    - not_null
+  - name: unit_price
+    description: Decimal.
+    data_tests:
+    - not_null
+  - name: discount_pct
+    description: Decimal.
+    data_tests:
+    - not_null
+  data_tests:
+  - unique_combination:
+      arguments:
+        combination:
+        - order_id
+        - line_number
+- name: stg_order_items__rejected
+  description: Quarantined rows of order_items.parquet and the rule ids they failed.
+- name: stg_order_items__checked
+  description: Every row of order_items.parquet, parsed, with failed and warned rule ids.
+- name: stg_orders
+  description: '402,000 source rows from orders.csv. Key: order_id. Points to customers, stores.'
+  columns:
+  - name: order_id
+    description: Integer. Primary key.
+    data_tests:
+    - unique
+    - not_null
+  - name: customer_id
+    description: Integer. References customers.customer_id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_customers')
+          field: customer_id
+        config:
+          severity: warn
+  - name: store_id
+    description: String. References stores.store_id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_stores')
+          field: store_id
+        config:
+          severity: warn
+  - name: ordered_at
+    description: 'Timestamp. Source formats: %Y-%m-%d %H:%M:%S, %m/%d/%Y %H:%M.'
+    data_tests:
+    - not_null
+  - name: status
+    description: 'String. One of: cancel, cancelled, delivered, pending_x, placed, returned, shipped. Standardised
+      to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - cancel
+          - cancelled
+          - delivered
+          - pending_x
+          - placed
+          - returned
+          - shipped
+  - name: channel
+    description: 'String. One of: app, store, web. Standardised to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - app
+          - store
+          - web
+  - name: order_total
+    description: Decimal.
+    data_tests:
+    - not_null
+  - name: discount_code
+    description: 'String. One of: bf25, freeship, ramadan15, vip20, welcome10. Empty in 80% of source rows. Standardised
+      to lower case.'
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - bf25
+          - freeship
+          - ramadan15
+          - vip20
+          - welcome10
+  - name: is_gift
+    description: Boolean.
+    data_tests:
+    - not_null
+- name: stg_orders__rejected
+  description: Quarantined rows of orders.csv and the rule ids they failed.
+- name: stg_orders__checked
+  description: Every row of orders.csv, parsed, with failed and warned rule ids.
+- name: stg_payments
+  description: '405,134 source rows from payments.csv. Key: payment_id. Points to orders.'
+  columns:
+  - name: payment_id
+    description: String. Primary key.
+    data_tests:
+    - unique
+    - not_null
+  - name: order_ref
+    description: Integer. References orders.order_id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_orders')
+          field: order_id
+        config:
+          severity: warn
+  - name: paid_at
+    description: 'Timestamp. Source formats: %Y-%m-%dT%H:%M:%S.'
+    data_tests:
+    - not_null
+  - name: method
+    description: 'String. One of: bank_transfer, card, cod, paypal_x, wallet. Standardised to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - bank_transfer
+          - card
+          - cod
+          - paypal_x
+          - wallet
+  - name: amount
+    description: Decimal.
+    data_tests:
+    - not_null
+  - name: currency
+    description: 'String. One of: aed, sar, usd. Standardised to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - aed
+          - sar
+          - usd
+  - name: is_settled
+    description: Boolean.
+    data_tests:
+    - not_null
+- name: stg_payments__rejected
+  description: Quarantined rows of payments.csv and the rule ids they failed.
+- name: stg_payments__checked
+  description: Every row of payments.csv, parsed, with failed and warned rule ids.
+- name: stg_products
+  description: '4,000 source rows from products.json. Key: sku.'
+  columns:
+  - name: sku
+    description: String. Primary key.
+    data_tests:
+    - unique
+    - not_null
+  - name: product_name
+    description: String.
+    data_tests:
+    - not_null
+  - name: category
+    description: 'String. One of: apparel, beauty, electronics, grocery, home, household, sports, toys. Standardised
+      to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - apparel
+          - beauty
+          - electronics
+          - grocery
+          - home
+          - household
+          - sports
+          - toys
+  - name: list_price
+    description: Decimal.
+    data_tests:
+    - not_null
+  - name: launched_on
+    description: 'Date. Source formats: %Y-%m-%d.'
+    data_tests:
+    - not_null
+  - name: is_active
+    description: Boolean.
+    data_tests:
+    - not_null
+  - name: weight_kg
+    description: Decimal. Empty in 14% of source rows.
+  - name: attributes_brand
+    description: 'String. One of: aster, borealis, cedar, dune, ember, falcon, garnet, harbor, iris, juniper. Standardised
+      to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - aster
+          - borealis
+          - cedar
+          - dune
+          - ember
+          - falcon
+          - garnet
+          - harbor
+          - iris
+          - juniper
+  - name: attributes_color
+    description: 'String. One of: beige, black, blue, green, grey, red, white. Empty in 13% of source rows. Standardised
+      to lower case.'
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - beige
+          - black
+          - blue
+          - green
+          - grey
+          - red
+          - white
+- name: stg_products__rejected
+  description: Quarantined rows of products.json and the rule ids they failed.
+- name: stg_products__checked
+  description: Every row of products.json, parsed, with failed and warned rule ids.
+- name: stg_returns
+  description: '19,575 source rows from returns.jsonl. Key: return_id. Points to orders, products.'
+  columns:
+  - name: return_id
+    description: Integer. Primary key.
+    data_tests:
+    - unique
+    - not_null
+  - name: order_id
+    description: Integer. References orders.order_id.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_orders')
+          field: order_id
+        config:
+          severity: warn
+  - name: sku
+    description: String. References products.sku.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('stg_products')
+          field: sku
+        config:
+          severity: warn
+  - name: returned_on
+    description: 'Date. Source formats: %d %b %Y.'
+    data_tests:
+    - not_null
+  - name: reason
+    description: 'String. One of: changed_mind, damaged, late_delivery, not_as_described, wrong_size. Empty in 10%
+      of source rows. Standardised to lower case.'
+    data_tests:
+    - accepted_values:
+        arguments:
+          values:
+          - changed_mind
+          - damaged
+          - late_delivery
+          - not_as_described
+          - wrong_size
+  - name: refund_amount
+    description: Decimal.
+    data_tests:
+    - not_null
+- name: stg_returns__rejected
+  description: Quarantined rows of returns.jsonl and the rule ids they failed.
+- name: stg_returns__checked
+  description: Every row of returns.jsonl, parsed, with failed and warned rule ids.
+- name: stg_stores
+  description: '120 source rows from stores.csv. Key: store_id.'
+  columns:
+  - name: store_id
+    description: String. Primary key.
+    data_tests:
+    - unique
+    - not_null
+  - name: store_name
+    description: String.
+    data_tests:
+    - not_null
+  - name: region
+    description: 'String. One of: central, east, north, online, south, west. Standardised to lower case.'
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - central
+          - east
+          - north
+          - online
+          - south
+          - west
+  - name: opened_on
+    description: 'Date. Source formats: %Y-%m-%d.'
+    data_tests:
+    - not_null
+  - name: is_online
+    description: Boolean.
+    data_tests:
+    - not_null
+  - name: square_meters
+    description: Integer. Empty in 2% of source rows.
+- name: stg_stores__rejected
+  description: Quarantined rows of stores.csv and the rule ids they failed.
+- name: stg_stores__checked
+  description: Every row of stores.csv, parsed, with failed and warned rule ids.

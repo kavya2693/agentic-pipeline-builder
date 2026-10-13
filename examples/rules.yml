@@ -1,0 +1,1268 @@
+rules:
+- id: customers__pk__unique
+  table: customers
+  expectation: expect_column_values_to_be_unique
+  columns:
+  - customer_id
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: customers__customer_id__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - customer_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__customer_id__type
+  table: customers
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - customer_id
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: customers__email__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - email
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.50% (required at <= 1%)
+- id: customers__email__pattern
+  table: customers
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - email
+  kwargs:
+    regex: ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$
+  severity: block
+  evidence: email address
+- id: customers__first_name__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - first_name
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__last_name__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - last_name
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__signup_date__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - signup_date
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__signup_date__type
+  table: customers
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - signup_date
+  kwargs:
+    type: date
+    formats:
+    - '%m/%d/%Y'
+    - '%Y-%m-%d'
+  severity: block
+  evidence: date inferred
+- id: customers__signup_date__window
+  table: customers
+  expectation: expect_column_values_to_be_between
+  columns:
+  - signup_date
+  kwargs:
+    min_value: '1990-01-01'
+    max_value: '2026-02-01'
+  severity: block
+  evidence: dates must fall between 1990-01-01 and the run date 2026-02-01
+- id: customers__country__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - country
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__country__in_set
+  table: customers
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - country
+  kwargs:
+    value_set:
+    - ae
+    - bh
+    - kw
+    - om
+    - qa
+    - sa
+  severity: block
+  evidence: 6 values cover 100.00%; rarer values excluded
+- id: customers__loyalty_tier__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - loyalty_tier
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__loyalty_tier__in_set
+  table: customers
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - loyalty_tier
+  kwargs:
+    value_set:
+    - bronze
+    - gold
+    - platinum
+    - silver
+  severity: block
+  evidence: 4 values cover 100.00%; rarer values excluded
+- id: customers__phone__pattern
+  table: customers
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - phone
+  kwargs:
+    regex: ^\+\d{3}\ \d{2}\ \d{3}\ \d{4}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: customers__postal_code__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - postal_code
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__postal_code__pattern
+  table: customers
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - postal_code
+  kwargs:
+    regex: ^\d{5}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: customers__marketing_opt_in__not_null
+  table: customers
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - marketing_opt_in
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: customers__marketing_opt_in__type
+  table: customers
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - marketing_opt_in
+  kwargs:
+    type: boolean
+  severity: block
+  evidence: boolean inferred
+- id: customers__birth_year__type
+  table: customers
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - birth_year
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: customers__birth_year__non_negative
+  table: customers
+  expectation: expect_column_values_to_be_between
+  columns:
+  - birth_year
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: customers__birth_year__outlier
+  table: customers
+  expectation: expect_column_values_to_be_between
+  columns:
+  - birth_year
+  kwargs:
+    max_value: 20060.0
+  severity: warn
+  evidence: p99 2006 x 10
+- id: order_items__pk__unique
+  table: order_items
+  expectation: expect_compound_columns_to_be_unique
+  columns:
+  - order_id
+  - line_number
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: order_items__order_id__not_null
+  table: order_items
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - order_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: order_items__order_id__type
+  table: order_items
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - order_id
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: order_items__line_number__not_null
+  table: order_items
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - line_number
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: order_items__line_number__type
+  table: order_items
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - line_number
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: order_items__sku__not_null
+  table: order_items
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - sku
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: order_items__sku__pattern
+  table: order_items
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - sku
+  kwargs:
+    regex: ^[A-Z]{3}\-\d{6}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: order_items__quantity__not_null
+  table: order_items
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - quantity
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.50% (required at <= 1%)
+- id: order_items__quantity__type
+  table: order_items
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - quantity
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: order_items__quantity__non_negative
+  table: order_items
+  expectation: expect_column_values_to_be_between
+  columns:
+  - quantity
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 99.49% of values >= 0
+- id: order_items__quantity__outlier
+  table: order_items
+  expectation: expect_column_values_to_be_between
+  columns:
+  - quantity
+  kwargs:
+    max_value: 60.0
+  severity: warn
+  evidence: p99 6 x 10
+- id: order_items__unit_price__not_null
+  table: order_items
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - unit_price
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: order_items__unit_price__type
+  table: order_items
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - unit_price
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: order_items__unit_price__non_negative
+  table: order_items
+  expectation: expect_column_values_to_be_between
+  columns:
+  - unit_price
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: order_items__unit_price__outlier
+  table: order_items
+  expectation: expect_column_values_to_be_between
+  columns:
+  - unit_price
+  kwargs:
+    max_value: 27672.612
+  severity: warn
+  evidence: p99 2767.26 x 10
+- id: order_items__discount_pct__not_null
+  table: order_items
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - discount_pct
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: order_items__discount_pct__type
+  table: order_items
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - discount_pct
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: order_items__discount_pct__non_negative
+  table: order_items
+  expectation: expect_column_values_to_be_between
+  columns:
+  - discount_pct
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: order_items__discount_pct__outlier
+  table: order_items
+  expectation: expect_column_values_to_be_between
+  columns:
+  - discount_pct
+  kwargs:
+    max_value: 2.5
+  severity: warn
+  evidence: p99 0.25 x 10
+- id: orders__pk__unique
+  table: orders
+  expectation: expect_column_values_to_be_unique
+  columns:
+  - order_id
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: orders__order_id__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - order_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__order_id__type
+  table: orders
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - order_id
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: orders__customer_id__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - customer_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.50% (required at <= 1%)
+- id: orders__customer_id__type
+  table: orders
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - customer_id
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: orders__store_id__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - store_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__store_id__pattern
+  table: orders
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - store_id
+  kwargs:
+    regex: ^[A-Z]{2}\-\d{4}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: orders__ordered_at__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - ordered_at
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__ordered_at__type
+  table: orders
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - ordered_at
+  kwargs:
+    type: timestamp
+    formats:
+    - '%Y-%m-%d %H:%M:%S'
+    - '%m/%d/%Y %H:%M'
+  severity: block
+  evidence: timestamp inferred
+- id: orders__ordered_at__window
+  table: orders
+  expectation: expect_column_values_to_be_between
+  columns:
+  - ordered_at
+  kwargs:
+    min_value: '1990-01-01'
+    max_value: '2026-02-01'
+  severity: block
+  evidence: dates must fall between 1990-01-01 and the run date 2026-02-01
+- id: orders__status__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - status
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__status__in_set
+  table: orders
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - status
+  kwargs:
+    value_set:
+    - cancel
+    - cancelled
+    - delivered
+    - pending_x
+    - placed
+    - returned
+    - shipped
+  severity: block
+  evidence: 7 values cover 99.62%; rarer values excluded
+- id: orders__channel__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - channel
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__channel__in_set
+  table: orders
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - channel
+  kwargs:
+    value_set:
+    - app
+    - store
+    - web
+  severity: block
+  evidence: 3 values cover 100.00%; rarer values excluded
+- id: orders__order_total__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - order_total
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__order_total__type
+  table: orders
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - order_total
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: orders__order_total__non_negative
+  table: orders
+  expectation: expect_column_values_to_be_between
+  columns:
+  - order_total
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: orders__order_total__outlier
+  table: orders
+  expectation: expect_column_values_to_be_between
+  columns:
+  - order_total
+  kwargs:
+    max_value: 124461.693
+  severity: warn
+  evidence: p99 12446.2 x 10
+- id: orders__discount_code__in_set
+  table: orders
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - discount_code
+  kwargs:
+    value_set:
+    - bf25
+    - freeship
+    - ramadan15
+    - vip20
+    - welcome10
+  severity: block
+  evidence: 5 values cover 100.00%; rarer values excluded
+- id: orders__is_gift__not_null
+  table: orders
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - is_gift
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: orders__is_gift__type
+  table: orders
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - is_gift
+  kwargs:
+    type: boolean
+  severity: block
+  evidence: boolean inferred
+- id: payments__pk__unique
+  table: payments
+  expectation: expect_column_values_to_be_unique
+  columns:
+  - payment_id
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: payments__payment_id__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - payment_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: payments__order_ref__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - order_ref
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: payments__order_ref__type
+  table: payments
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - order_ref
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: payments__paid_at__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - paid_at
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: payments__paid_at__type
+  table: payments
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - paid_at
+  kwargs:
+    type: timestamp
+    formats:
+    - '%Y-%m-%dT%H:%M:%S'
+  severity: block
+  evidence: timestamp inferred
+- id: payments__paid_at__window
+  table: payments
+  expectation: expect_column_values_to_be_between
+  columns:
+  - paid_at
+  kwargs:
+    min_value: '1990-01-01'
+    max_value: '2026-02-01'
+  severity: block
+  evidence: dates must fall between 1990-01-01 and the run date 2026-02-01
+- id: payments__method__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - method
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: payments__method__in_set
+  table: payments
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - method
+  kwargs:
+    value_set:
+    - bank_transfer
+    - card
+    - cod
+    - paypal_x
+    - wallet
+  severity: block
+  evidence: 5 values cover 99.66%; rarer values excluded
+- id: payments__amount__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - amount
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.50% (required at <= 1%)
+- id: payments__amount__type
+  table: payments
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - amount
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: payments__amount__non_negative
+  table: payments
+  expectation: expect_column_values_to_be_between
+  columns:
+  - amount
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 99.50% of values >= 0
+- id: payments__amount__outlier
+  table: payments
+  expectation: expect_column_values_to_be_between
+  columns:
+  - amount
+  kwargs:
+    max_value: 118492.424
+  severity: warn
+  evidence: p99 11849.2 x 10
+- id: payments__currency__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - currency
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: payments__currency__in_set
+  table: payments
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - currency
+  kwargs:
+    value_set:
+    - aed
+    - sar
+    - usd
+  severity: block
+  evidence: 3 values cover 100.00%; rarer values excluded
+- id: payments__is_settled__not_null
+  table: payments
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - is_settled
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: payments__is_settled__type
+  table: payments
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - is_settled
+  kwargs:
+    type: boolean
+  severity: block
+  evidence: boolean inferred
+- id: products__pk__unique
+  table: products
+  expectation: expect_column_values_to_be_unique
+  columns:
+  - sku
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: products__sku__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - sku
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__sku__pattern
+  table: products
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - sku
+  kwargs:
+    regex: ^[A-Z]{3}\-\d{6}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: products__product_name__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - product_name
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__category__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - category
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__category__in_set
+  table: products
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - category
+  kwargs:
+    value_set:
+    - apparel
+    - beauty
+    - electronics
+    - grocery
+    - home
+    - household
+    - sports
+    - toys
+  severity: block
+  evidence: 8 values cover 100.00%; rarer values excluded
+- id: products__list_price__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - list_price
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__list_price__type
+  table: products
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - list_price
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: products__list_price__non_negative
+  table: products
+  expectation: expect_column_values_to_be_between
+  columns:
+  - list_price
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: products__list_price__outlier
+  table: products
+  expectation: expect_column_values_to_be_between
+  columns:
+  - list_price
+  kwargs:
+    max_value: 23634.019
+  severity: warn
+  evidence: p99 2363.4 x 10
+- id: products__launched_on__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - launched_on
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__launched_on__type
+  table: products
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - launched_on
+  kwargs:
+    type: date
+    formats:
+    - '%Y-%m-%d'
+  severity: block
+  evidence: date inferred
+- id: products__launched_on__window
+  table: products
+  expectation: expect_column_values_to_be_between
+  columns:
+  - launched_on
+  kwargs:
+    min_value: '1990-01-01'
+    max_value: '2026-02-01'
+  severity: block
+  evidence: dates must fall between 1990-01-01 and the run date 2026-02-01
+- id: products__is_active__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - is_active
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__is_active__type
+  table: products
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - is_active
+  kwargs:
+    type: boolean
+  severity: block
+  evidence: boolean inferred
+- id: products__weight_kg__type
+  table: products
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - weight_kg
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: products__weight_kg__non_negative
+  table: products
+  expectation: expect_column_values_to_be_between
+  columns:
+  - weight_kg
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: products__weight_kg__outlier
+  table: products
+  expectation: expect_column_values_to_be_between
+  columns:
+  - weight_kg
+  kwargs:
+    max_value: 103.7345
+  severity: warn
+  evidence: p99 10.3734 x 10
+- id: products__attributes_brand__not_null
+  table: products
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - attributes_brand
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: products__attributes_brand__in_set
+  table: products
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - attributes_brand
+  kwargs:
+    value_set:
+    - aster
+    - borealis
+    - cedar
+    - dune
+    - ember
+    - falcon
+    - garnet
+    - harbor
+    - iris
+    - juniper
+  severity: block
+  evidence: 10 values cover 100.00%; rarer values excluded
+- id: products__attributes_color__in_set
+  table: products
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - attributes_color
+  kwargs:
+    value_set:
+    - beige
+    - black
+    - blue
+    - green
+    - grey
+    - red
+    - white
+  severity: block
+  evidence: 7 values cover 100.00%; rarer values excluded
+- id: returns__pk__unique
+  table: returns
+  expectation: expect_column_values_to_be_unique
+  columns:
+  - return_id
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: returns__return_id__not_null
+  table: returns
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - return_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: returns__return_id__type
+  table: returns
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - return_id
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: returns__order_id__not_null
+  table: returns
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - order_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: returns__order_id__type
+  table: returns
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - order_id
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: returns__sku__not_null
+  table: returns
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - sku
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: returns__sku__pattern
+  table: returns
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - sku
+  kwargs:
+    regex: ^[A-Z]{3}\-\d{6}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: returns__returned_on__not_null
+  table: returns
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - returned_on
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: returns__returned_on__type
+  table: returns
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - returned_on
+  kwargs:
+    type: date
+    formats:
+    - '%d %b %Y'
+  severity: block
+  evidence: date inferred
+- id: returns__returned_on__window
+  table: returns
+  expectation: expect_column_values_to_be_between
+  columns:
+  - returned_on
+  kwargs:
+    min_value: '1990-01-01'
+    max_value: '2026-02-01'
+  severity: block
+  evidence: dates must fall between 1990-01-01 and the run date 2026-02-01
+- id: returns__reason__in_set
+  table: returns
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - reason
+  kwargs:
+    value_set:
+    - changed_mind
+    - damaged
+    - late_delivery
+    - not_as_described
+    - wrong_size
+  severity: block
+  evidence: 5 values cover 100.00%; rarer values excluded
+- id: returns__refund_amount__not_null
+  table: returns
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - refund_amount
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: returns__refund_amount__type
+  table: returns
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - refund_amount
+  kwargs:
+    type: decimal
+  severity: block
+  evidence: decimal inferred
+- id: returns__refund_amount__non_negative
+  table: returns
+  expectation: expect_column_values_to_be_between
+  columns:
+  - refund_amount
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: returns__refund_amount__outlier
+  table: returns
+  expectation: expect_column_values_to_be_between
+  columns:
+  - refund_amount
+  kwargs:
+    max_value: 74397.81
+  severity: warn
+  evidence: p99 7439.78 x 10
+- id: stores__pk__unique
+  table: stores
+  expectation: expect_column_values_to_be_unique
+  columns:
+  - store_id
+  kwargs: {}
+  severity: block
+  evidence: inferred primary key
+- id: stores__store_id__not_null
+  table: stores
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - store_id
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: stores__store_id__pattern
+  table: stores
+  expectation: expect_column_values_to_match_regex
+  columns:
+  - store_id
+  kwargs:
+    regex: ^[A-Z]{2}\-\d{4}$
+  severity: block
+  evidence: one shape covers 100.00%
+- id: stores__store_name__not_null
+  table: stores
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - store_name
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: stores__region__not_null
+  table: stores
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - region
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: stores__region__in_set
+  table: stores
+  expectation: expect_column_values_to_be_in_set
+  columns:
+  - region
+  kwargs:
+    value_set:
+    - central
+    - east
+    - north
+    - online
+    - south
+    - west
+  severity: block
+  evidence: 6 values cover 100.00%; rarer values excluded
+- id: stores__opened_on__not_null
+  table: stores
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - opened_on
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: stores__opened_on__type
+  table: stores
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - opened_on
+  kwargs:
+    type: date
+    formats:
+    - '%Y-%m-%d'
+  severity: block
+  evidence: date inferred
+- id: stores__opened_on__window
+  table: stores
+  expectation: expect_column_values_to_be_between
+  columns:
+  - opened_on
+  kwargs:
+    min_value: '1990-01-01'
+    max_value: '2026-02-01'
+  severity: block
+  evidence: dates must fall between 1990-01-01 and the run date 2026-02-01
+- id: stores__is_online__not_null
+  table: stores
+  expectation: expect_column_values_to_not_be_null
+  columns:
+  - is_online
+  kwargs: {}
+  severity: block
+  evidence: null rate 0.00% (required at <= 1%)
+- id: stores__is_online__type
+  table: stores
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - is_online
+  kwargs:
+    type: boolean
+  severity: block
+  evidence: boolean inferred
+- id: stores__square_meters__type
+  table: stores
+  expectation: expect_column_values_to_be_of_type
+  columns:
+  - square_meters
+  kwargs:
+    type: integer
+  severity: block
+  evidence: integer inferred
+- id: stores__square_meters__non_negative
+  table: stores
+  expectation: expect_column_values_to_be_between
+  columns:
+  - square_meters
+  kwargs:
+    min_value: 0
+  severity: block
+  evidence: 100.00% of values >= 0
+- id: stores__square_meters__outlier
+  table: stores
+  expectation: expect_column_values_to_be_between
+  columns:
+  - square_meters
+  kwargs:
+    max_value: 58820.0
+  severity: warn
+  evidence: p99 5882 x 10
+- id: order_items__order_id__references_orders
+  table: order_items
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - order_id
+  kwargs:
+    ref_table: orders
+    ref_column: order_id
+  severity: block
+  evidence: 100.00% of rows resolve to orders.order_id
+- id: order_items__sku__references_products
+  table: order_items
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - sku
+  kwargs:
+    ref_table: products
+    ref_column: sku
+  severity: block
+  evidence: 99.50% of rows resolve to products.sku
+- id: orders__customer_id__references_customers
+  table: orders
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - customer_id
+  kwargs:
+    ref_table: customers
+    ref_column: customer_id
+  severity: block
+  evidence: 99.50% of rows resolve to customers.customer_id
+- id: orders__store_id__references_stores
+  table: orders
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - store_id
+  kwargs:
+    ref_table: stores
+    ref_column: store_id
+  severity: block
+  evidence: 100.00% of rows resolve to stores.store_id
+- id: payments__order_ref__references_orders
+  table: payments
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - order_ref
+  kwargs:
+    ref_table: orders
+    ref_column: order_id
+  severity: block
+  evidence: 100.00% of rows resolve to orders.order_id
+- id: returns__order_id__references_orders
+  table: returns
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - order_id
+  kwargs:
+    ref_table: orders
+    ref_column: order_id
+  severity: block
+  evidence: 99.50% of rows resolve to orders.order_id
+- id: returns__sku__references_products
+  table: returns
+  expectation: expect_column_values_to_exist_in
+  columns:
+  - sku
+  kwargs:
+    ref_table: products
+    ref_column: sku
+  severity: block
+  evidence: 100.00% of rows resolve to products.sku

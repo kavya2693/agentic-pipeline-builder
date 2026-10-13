@@ -1,0 +1,23 @@
+version: 2
+sources:
+- name: raw
+  schema: raw
+  description: Raw files landed as text, one table per file, file row position in _row_id.
+  tables:
+  - name: customers
+    description: 'Landed from customers.csv. 60,300 source rows from customers.csv. Key: customer_id.'
+  - name: order_items
+    description: 'Landed from order_items.parquet. 972,645 source rows from order_items.parquet. Key: order_id,
+      line_number. Points to orders, products.'
+  - name: orders
+    description: 'Landed from orders.csv. 402,000 source rows from orders.csv. Key: order_id. Points to customers,
+      stores.'
+  - name: payments
+    description: 'Landed from payments.csv. 405,134 source rows from payments.csv. Key: payment_id. Points to orders.'
+  - name: products
+    description: 'Landed from products.json. 4,000 source rows from products.json. Key: sku.'
+  - name: returns
+    description: 'Landed from returns.jsonl. 19,575 source rows from returns.jsonl. Key: return_id. Points to orders,
+      products.'
+  - name: stores
+    description: 'Landed from stores.csv. 120 source rows from stores.csv. Key: store_id.'
