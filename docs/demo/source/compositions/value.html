@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        /* WHITE "END-USER VALUE" SLIDE: the contract sheet the engineer signs (left) + a small 2D scene of the
+           review and the nightly run it controls (right). Data is inlined by tools/inject_contract.py between the SHEET markers. */
+        #value-root {
+          position: absolute; inset: 0;
+          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #6b7280; --w-line: #d1d5db; --w-faint: #f3f4f6;
+          --w-data: #d97706; --w-model: #6d3cf0; --w-tools: #1f8fa8; --w-risk: #dc2b4a; --w-opt: #0f9f6e;
+          color: var(--w-ink); font-family: Inter, "Helvetica Neue", sans-serif;
+        }
+        #value-root .page { position: absolute; inset: 0; background: var(--w-bg); }
+        #value-root .edge { position: absolute; top: 0; width: 10px; height: 1080px; background: var(--w-model); }
+        #value-root .kick {
+          position: absolute; left: 120px; top: 84px; font-family: "JetBrains Mono", monospace; font-size: 24px;
+          font-weight: 700; letter-spacing: 0.18em; color: var(--w-mute);
+        }
+        #value-root .ttl {
+          position: absolute; left: 120px; top: 124px; font-family: Montserrat, sans-serif; font-weight: 900;
+          font-size: 68px; letter-spacing: -0.02em; white-space: nowrap;
+        }
+        #value-root .ttl em { font-style: normal; color: var(--w-model); }
+        #value-root .uline { position: absolute; left: 124px; top: 222px; width: 120px; height: 10px; border-radius: 5px; background: var(--w-model); transform-origin: left center; }
+
+        /* sheet */
+        #value-root .sheet {
+          position: absolute; left: 120px; top: 280px; width: 1050px; height: 640px; border: 3px solid var(--w-line);
+          border-radius: 24px; background: #fff; box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08); overflow: hidden;
+        }
+        #value-root .sheet-head {
+          height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
+          background: var(--w-ink); color: #fff; font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.08em;
+        }
+        #value-root .sheet-head .hr { position: relative; color: #c4b5fd; }
+        #value-root .sheet-head .hr .signed { position: absolute; right: 0; top: 0; color: #6ee7b7; opacity: 0; white-space: nowrap; }
+        #value-root .row {
+          position: relative; display: flex; align-items: center; height: 66px; padding: 0 26px;
+          font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
+        }
+        #value-root .row.hdr { height: 54px; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: var(--w-mute); background: #fafafa; }
+        #value-root .row .tint { position: absolute; inset: 0; opacity: 0; background: #fee2e2; }
+        #value-root .c { position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #value-root .c1 { width: 180px; font-weight: 700; }
+        #value-root .c2 { width: 230px; }
+        #value-root .c3 { width: 360px; font-family: Inter, sans-serif; font-size: 21px; color: var(--w-soft); padding-right: 16px; }
+        #value-root .c4 { width: 96px; }
+        #value-root .c4 span { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 18px; font-weight: 700; }
+        #value-root .c4 .block { background: #fee2e2; color: #b91c1c; }
+        #value-root .c4 .warn { background: #fef3c7; color: #92400e; }
+        #value-root .c5 { width: 120px; text-align: right; font-weight: 700; }
+        #value-root .more { padding: 14px 30px 0; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-mute); }
+        #value-root .totals {
+          position: absolute; left: 0; bottom: 0; width: 100%; height: 66px; display: flex; align-items: center; gap: 14px; padding: 0 30px;
+          background: #ecfdf5; border-top: 2px solid #a7f3d0; font-size: 23px; font-weight: 700; color: #065f46;
+        }
+        #value-root .totals b { display: block; width: 28px; height: 28px; border-radius: 50%; background: var(--w-opt); position: relative; }
+        #value-root .totals svg { position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; }
+
+        /* scene */
+        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); white-space: nowrap; }
+        #value-root .desk { position: absolute; left: 1220px; top: 312px; width: 600px; height: 250px; border-radius: 20px; background: var(--w-faint); }
+        #value-root .doc {
+          position: absolute; left: 1350px; top: 326px; width: 452px; height: 222px; border-radius: 14px; background: #fff;
+          border: 2px solid var(--w-line); box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08); padding: 14px 18px;
+        }
+        #value-root .doc-h { font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; color: var(--w-ink); }
+        #value-root .doc-h span { color: var(--w-mute); font-weight: 400; }
+        #value-root .chips { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 12px; }
+        #value-root .chip {
+          position: relative; display: block; padding: 3px 11px; border-radius: 8px; background: #eef2ff; color: #3730a3;
+          font-family: "JetBrains Mono", monospace; font-size: 20px;
+        }
+        #value-root .chip .ring { position: absolute; inset: -4px; border: 3px solid var(--w-risk); border-radius: 10px; opacity: 0; }
+        #value-root .doc-note { position: absolute; left: 18px; bottom: 12px; font-size: 20px; color: var(--w-risk); font-weight: 700; opacity: 0; white-space: nowrap; }
+        #value-root .stamp {
+          position: absolute; left: 1650px; top: 478px; padding: 4px 14px; border: 4px solid var(--w-opt); border-radius: 10px;
+          font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.1em; color: var(--w-opt); background: rgba(255,255,255,0.9);
+        }
+        #value-root .floor {
+          position: absolute; left: 1220px; top: 600px; width: 600px; height: 320px; border-radius: 24px; border: 3px solid var(--w-line);
+          background-color: #fbfbfc;
+          background-image: linear-gradient(#eef0f3 2px, transparent 2px), linear-gradient(90deg, #eef0f3 2px, transparent 2px);
+          background-size: 40px 40px;
+        }
+        #value-root .bin {
+          position: absolute; width: 210px; height: 112px; border-radius: 16px; display: flex; flex-direction: column; justify-content: center;
+          padding: 0 16px; font-family: "JetBrains Mono", monospace;
+        }
+        #value-root .bin .bn { font-size: 20px; font-weight: 700; }
+        #value-root .bin .bc { margin-top: 4px; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        #value-root .bin.ok { left: 1590px; top: 620px; background: #ecfdf5; border: 3px solid #6ee7b7; color: #065f46; }
+        #value-root .bin.bad { left: 1590px; top: 788px; background: #fef2f2; border: 3px solid #fca5a5; color: #991b1b; }
+        #value-root .dbt {
+          position: absolute; left: 1240px; top: 862px; display: flex; align-items: center; gap: 10px; font-family: "JetBrains Mono", monospace;
+          font-size: 20px; font-weight: 700; color: #065f46; white-space: nowrap;
+        }
+        #value-root .dbt b { display: block; width: 26px; height: 26px; border-radius: 50%; background: var(--w-opt); position: relative; }
+        #value-root .dbt svg { position: absolute; left: 5px; top: 5px; width: 16px; height: 16px; }
+        #value-root svg.layer { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #value-root .caption {
+          position: absolute; left: 120px; top: 944px; width: 1700px; font-size: 30px; font-weight: 700; color: var(--w-ink);
+        }
+        #value-root .caption span { color: var(--w-model); }
+      </style>
+
+      <div id="value-root" data-composition-id="value" data-width="1920" data-height="1080">
+        <div class="page" id="va-page">
+          <div class="kick" id="va-kick">07 · END-USER VALUE</div>
+          <div class="ttl" id="va-ttl">What the <em>data engineer</em> gets</div>
+          <div class="uline" id="va-ul"></div>
+
+          <div class="sheet" id="va-sheet">
+            <div class="sheet-head"><span id="va-head-l">DATA CONTRACT</span><span class="hr"><span id="va-head-r">DRAFT</span><span class="signed" id="va-head-s">REVIEWED · SIGNED</span></span></div>
+            <div class="row hdr" id="va-hdr">
+              <div class="c c1">COLUMN</div><div class="c c2">CHECK</div><div class="c c3" style="font-family: 'JetBrains Mono', monospace; font-size: 18px">EVIDENCE</div>
+              <div class="c c4">ON FAIL</div><div class="c c5">ROWS HELD</div>
+            </div>
+            <div id="va-rows"></div>
+            <div class="more" id="va-more"></div>
+            <div class="totals" id="va-totals"></div>
+          </div>
+
+          <div class="scene-lab" id="va-lab-desk" style="left: 1220px; top: 280px">ENGINEER · REVIEWS rules.yml</div>
+          <div class="desk" id="va-desk"></div>
+          <div class="doc" id="va-doc">
+            <div class="doc-h" id="va-doc-h"></div>
+            <div class="chips" id="va-chips"></div>
+            <div class="doc-note" id="va-doc-note">typos learned as values</div>
+          </div>
+          <div class="stamp" id="va-stamp">SIGNED</div>
+
+          <div class="scene-lab" id="va-lab-floor" style="left: 1244px; top: 614px">TONIGHT'S DROP</div>
+          <div class="floor" id="va-floor"></div>
+          <div class="bin ok" id="va-bin-ok"><div class="bn">stg_orders</div><div class="bc" id="va-ok-n">0</div></div>
+          <div class="bin bad" id="va-bin-bad"><div class="bn">__rejected</div><div class="bc" id="va-bad-n">0</div></div>
+          <div class="dbt" id="va-dbt"><b></b><span id="va-dbt-t">dbt build green</span></div>
+          <svg class="layer" id="va-svg" viewBox="0 0 1920 1080"></svg>
+
+          <div class="caption" id="va-caption">Rules they can read and sign; bad rows held back with reasons. <span>Days of detective work become a review.</span></div>
+        </div>
+        <div class="edge" id="va-edge"></div>
+      </div>
+
+      <script>
+        (() => {
+          /* SHEET:BEGIN */ const SHEET = {"table":"orders","file":"orders.csv","rows":402000,"quarantined":11507,"warned":17,"rules_table":23,"more_rules":17,"more_rules_holding":1,"max_rate":0.02862,"tables":7,"clean":390493,"rows_shown":[{"id":"orders__pk__unique","column":"order_id","check":"unique","severity":"block","evidence":"inferred primary key","held":2000,"false_alarms":0,"value_set":null},{"id":"orders__customer_id__not_null","column":"customer_id","check":"not null","severity":"block","evidence":"null rate 0.50% (required at <= 1%)","held":2000,"false_alarms":0,"value_set":null},{"id":"orders__customer_id__references_customers","column":"customer_id","check":"in customers","severity":"block","evidence":"99.50% of rows resolve to customers.customer_id","held":2000,"false_alarms":0,"value_set":null},{"id":"orders__ordered_at__window","column":"ordered_at","check":"date in window","severity":"block","evidence":"dates must fall between 1990-01-01 and the run date 2026-02-01","held":2000,"false_alarms":0,"value_set":null},{"id":"orders__order_total__type","column":"order_total","check":"is decimal","severity":"block","evidence":"decimal inferred","held":2000,"false_alarms":0,"value_set":null},{"id":"orders__status__in_set","column":"status","check":"one of 7 values","severity":"block","evidence":"7 values cover 99.62%; rarer values excluded","held":1515,"false_alarms":322,"value_set":["cancel","cancelled","delivered","pending_x","placed","returned","shipped"]}]}; /* SHEET:END */
+
+          const CONFIG = {
+            duration: 13.0,
+            // values a reviewer strikes from the learned status set (README "Known limitations": visible typos)
+            typos: ["cancel", "pending_x"],
+            person: { x: 1282, y: 440 },
+            file: { x: 1290, y: 740 },
+            gate: { x: 1460, y: 740 },
+            okBin: { x: 1590, y: 676 },
+            badBin: { x: 1590, y: 844 },
+            tokens: 22, // illustrative row tokens; every 11th goes to quarantine (the counters carry the real numbers)
+          };
+          const NS = "http://www.w3.org/2000/svg";
+          const svg = document.getElementById("va-svg");
+          const el = (tag, attrs, parent) => {
+            const n = document.createElementNS(NS, tag);
+            Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+            (parent || svg).appendChild(n);
+            return n;
+          };
+          const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+          const fmt = (v) => Math.round(v).toLocaleString("en-US");
+          const tl = gsap.timeline({ paused: true });
+          const D = CONFIG.duration;
+
+          // ---------------- sheet ----------------
+          document.getElementById("va-head-l").textContent = "DATA CONTRACT · " + SHEET.file;
+          const rowsEl = document.getElementById("va-rows");
+          let reviewIdx = -1;
+          SHEET.rows_shown.forEach((r, i) => {
+            if (r.value_set) reviewIdx = i;
+            rowsEl.insertAdjacentHTML("beforeend",
+              '<div class="row" id="va-r' + i + '"><div class="tint" id="va-t' + i + '"></div>' +
+              '<div class="c c1">' + r.column + '</div><div class="c c2">' + r.check + '</div>' +
+              '<div class="c c3">' + r.evidence.replace(/</g, "&lt;") + '</div>' +
+              '<div class="c c4"><span class="' + r.severity + '">' + r.severity + '</span></div><div class="c c5">' + fmt(r.held) + "</div></div>");
+          });
+          document.getElementById("va-more").textContent =
+            "+ " + SHEET.more_rules + " more rules on " + SHEET.table + " (" + (SHEET.more_rules - SHEET.more_rules_holding) + " flag no rows)";
+          document.getElementById("va-totals").innerHTML =
+            "<b>" + CHECK + "</b>" + fmt(SHEET.quarantined) + " of " + fmt(SHEET.rows) + " rows held back (" + (100 * SHEET.quarantined / SHEET.rows).toFixed(2) + "%) · under the 5% gate";
+
+          // ---------------- scene: the review ----------------
+          const rv = SHEET.rows_shown[reviewIdx];
+          document.getElementById("va-doc-h").innerHTML = rv.column + " <span>· " + rv.check + "</span>";
+          const order = rv.value_set.filter((v) => !CONFIG.typos.includes(v)).concat(CONFIG.typos.filter((v) => rv.value_set.includes(v)));
+          document.getElementById("va-chips").innerHTML = order.map((v, k) =>
+            '<span class="chip" id="va-chip' + k + '">' + v + (CONFIG.typos.includes(v) ? '<i class="ring" id="va-ring-' + v + '"></i>' : "") + "</span>").join("");
+
+          const P = CONFIG.person;
+          const person = el("g", { id: "va-person" });
+          el("circle", { cx: P.x, cy: P.y - 44, r: 20, fill: "#111827" }, person);
+          el("path", { d: "M" + (P.x - 32) + " " + (P.y + 50) + "v-30a32 27 0 0 1 64 0v30z", fill: "#6d3cf0" }, person);
+          const pen = el("g", { id: "va-pen" }, person);
+          el("rect", { x: P.x + 26, y: P.y - 8, width: 8, height: 34, rx: 3, fill: "#111827", transform: "rotate(35 " + (P.x + 30) + " " + (P.y + 9) + ")" }, pen);
+
+          // the signed contract travels to tonight's drop (hand-off)
+          const card = el("g", { id: "va-card", opacity: 0 });
+          el("rect", { x: -20, y: -26, width: 40, height: 52, rx: 6, fill: "#fff", stroke: "#0f9f6e", "stroke-width": 3 }, card);
+          [0, 1, 2].forEach((k) => el("line", { x1: -11, x2: 11, y1: -12 + k * 10, y2: -12 + k * 10, stroke: "#9ca3af", "stroke-width": 2.5 }, card));
+          el("circle", { cx: 12, cy: 18, r: 9, fill: "#0f9f6e" }, card);
+
+          // floor: file -> contract gate -> two bins
+          const F = CONFIG.file, G = CONFIG.gate, OK = CONFIG.okBin, BAD = CONFIG.badBin;
+          const fileG = el("g", { id: "va-file" });
+          el("path", { d: "M" + (F.x - 30) + " " + (F.y - 40) + "h40l20 20v60h-60z", fill: "#fff7ed", stroke: "#d97706", "stroke-width": 3 }, fileG);
+          el("path", { d: "M" + (F.x + 10) + " " + (F.y - 40) + "v20h20", fill: "none", stroke: "#d97706", "stroke-width": 3 }, fileG);
+          const ft = el("text", { x: F.x, y: F.y + 70, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#92400e" }, fileG);
+          ft.textContent = SHEET.file;
+          const gateG = el("g", { id: "va-gate" });
+          el("rect", { x: G.x - 36, y: G.y - 46, width: 72, height: 92, rx: 14, fill: "#111827" }, gateG);
+          el("path", { d: "M" + G.x + " " + (G.y - 26) + "l18 7v13c0 11-8 19-18 22-10-3-18-11-18-22v-13z", fill: "none", stroke: "#fff", "stroke-width": 3, "stroke-linejoin": "round" }, gateG);
+          const gt = el("text", { x: G.x, y: G.y + 76, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#111827" }, gateG);
+          gt.textContent = "rules";
+          // lanes
+          el("path", { d: "M" + (F.x + 34) + " " + G.y + "H" + (G.x - 40), stroke: "#d1d5db", "stroke-width": 4, fill: "none", "stroke-dasharray": "2 10", "stroke-linecap": "round" });
+          el("path", { d: "M" + (G.x + 40) + " " + G.y + "H" + (G.x + 70) + "V" + OK.y + "H" + OK.x, stroke: "#a7f3d0", "stroke-width": 4, fill: "none", "stroke-linejoin": "round" });
+          el("path", { d: "M" + (G.x + 70) + " " + G.y + "V" + BAD.y + "H" + BAD.x, stroke: "#fecaca", "stroke-width": 4, fill: "none", "stroke-linejoin": "round" });
+          svg.appendChild(gateG);
+
+          // ---------------- choreography ----------------
+          tl.fromTo("#va-page", { clipPath: "inset(0px 100% 0px 0px)" }, { clipPath: "inset(0px 0% 0px 0px)", duration: 0.7, ease: "power3.inOut" }, 0);
+          tl.fromTo("#va-edge", { x: 0, opacity: 1 }, { x: 1920, duration: 0.7, ease: "power3.inOut" }, 0);
+          tl.to("#va-edge", { opacity: 0, duration: 0.1 }, 0.7);
+          tl.fromTo("#va-kick", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
+          tl.fromTo("#va-ttl", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.55);
+          tl.fromTo("#va-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 0.9);
+          tl.fromTo("#va-sheet", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
+          SHEET.rows_shown.forEach((_, i) => tl.fromTo("#va-r" + i, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 1.3 + i * 0.3));
+          tl.fromTo("#va-more", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.3 + SHEET.rows_shown.length * 0.3);
+          tl.fromTo("#va-totals", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 3.4);
+
+          tl.fromTo(["#va-desk", "#va-lab-desk"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.9);
+          tl.fromTo("#va-person", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 1.1);
+          tl.fromTo("#va-doc", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, 1.4);
+          // review: the status row lights up on the sheet, the learned typos get ringed
+          const RV = 3.0;
+          tl.to("#va-t" + reviewIdx, { opacity: 1, duration: 0.3 }, RV);
+          tl.fromTo("#va-pen", { x: 0, y: 0 }, { keyframes: [{ x: 6, y: -4, duration: 0.25 }, { x: 0, y: 0, duration: 0.25 }], repeat: 3, ease: "sine.inOut" }, RV);
+          CONFIG.typos.forEach((v, k) => tl.fromTo("#va-ring-" + v, { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, RV + 0.4 + k * 0.35));
+          tl.fromTo("#va-doc-note", { opacity: 0 }, { opacity: 1, duration: 0.4 }, RV + 1.2);
+          tl.fromTo("#va-stamp", { opacity: 0, scale: 1.6, rotation: -14 }, { opacity: 1, scale: 1, rotation: -8, duration: 0.35, ease: "power3.in" }, RV + 2.0);
+          tl.to("#va-head-r", { opacity: 0, duration: 0.2 }, RV + 2.2);
+          tl.fromTo("#va-head-s", { opacity: 0 }, { opacity: 1, duration: 0.3 }, RV + 2.3);
+          tl.to("#va-t" + reviewIdx, { opacity: 0.5, duration: 0.4 }, RV + 2.4);
+          // hand-off: the signed contract moves from the desk into tonight's run
+          const HO = RV + 2.6;
+          tl.fromTo(["#va-floor", "#va-lab-floor", "#va-file", "#va-gate", "#va-bin-ok", "#va-bin-bad"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.6);
+          tl.fromTo("#va-card", { attr: { opacity: 0 }, x: 1690, y: 480 }, { attr: { opacity: 1 }, duration: 0.2 }, HO);
+          tl.to("#va-card", { x: G.x, y: G.y, duration: 0.9, ease: "power2.inOut" }, HO + 0.1);
+          tl.to("#va-card", { attr: { opacity: 0 }, scale: 0.6, duration: 0.25 }, HO + 1.0);
+          tl.fromTo("#va-gate", { scale: 1 }, { scale: 1.08, svgOrigin: G.x + " " + G.y, duration: 0.2, yoyo: true, repeat: 1 }, HO + 1.0);
+          // rows flow: file -> gate -> clean bin, every 11th to quarantine (illustrative), counters carry the real numbers
+          const FLOW0 = HO + 1.3, FLOW = 4.2;
+          for (let k = 0; k < CONFIG.tokens; k++) {
+            const bad = k % 11 === 7;
+            const tok = el("rect", { x: -9, y: -6, width: 18, height: 12, rx: 3, fill: bad ? "#dc2b4a" : "#0f9f6e", opacity: 0 });
+            const at = FLOW0 + (k * (FLOW - 1.0)) / CONFIG.tokens;
+            const dst = bad ? BAD : OK;
+            tl.fromTo(tok, { attr: { opacity: 0 }, x: F.x + 34, y: G.y }, { attr: { opacity: 1 }, duration: 0.1 }, at);
+            tl.to(tok, { keyframes: [
+              { x: G.x + 70, y: G.y, duration: 0.45, ease: "none" },
+              { y: dst.y, duration: 0.2, ease: "none" },
+              { x: dst.x + 10, duration: 0.25, ease: "none" },
+            ] }, at);
+            tl.to(tok, { attr: { opacity: 0 }, duration: 0.1 }, at + 0.9);
+          }
+          const okN = { v: 0 }, badN = { v: 0 };
+          const okEl = document.getElementById("va-ok-n"), badEl = document.getElementById("va-bad-n");
+          tl.to(okN, { v: SHEET.clean, duration: FLOW, ease: "power1.inOut", onUpdate: () => { okEl.textContent = fmt(okN.v); } }, FLOW0 + 0.5);
+          tl.to(badN, { v: SHEET.quarantined, duration: FLOW, ease: "power1.inOut", onUpdate: () => { badEl.textContent = fmt(badN.v); } }, FLOW0 + 0.5);
+          document.querySelector("#va-dbt b").innerHTML = CHECK;
+          tl.fromTo("#va-dbt", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, FLOW0 + FLOW + 0.4);
+          tl.fromTo("#va-caption", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 9.6);
+          // wipe out (white -> dark), revealing the next dark scene underneath
+          tl.to("#va-page", { clipPath: "inset(0px 0px 0px 100%)", duration: 0.7, ease: "power3.inOut" }, D - 0.7);
+          tl.fromTo("#va-edge", { x: 0, opacity: 0 }, { x: 1920, opacity: 1, duration: 0.7, ease: "power3.inOut", immediateRender: false }, D - 0.7);
+          window.__timelines["value"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

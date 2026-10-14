@@ -1,0 +1,5 @@
+renders/
+snaps/
+.hyperframes/
+node_modules/
+__pycache__/

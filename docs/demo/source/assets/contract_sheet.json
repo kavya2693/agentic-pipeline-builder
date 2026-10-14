@@ -1,0 +1,369 @@
+{
+ "table": "orders",
+ "file": "orders.csv",
+ "as_of": "2026-02-01",
+ "rows": 402000,
+ "quarantined": 11507,
+ "warned": 17,
+ "rules_total": 136,
+ "rules_table": 23,
+ "rules": [
+  {
+   "id": "orders__pk__unique",
+   "column": "order_id",
+   "expectation": "expect_column_values_to_be_unique",
+   "check": "unique",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "inferred primary key",
+   "rows_flagged": 2000,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__order_id__not_null",
+   "column": "order_id",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__order_id__type",
+   "column": "order_id",
+   "expectation": "expect_column_values_to_be_of_type",
+   "check": "type integer",
+   "kwargs": {
+    "type": "integer"
+   },
+   "severity": "block",
+   "evidence": "integer inferred",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__customer_id__not_null",
+   "column": "customer_id",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.50% (required at <= 1%)",
+   "rows_flagged": 2000,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__customer_id__type",
+   "column": "customer_id",
+   "expectation": "expect_column_values_to_be_of_type",
+   "check": "type integer",
+   "kwargs": {
+    "type": "integer"
+   },
+   "severity": "block",
+   "evidence": "integer inferred",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__store_id__not_null",
+   "column": "store_id",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__store_id__pattern",
+   "column": "store_id",
+   "expectation": "expect_column_values_to_match_regex",
+   "check": "matches pattern",
+   "kwargs": {
+    "regex": "^[A-Z]{2}\\-\\d{4}$"
+   },
+   "severity": "block",
+   "evidence": "one shape covers 100.00%",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__ordered_at__not_null",
+   "column": "ordered_at",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__ordered_at__type",
+   "column": "ordered_at",
+   "expectation": "expect_column_values_to_be_of_type",
+   "check": "type timestamp",
+   "kwargs": {
+    "type": "timestamp",
+    "formats": [
+     "%Y-%m-%d %H:%M:%S",
+     "%m/%d/%Y %H:%M"
+    ]
+   },
+   "severity": "block",
+   "evidence": "timestamp inferred",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__ordered_at__window",
+   "column": "ordered_at",
+   "expectation": "expect_column_values_to_be_between",
+   "check": "between 1990-01-01 and 2026-02-01",
+   "kwargs": {
+    "min_value": "1990-01-01",
+    "max_value": "2026-02-01"
+   },
+   "severity": "block",
+   "evidence": "dates must fall between 1990-01-01 and the run date 2026-02-01",
+   "rows_flagged": 2000,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__status__not_null",
+   "column": "status",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__status__in_set",
+   "column": "status",
+   "expectation": "expect_column_values_to_be_in_set",
+   "check": "in set (7 values)",
+   "kwargs": {
+    "value_set": [
+     "cancel",
+     "cancelled",
+     "delivered",
+     "pending_x",
+     "placed",
+     "returned",
+     "shipped"
+    ]
+   },
+   "severity": "block",
+   "evidence": "7 values cover 99.62%; rarer values excluded",
+   "rows_flagged": 1515,
+   "false_alarms": 322
+  },
+  {
+   "id": "orders__channel__not_null",
+   "column": "channel",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__channel__in_set",
+   "column": "channel",
+   "expectation": "expect_column_values_to_be_in_set",
+   "check": "in set (3 values)",
+   "kwargs": {
+    "value_set": [
+     "app",
+     "store",
+     "web"
+    ]
+   },
+   "severity": "block",
+   "evidence": "3 values cover 100.00%; rarer values excluded",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__order_total__not_null",
+   "column": "order_total",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__order_total__type",
+   "column": "order_total",
+   "expectation": "expect_column_values_to_be_of_type",
+   "check": "type decimal",
+   "kwargs": {
+    "type": "decimal"
+   },
+   "severity": "block",
+   "evidence": "decimal inferred",
+   "rows_flagged": 2000,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__order_total__non_negative",
+   "column": "order_total",
+   "expectation": "expect_column_values_to_be_between",
+   "check": ">= 0",
+   "kwargs": {
+    "min_value": 0
+   },
+   "severity": "block",
+   "evidence": "100.00% of values >= 0",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__order_total__outlier",
+   "column": "order_total",
+   "expectation": "expect_column_values_to_be_between",
+   "check": "<= 124461.693",
+   "kwargs": {
+    "max_value": 124461.693
+   },
+   "severity": "warn",
+   "evidence": "p99 12446.2 x 10",
+   "rows_flagged": 17,
+   "false_alarms": 17
+  },
+  {
+   "id": "orders__discount_code__in_set",
+   "column": "discount_code",
+   "expectation": "expect_column_values_to_be_in_set",
+   "check": "in set (5 values)",
+   "kwargs": {
+    "value_set": [
+     "bf25",
+     "freeship",
+     "ramadan15",
+     "vip20",
+     "welcome10"
+    ]
+   },
+   "severity": "block",
+   "evidence": "5 values cover 100.00%; rarer values excluded",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__is_gift__not_null",
+   "column": "is_gift",
+   "expectation": "expect_column_values_to_not_be_null",
+   "check": "not null",
+   "kwargs": {},
+   "severity": "block",
+   "evidence": "null rate 0.00% (required at <= 1%)",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__is_gift__type",
+   "column": "is_gift",
+   "expectation": "expect_column_values_to_be_of_type",
+   "check": "type boolean",
+   "kwargs": {
+    "type": "boolean"
+   },
+   "severity": "block",
+   "evidence": "boolean inferred",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__customer_id__references_customers",
+   "column": "customer_id",
+   "expectation": "expect_column_values_to_exist_in",
+   "check": "exists in customers",
+   "kwargs": {
+    "ref_table": "customers",
+    "ref_column": "customer_id"
+   },
+   "severity": "block",
+   "evidence": "99.50% of rows resolve to customers.customer_id",
+   "rows_flagged": 2000,
+   "false_alarms": 0
+  },
+  {
+   "id": "orders__store_id__references_stores",
+   "column": "store_id",
+   "expectation": "expect_column_values_to_exist_in",
+   "check": "exists in stores",
+   "kwargs": {
+    "ref_table": "stores",
+    "ref_column": "store_id"
+   },
+   "severity": "block",
+   "evidence": "100.00% of rows resolve to stores.store_id",
+   "rows_flagged": 0,
+   "false_alarms": 0
+  }
+ ],
+ "summary": [
+  {
+   "table": "customers",
+   "rows": 60300,
+   "quarantined": 1200,
+   "quarantine_rate": 0.0199,
+   "warned": 0
+  },
+  {
+   "table": "order_items",
+   "rows": 972645,
+   "quarantined": 19452,
+   "quarantine_rate": 0.02,
+   "warned": 1421
+  },
+  {
+   "table": "orders",
+   "rows": 402000,
+   "quarantined": 11507,
+   "quarantine_rate": 0.02862,
+   "warned": 17
+  },
+  {
+   "table": "payments",
+   "rows": 405134,
+   "quarantined": 7409,
+   "quarantine_rate": 0.01829,
+   "warned": 17
+  },
+  {
+   "table": "products",
+   "rows": 4000,
+   "quarantined": 0,
+   "quarantine_rate": 0.0,
+   "warned": 0
+  },
+  {
+   "table": "returns",
+   "rows": 19575,
+   "quarantined": 98,
+   "quarantine_rate": 0.00501,
+   "warned": 2
+  },
+  {
+   "table": "stores",
+   "rows": 120,
+   "quarantined": 0,
+   "quarantine_rate": 0.0,
+   "warned": 0
+  }
+ ]
+}

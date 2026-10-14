@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #endcard-root { position: absolute; inset: 0; }
+        #endcard-root .endmap {
+          position: absolute; left: 1290px; top: 470px; width: 580px; height: 485px; opacity: 0.45;
+          -webkit-mask-image: radial-gradient(ellipse at center, #000 45%, transparent 72%);
+          mask-image: radial-gradient(ellipse at center, #000 45%, transparent 72%);
+        }
+        #endcard-root .end { position: absolute; left: 120px; top: 270px; width: 1680px; }
+        #endcard-root .kicker { font-family: var(--mono); font-size: 26px; letter-spacing: 0.16em; color: var(--c-opt); }
+        #endcard-root .name { margin-top: 18px; font-family: var(--mono); font-size: 104px; font-weight: 700; letter-spacing: -0.04em; color: var(--ink); }
+        #endcard-root .url { margin-top: 18px; font-family: var(--mono); font-size: 42px; color: var(--c-opt); }
+        #endcard-root .chips { display: flex; gap: 18px; margin-top: 52px; }
+        #endcard-root .chip { display: block; font-family: var(--mono); font-size: 30px; font-weight: 700; padding: 12px 26px; border-radius: 999px; color: var(--ink); }
+        #endcard-root .chip.opt { border: 2px solid rgba(63, 216, 168, 0.65); background: rgba(63, 216, 168, 0.1); }
+        #endcard-root .chip.mod { border: 2px solid rgba(185, 162, 255, 0.65); background: rgba(185, 162, 255, 0.1); }
+        #endcard-root .chip.dat { border: 2px solid rgba(127, 168, 255, 0.65); background: rgba(127, 168, 255, 0.1); }
+        #endcard-root .run { margin-top: 44px; font-family: var(--mono); font-size: 26px; color: var(--ink-mute); white-space: pre; }
+      </style>
+      <div id="endcard-root" data-composition-id="endcard" data-width="1920" data-height="1080">
+        <div class="scene" id="endcard-in">
+          <svg class="endmap" id="endcard-map" viewBox="0 0 580 485" aria-hidden="true"></svg>
+          <div class="end">
+            <div class="kicker" id="endcard-kicker">10 · OPEN SOURCE · MIT · RUNS ON A LAPTOP</div>
+            <div class="name" id="endcard-name">agentic-pipeline-builder</div>
+            <div class="url" id="endcard-url">github.com/kavya2693/agentic-pipeline-builder</div>
+            <div class="chips">
+              <span class="chip opt" id="endcard-c1">dbt</span>
+              <span class="chip opt" id="endcard-c2">DuckDB</span>
+              <span class="chip mod" id="endcard-c3">Airflow DAG</span>
+              <span class="chip dat" id="endcard-c4">pandas</span>
+              <span class="chip dat" id="endcard-c5">Python</span>
+            </div>
+            <div class="run" id="endcard-run">$ make e2e   # generate 1.86M rows, build, dbt build, score</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          // faint state-machine motif (decoration): five state nodes on a loop
+          const NS = "http://www.w3.org/2000/svg", em = document.getElementById("endcard-map");
+          const pts = [[110, 120], [290, 70], [470, 120], [420, 330], [160, 330]];
+          pts.forEach((p, i) => {
+            const q = pts[(i + 1) % pts.length], l = document.createElementNS(NS, "line");
+            l.setAttribute("x1", p[0]); l.setAttribute("y1", p[1]); l.setAttribute("x2", q[0]); l.setAttribute("y2", q[1]);
+            l.setAttribute("stroke", "#3fd8a8"); l.setAttribute("stroke-width", "4"); l.setAttribute("stroke-dasharray", "10 10");
+            em.appendChild(l);
+          });
+          pts.forEach((p) => {
+            const c = document.createElementNS(NS, "rect");
+            c.setAttribute("x", p[0] - 40); c.setAttribute("y", p[1] - 28); c.setAttribute("width", 80); c.setAttribute("height", 56); c.setAttribute("rx", 12);
+            c.setAttribute("fill", "#0f1a26"); c.setAttribute("stroke", "#7fa8ff"); c.setAttribute("stroke-width", "4");
+            em.appendChild(c);
+          });
+          tl.fromTo("#endcard-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#endcard-map", { opacity: 0, scale: 0.94 }, { opacity: 0.45, scale: 1, duration: 3.6, ease: "power2.out" }, 0);
+          tl.fromTo("#endcard-kicker", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.15);
+          tl.fromTo("#endcard-name", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }, 0.25);
+          tl.fromTo("#endcard-url", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.5);
+          [1, 2, 3, 4, 5].forEach((n, i) =>
+            tl.fromTo("#endcard-c" + n, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.1));
+          tl.fromTo("#endcard-run", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.4);
+          window.__timelines["endcard"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

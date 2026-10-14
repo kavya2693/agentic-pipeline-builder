@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #ctx-root { position: absolute; inset: 0; }
+        #ctx-root .eyebrow { color: var(--c-data); }
+        #ctx-root .who {
+          position: absolute; left: 120px; top: 268px; display: flex; align-items: center; gap: 18px;
+        }
+        #ctx-root .who-label {
+          font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; color: var(--ink-mute);
+          text-transform: uppercase; margin-right: 8px;
+        }
+        #ctx-root .chip {
+          display: block; font-size: 28px; font-weight: 700; color: var(--ink);
+          padding: 12px 24px; border-radius: 999px; border: 2px solid rgba(127, 168, 255, 0.55);
+          background: rgba(127, 168, 255, 0.1);
+        }
+        #ctx-root .cards {
+          position: absolute; left: 120px; top: 380px; width: 1680px; display: flex; gap: 30px;
+        }
+        #ctx-root .card {
+          position: relative; flex: 1 1 0; height: 420px; border-radius: 16px;
+          border: 2px solid var(--line); background: var(--panel); padding: 44px 34px 36px;
+          display: flex; flex-direction: column; overflow: hidden;
+        }
+        #ctx-root .card .bar { position: absolute; left: 0; top: 0; width: 100%; height: 6px; }
+        #ctx-root .card .num { font-family: var(--mono); font-size: 26px; font-weight: 700; }
+        #ctx-root .card .head {
+          margin-top: 22px; font-size: 34px; font-weight: 700; line-height: 1.18; color: var(--ink);
+        }
+        #ctx-root .card .cost {
+          margin-top: auto; padding-top: 18px; border-top: 2px solid var(--line);
+          font-size: 26px; line-height: 1.35; color: var(--ink-soft);
+        }
+        #ctx-root .k1 .bar, #ctx-root .k1 .num { background: var(--c-opt); color: var(--c-opt); }
+        #ctx-root .k2 .bar, #ctx-root .k2 .num { background: var(--c-data); color: var(--c-data); }
+        #ctx-root .k3 .bar, #ctx-root .k3 .num { background: var(--c-risk); color: var(--c-risk); }
+        #ctx-root .k4 .bar, #ctx-root .k4 .num { background: var(--c-model); color: var(--c-model); }
+        #ctx-root .card .num { background: none !important; }
+        #ctx-root .next {
+          position: absolute; left: 120px; top: 862px; display: flex; align-items: center; gap: 20px;
+          font-size: 32px; font-weight: 700; color: var(--ink);
+        }
+        #ctx-root .next .tag {
+          font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: 0.12em;
+          color: var(--bg); background: var(--c-opt); padding: 6px 14px; border-radius: 6px;
+        }
+        #ctx-root .next .flow { font-family: var(--mono); font-size: 28px; font-weight: 400; color: var(--ink-soft); }
+      </style>
+
+      <div id="ctx-root" data-composition-id="ctx" data-width="1920" data-height="1080">
+        <div class="scene" id="ctx-in">
+          <div class="eyebrow" data-layout-allow-overlap id="ctx-eyebrow">01 · The industry</div>
+          <div class="scene-title" data-layout-allow-overlap id="ctx-title">A new source arrives as a folder of messy files.</div>
+          <div class="who" id="ctx-who">
+            <span class="who-label">Who lives with this</span>
+            <span class="chip" id="ctx-c1">Retail &amp; e-commerce data teams</span>
+            <span class="chip" id="ctx-c2">Analytics engineers</span>
+            <span class="chip" id="ctx-c3">Data platform &amp; integration</span>
+          </div>
+          <div class="cards">
+            <div class="card k1" id="ctx-k1"><div class="bar"></div><div class="num">01</div>
+              <div class="head">Days of detective work per new source</div>
+              <div class="cost">Open every file, guess every column</div></div>
+            <div class="card k2" id="ctx-k2"><div class="bar"></div><div class="num">02</div>
+              <div class="head">Types guessed wrong on read</div>
+              <div class="cost">A postcode read as a number loses its leading zero</div></div>
+            <div class="card k3" id="ctx-k3"><div class="bar"></div><div class="num">03</div>
+              <div class="head">Bad rows slip in quietly</div>
+              <div class="cost">A status typo becomes its own category on a dashboard</div></div>
+            <div class="card k4" id="ctx-k4"><div class="bar"></div><div class="num">04</div>
+              <div class="head">Checks learned from dirty data</div>
+              <div class="cost">Common enough mess starts to look normal</div></div>
+          </div>
+          <div class="next" id="ctx-next">
+            <span class="tag">THIS PROJECT</span>
+            <span>turns the raw folder into a tested pipeline</span>
+            <span class="flow">discover → validate → build → run</span>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 7.2;
+          tl.fromTo("#ctx-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#ctx-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#ctx-who", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.8);
+          ["#ctx-c1", "#ctx-c2", "#ctx-c3"].forEach((c, i) =>
+            tl.fromTo(c, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0.9 + i * 0.12));
+          ["#ctx-k1", "#ctx-k2", "#ctx-k3", "#ctx-k4"].forEach((c, i) =>
+            tl.fromTo(c, { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.5 + i * 0.16));
+          tl.fromTo("#ctx-next", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 4.0);
+          tl.to("#ctx-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["ctx"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

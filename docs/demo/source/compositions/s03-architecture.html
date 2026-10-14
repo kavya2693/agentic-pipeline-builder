@@ -1,0 +1,339 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #arch-root { position: absolute; inset: 0; }
+        #arch-root .diagram { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+        #arch-root svg.wires { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
+        #arch-root .wire { fill: none; stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+        /* orchestrator band */
+        #arch-root .band {
+          position: absolute; left: 120px; top: 202px; width: 1680px; height: 60px; border-radius: 12px;
+          border: 2px solid var(--line); background: rgba(15, 26, 38, 0.92);
+          display: flex; align-items: center; gap: 10px; padding: 0 16px; font-family: var(--mono); font-size: 21px;
+        }
+        #arch-root .band .who { color: var(--ink-soft); padding-right: 8px; white-space: nowrap; }
+        #arch-root .band .who b { color: var(--ink); font-weight: 700; }
+        #arch-root .band .st {
+          position: relative; display: block; padding: 6px 12px; border-radius: 8px; border: 2px solid var(--line); color: var(--ink-soft);
+          white-space: nowrap; background: var(--panel);
+        }
+        #arch-root .band .st i { font-style: normal; color: var(--ink-mute); }
+        #arch-root .band .ar { color: var(--ink-mute); }
+        #arch-root .band .tot { margin-left: auto; color: var(--ink-mute); white-space: nowrap; }
+        #arch-root .band .st-lit { position: absolute; inset: -2px; border-radius: 8px; border: 2px solid var(--c-opt); background: rgba(63, 216, 168, 0.16); opacity: 0; }
+        /* layer headers */
+        #arch-root .lh { position: absolute; top: 290px; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
+        #arch-root .lh::after { content: ""; display: block; margin-top: 8px; height: 2px; width: 100%; background: currentColor; opacity: 0.35; }
+        /* nodes */
+        #arch-root .node {
+          position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 6px;
+          padding: 0 22px; border: 2px solid var(--line); border-radius: 12px; background: var(--panel);
+        }
+        #arch-root .node .t { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+        #arch-root .node .s { font-family: var(--mono); font-size: 21px; color: var(--ink-soft); white-space: nowrap; }
+        #arch-root .node .f {
+          position: absolute; right: 12px; top: -15px; font-family: var(--mono); font-size: 20px; padding: 1px 9px;
+          border-radius: 6px; background: var(--bg); border: 2px solid var(--line); white-space: nowrap; z-index: 2;
+        }
+        #arch-root .node .glow { position: absolute; inset: -2px; border-radius: 12px; border: 3px solid currentColor; opacity: 0; pointer-events: none; }
+        #arch-root .L-data { border-color: rgba(127, 168, 255, 0.6); color: var(--c-data); }
+        #arch-root .L-data .f { color: var(--c-data); }
+        #arch-root .L-model { border-color: rgba(185, 162, 255, 0.65); color: var(--c-model); }
+        #arch-root .L-model .f { color: var(--c-model); }
+        #arch-root .L-opt { border-color: rgba(63, 216, 168, 0.65); color: var(--c-opt); }
+        #arch-root .L-opt .f { color: var(--c-opt); }
+        #arch-root .L-eval { border-color: rgba(242, 196, 109, 0.7); color: var(--c-eval); }
+        #arch-root .L-eval .f { color: var(--c-eval); }
+        #arch-root .L-risk { border-color: rgba(255, 138, 115, 0.7); color: var(--c-risk); }
+        #arch-root .L-risk .f { color: var(--c-risk); }
+        #arch-root .ext { border-style: dashed; background: rgba(15, 26, 38, 0.6); }
+        #arch-root .ext .f { border-style: dashed; }
+        /* data stores: cylinders */
+        #arch-root .cyl { border-radius: 50% / 26px; padding-top: 30px; }
+        #arch-root .cyl::before {
+          content: ""; position: absolute; left: -2px; top: -2px; right: -2px; height: 52px; border-radius: 50%;
+          border: 2px solid currentColor; opacity: 0.7; box-sizing: border-box;
+        }
+        #arch-root .cyl .glow { border-radius: 50% / 26px; }
+        /* source folder */
+        #arch-root .folder { border-top-left-radius: 0; }
+        #arch-root .folder::before {
+          content: ""; position: absolute; left: -2px; top: -20px; width: 96px; height: 20px; border: 2px solid currentColor;
+          border-bottom: none; border-radius: 10px 10px 0 0; background: var(--panel); opacity: 0.9; box-sizing: border-box;
+        }
+        /* human in the loop */
+        #arch-root .human { flex-direction: row; align-items: center; justify-content: flex-start; gap: 16px; border-radius: 40px; padding: 0 18px; }
+        #arch-root .human .av { flex: 0 0 auto; width: 62px; height: 62px; }
+        #arch-root .human .col { display: flex; flex-direction: column; gap: 4px; }
+        #arch-root .human .glow { border-radius: 40px; }
+        /* decision diamond */
+        #arch-root .gate { position: absolute; width: 212px; height: 212px; }
+        #arch-root .gate .dia {
+          position: absolute; left: 31px; top: 31px; width: 150px; height: 150px; border: 3px solid var(--c-risk);
+          background: #1d1a20; transform: rotate(45deg); border-radius: 10px; box-shadow: 0 0 0px rgba(255, 138, 115, 0);
+        }
+        #arch-root .gate .gt {
+          position: absolute; left: 0; top: 0; width: 212px; height: 212px; display: flex; flex-direction: column;
+          align-items: center; justify-content: center; font-family: var(--mono); font-size: 20px; line-height: 1.2; color: var(--ink); text-align: center;
+        }
+        #arch-root .gate .gt b { color: var(--c-risk); font-size: 26px; }
+        #arch-root .wl { position: absolute; font-family: var(--mono); font-size: 20px; white-space: nowrap; }
+        #arch-root .legend {
+          position: absolute; left: 120px; top: 962px; display: flex; gap: 34px; align-items: center;
+          font-family: var(--mono); font-size: 20px; color: var(--ink-mute); white-space: nowrap;
+        }
+        #arch-root .legend span { display: flex; align-items: center; gap: 10px; }
+        #arch-root .cp {
+          position: absolute; left: 1225px; top: 956px; padding: 6px 16px; border-radius: 8px; border: 2px solid var(--c-opt);
+          background: rgba(63, 216, 168, 0.12); font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--c-opt); white-space: nowrap;
+        }
+      </style>
+
+      <div id="arch-root" data-composition-id="arch" data-width="1920" data-height="1080">
+        <div class="scene" id="arch-in">
+          <div class="eyebrow" data-layout-allow-overlap id="arch-eyebrow">05 · Architecture</div>
+          <div class="scene-title" data-layout-allow-overlap id="arch-title">Three code agents, one quarantine gate, one signed contract.</div>
+          <div class="diagram" id="arch-diagram">
+            <svg class="wires" viewBox="0 0 1920 1080" id="arch-svg"></svg>
+
+            <div class="band" id="arch-band">
+              <span class="who"><b>orchestrator.py</b></span>
+              <span class="st" id="st-0"><span class="st-lit" id="stl-0"></span>DISCOVER <i>39 s</i></span><span class="ar">→</span>
+              <span class="st" id="st-1"><span class="st-lit" id="stl-1"></span>VALIDATE <i>44 s</i></span><span class="ar">→</span>
+              <span class="st" id="st-2"><span class="st-lit" id="stl-2"></span>BUILD <i>0.14 s</i></span><span class="ar">→</span>
+              <span class="st" id="st-3"><span class="st-lit" id="stl-3"></span>LAND <i>6 s</i></span><span class="ar">→</span>
+              <span class="st" id="st-4"><span class="st-lit" id="stl-4"></span>DBT_BUILD <i>11 s</i></span><span class="ar">→</span>
+              <span class="st" id="st-5"><span class="st-lit" id="stl-5"></span>DONE</span>
+              <span class="tot" id="arch-tot">→ run_state.json</span>
+            </div>
+
+            <div class="lh" id="lh-1" style="left: 120px; width: 240px; color: var(--c-data)">SOURCES</div>
+            <div class="lh" id="lh-2" style="left: 410px; width: 290px; color: var(--c-model)">AGENTS</div>
+            <div class="lh" id="lh-3" style="left: 760px; width: 210px; color: var(--c-risk)">CONTROL</div>
+            <div class="lh" id="lh-4" style="left: 1020px; width: 300px; color: var(--c-opt)">BUILD + RUN</div>
+            <div class="lh" id="lh-5" style="left: 1400px; width: 400px; color: var(--c-eval)">SERVE + SCORE</div>
+
+            <div id="arch-nodes"></div>
+
+            <div class="gate" id="n-gate" style="left: 759px; top: 529px">
+              <div class="dia" id="n-gate-dia"></div>
+              <div class="gt"><span>quarantine</span><b>&gt; 5%?</b><span>any table</span></div>
+            </div>
+
+            <div class="wl" id="wl-cat" style="left: 568px; top: 510px; color: var(--c-model)">catalog.yml</div>
+            <div class="wl" id="wl-con" style="left: 238px; top: 516px; color: var(--c-data)">--contract</div>
+            <div class="wl" id="wl-ok" style="left: 902px; top: 492px; color: var(--c-opt)">≤ 5%</div>
+            <div class="wl" id="wl-bad" style="left: 878px; top: 752px; color: var(--c-risk)">&gt; 5%</div>
+            <div class="wl" id="wl-dbt" style="left: 1336px; top: 374px; color: var(--c-opt)">dbt/</div>
+            <div class="wl" id="wl-raw" style="left: 1186px; top: 690px; color: var(--c-opt)">raw.* as text</div>
+            <div class="wl" id="wl-mod" style="left: 1614px; top: 510px; color: var(--c-opt)">31 models</div>
+            <div class="wl" id="wl-par" style="left: 1540px; top: 736px; color: var(--c-eval)">row-for-row check</div>
+            <div class="wl" id="wl-sign" style="left: 254px; top: 878px; color: var(--c-eval)">signs</div>
+
+            <div class="legend" id="arch-legend">
+              <span><svg width="44" height="10"><path d="M2 5h40" stroke="#b2bfcc" stroke-width="3.5"/></svg>data</span>
+              <span><svg width="44" height="10"><path d="M2 5h40" stroke="#b2bfcc" stroke-width="3.5" stroke-dasharray="7 6"/></svg>control / review</span>
+              <span><svg width="22" height="22"><rect x="4" y="4" width="14" height="14" transform="rotate(45 11 11)" fill="none" stroke="#ff8a73" stroke-width="2.5"/></svg>decision</span>
+              <span><svg width="26" height="22"><path d="M3 6v10a10 4 0 0 0 20 0V6M3 6a10 4 0 0 0 20 0a10 4 0 0 0-20 0" fill="none" stroke="#b2bfcc" stroke-width="2"/></svg>store</span>
+            </div>
+            <div class="cp" id="arch-cp">critical path · raw → green build 100 s</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 14.6;
+          const NS = "http://www.w3.org/2000/svg";
+          const COL = { data: "#7fa8ff", model: "#b9a2ff", opt: "#3fd8a8", eval: "#f2c46d", risk: "#ff8a73" };
+
+          /* ---------- nodes: every box maps to a file in src/pipeline_builder/ (or a repo folder) ---------- */
+          const NODES = [
+            // layer 1: sources
+            { id: "n-raw", L: "data", cls: "folder", x: 120, y: 350, w: 240, h: 140, f: "data/raw/", t: "Raw drop", s: ["7 files", "1.86M rows"] },
+            { id: "n-con", L: "data", cls: "cyl", x: 120, y: 600, w: 240, h: 190, t: "Contract", s: ["catalog.yml", "rules.yml"] },
+            // layer 2: agents
+            { id: "n-disc", L: "model", x: 410, y: 350, w: 290, h: 140, f: "discovery.py", t: "Discover", s: ["types, keys, joins", "parse rates, no LLM"] },
+            { id: "n-val", L: "model", x: 410, y: 560, w: 290, h: 150, f: "validation.py", t: "Validate", s: ["136 rules", "each with evidence"] },
+            { id: "n-hum", L: "eval", cls: "human", x: 410, y: 800, w: 290, h: 130, t: "Engineer", s: ["reviews, signs", "rules.yml"], human: true },
+            // layer 3: control
+            { id: "n-llm", L: "model", cls: "ext", x: 760, y: 350, w: 210, h: 140, f: "describe.py", t: "Local LLM", s: ["opt-in", "wording only"] },
+            { id: "n-halt", L: "risk", x: 760, y: 800, w: 210, h: 130, t: "HALTED", s: ["nothing built", "until signed"] },
+            // layer 4: build + run
+            { id: "n-build", L: "opt", x: 1020, y: 350, w: 300, h: 140, f: "builder.py · sql.py", t: "Build", s: ["dbt SQL · 39 files", "DAG · nightly 03:00"] },
+            { id: "n-land", L: "opt", x: 1020, y: 560, w: 300, h: 110, f: "runtime.py", t: "Land", s: ["text + row position"] },
+            { id: "n-wh", L: "data", cls: "cyl", x: 1020, y: 740, w: 300, h: 170, t: "Warehouse", s: ["warehouse.duckdb"] },
+            // layer 5: serve + score
+            { id: "n-dbt", L: "opt", x: 1400, y: 350, w: 400, h: 140, f: "dbt_run.py", t: "dbt build", s: ["31 models · 91 tests pass", "retried once · 11 s"] },
+            { id: "n-marts", L: "opt", x: 1400, y: 560, w: 400, h: 150, f: "generated dbt/", t: "Marts + quarantine", s: ["stg_* + stg_*__rejected", "dim · fct · agg_daily"] },
+            { id: "n-eval", L: "eval", x: 1400, y: 790, w: 250, h: 140, f: "evaluate.py", t: "Score", s: ["vs answer key", "metrics.json"] },
+            { id: "n-key", L: "eval", cls: "cyl", x: 1680, y: 790, w: 120, h: 140, t: "", s: ["answer", "key"] },
+          ];
+          const AVATAR = '<svg class="av" viewBox="0 0 62 62"><circle cx="31" cy="31" r="30" fill="rgba(242,196,109,0.16)" stroke="#f2c46d" stroke-width="2"/><circle cx="31" cy="24" r="9" fill="#f2c46d"/><path d="M14 50c2-9 9-14 17-14s15 5 17 14" fill="#f2c46d"/></svg>';
+          const host = document.getElementById("arch-nodes");
+          host.innerHTML = NODES.map((n) => {
+            const lines = (n.t ? '<div class="t">' + n.t + "</div>" : "") + n.s.map((x) => '<div class="s">' + x + "</div>").join("");
+            const body = n.human ? AVATAR + '<div class="col">' + lines + "</div>" : lines;
+            return '<div class="node L-' + n.L + " " + (n.cls || "") + '" id="' + n.id + '" style="left:' + n.x + "px;top:" + n.y + "px;width:" + n.w + "px;height:" + n.h + 'px">' +
+              (n.f ? '<div class="f">' + n.f + "</div>" : "") + body + '<div class="glow" id="' + n.id + '-glow"></div></div>';
+          }).join("");
+
+          /* ---------- wires: orthogonal point lists matched to the boxes above; colour = source layer ---------- */
+          const W = {
+            raw_disc: { pts: [[360, 420], [410, 420]], c: "data" },
+            disc_val: { pts: [[555, 490], [555, 560]], c: "model" },
+            val_gate: { pts: [[700, 635], [759, 635]], c: "model" },
+            gate_build: { pts: [[971, 635], [995, 635], [995, 455], [1020, 455]], c: "opt" },
+            llm_build: { pts: [[970, 400], [1020, 400]], c: "model", dash: true },
+            gate_halt: { pts: [[865, 741], [865, 800]], c: "risk", dash: true },
+            halt_hum: { pts: [[760, 865], [700, 865]], c: "risk", dash: true },
+            hum_con: { pts: [[410, 865], [240, 865], [240, 790]], c: "eval", dash: true },
+            con_disc: { pts: [[360, 640], [385, 640], [385, 465], [410, 465]], c: "data", dash: true },
+            con_val: { pts: [[360, 690], [410, 690]], c: "data", dash: true },
+            build_dbt: { pts: [[1320, 415], [1400, 415]], c: "opt" },
+            build_land: { pts: [[1170, 490], [1170, 560]], c: "opt", dash: true },
+            land_wh: { pts: [[1170, 670], [1170, 740]], c: "opt" },
+            wh_dbt: { pts: [[1320, 825], [1360, 825], [1360, 455], [1400, 455]], c: "data" },
+            dbt_marts: { pts: [[1600, 490], [1600, 560]], c: "opt" },
+            marts_eval: { pts: [[1525, 710], [1525, 790]], c: "eval" },
+            key_eval: { pts: [[1680, 860], [1650, 860]], c: "eval" },
+          };
+          const svg = document.getElementById("arch-svg");
+          const lenOf = (pts) => pts.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
+          const arrowHead = (w, name) => {
+            const n = w.pts.length, [x1, y1] = w.pts[n - 2], [x2, y2] = w.pts[n - 1];
+            const a = Math.atan2(y2 - y1, x2 - x1), s = 13;
+            const p1 = [x2 - s * Math.cos(a - 0.45), y2 - s * Math.sin(a - 0.45)], p2 = [x2 - s * Math.cos(a + 0.45), y2 - s * Math.sin(a + 0.45)];
+            const h = document.createElementNS(NS, "path");
+            h.setAttribute("d", "M" + p1.map((v) => v.toFixed(1)).join(" ") + " L" + x2 + " " + y2 + " L" + p2.map((v) => v.toFixed(1)).join(" ") + "z");
+            h.setAttribute("fill", COL[w.c]);
+            h.setAttribute("id", "arch-h-" + name);
+            h.setAttribute("opacity", "0");
+            return h;
+          };
+          Object.entries(W).forEach(([name, w]) => {
+            const p = document.createElementNS(NS, "path");
+            p.setAttribute("d", "M" + w.pts.map((q) => q.join(" ")).join(" L"));
+            p.setAttribute("class", "wire");
+            p.setAttribute("id", "arch-w-" + name);
+            p.setAttribute("stroke", COL[w.c]);
+            w.len = lenOf(w.pts);
+            if (w.dash) {
+              p.setAttribute("stroke-dasharray", "9 8");
+              p.setAttribute("opacity", "0");
+            } else {
+              p.setAttribute("stroke-dasharray", w.len + " " + w.len);
+              p.setAttribute("stroke-dashoffset", String(w.len));
+              p.setAttribute("opacity", "0.8");
+            }
+            svg.appendChild(p);
+            svg.appendChild(arrowHead(w, name));
+            w.el = p;
+          });
+          const drawWire = (name, at) => {
+            const w = W[name];
+            const dur = Math.max(0.35, w.len / 700);
+            if (w.dash) tl.fromTo(w.el, { attr: { opacity: 0 } }, { attr: { opacity: 0.75 }, duration: 0.5, ease: "power2.out" }, at);
+            else tl.fromTo(w.el, { attr: { "stroke-dashoffset": w.len } }, { attr: { "stroke-dashoffset": 0 }, duration: dur, ease: "power2.inOut" }, at);
+            tl.fromTo("#arch-h-" + name, { attr: { opacity: 0 } }, { attr: { opacity: 0.9 }, duration: 0.2 }, at + (w.dash ? 0.3 : dur - 0.1));
+          };
+
+          /* ---------- phase 1: build the diagram layer by layer ---------- */
+          tl.fromTo("#arch-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#arch-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#arch-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#arch-band", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.6);
+          const pop = (sel, at, from) =>
+            tl.fromTo(sel, Object.assign({ opacity: 0, x: 0, y: 0 }, from), { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "power3.out" }, at);
+          const LAYERS = [
+            { at: 1.0, h: "#lh-1", nodes: ["#n-raw", "#n-con"], wires: [] },
+            { at: 1.7, h: "#lh-2", nodes: ["#n-disc", "#n-val", "#n-hum"], wires: ["raw_disc", "disc_val", "con_disc", "con_val", "hum_con"], labels: ["#wl-cat", "#wl-con", "#wl-sign"] },
+            { at: 2.5, h: "#lh-3", nodes: ["#n-gate", "#n-llm", "#n-halt"], wires: ["val_gate", "gate_halt", "halt_hum"], labels: ["#wl-bad"] },
+            { at: 3.3, h: "#lh-4", nodes: ["#n-build", "#n-land", "#n-wh"], wires: ["gate_build", "llm_build", "build_land", "land_wh"], labels: ["#wl-ok", "#wl-raw"] },
+            { at: 4.1, h: "#lh-5", nodes: ["#n-dbt", "#n-marts", "#n-eval", "#n-key"], wires: ["build_dbt", "wh_dbt", "dbt_marts", "marts_eval", "key_eval"], labels: ["#wl-dbt", "#wl-mod", "#wl-par"] },
+          ];
+          LAYERS.forEach((Ly) => {
+            tl.fromTo(Ly.h, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, Ly.at);
+            Ly.nodes.forEach((n, i) => pop(n, Ly.at + 0.08 + i * 0.1, { y: 18 }));
+            Ly.wires.forEach((w, i) => drawWire(w, Ly.at + 0.3 + i * 0.05));
+            (Ly.labels || []).forEach((l) => tl.fromTo(l, { opacity: 0 }, { opacity: 1, duration: 0.4 }, Ly.at + 0.6));
+          });
+          tl.fromTo("#arch-legend", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 4.6);
+
+          /* ---------- phase 2: packets in execution order (one nightly run) ---------- */
+          const packet = (name, at, dur, color) => {
+            const w = W[name], c = document.createElementNS(NS, "circle");
+            c.setAttribute("r", "8"); c.setAttribute("cx", w.pts[0][0]); c.setAttribute("cy", w.pts[0][1]);
+            c.setAttribute("fill", color || COL[w.c]); c.setAttribute("opacity", "0");
+            svg.appendChild(c);
+            const kf = [];
+            for (let i = 1; i < w.pts.length; i++) {
+              const seg = Math.hypot(w.pts[i][0] - w.pts[i - 1][0], w.pts[i][1] - w.pts[i - 1][1]);
+              kf.push({ attr: { cx: w.pts[i][0], cy: w.pts[i][1] }, duration: (dur * seg) / w.len, ease: "none" });
+            }
+            tl.fromTo(c, { attr: { opacity: 0 } }, { attr: { opacity: 1 }, duration: 0.1 }, at);
+            tl.to(c, { keyframes: kf }, at);
+            tl.to(c, { attr: { opacity: 0 }, duration: 0.15 }, at + dur);
+            return at + dur;
+          };
+          const flash = (node, at) => {
+            tl.fromTo(node + "-glow", { opacity: 0 }, { opacity: 0.9, duration: 0.18, ease: "power2.out" }, at);
+            tl.to(node + "-glow", { opacity: 0, duration: 0.6, ease: "power2.in" }, at + 0.35);
+          };
+          const lightState = (i, at) => {
+            tl.fromTo("#stl-" + i, { opacity: 0 }, { opacity: 1, duration: 0.2 }, at);
+            if (i < 5) tl.to("#stl-" + i, { opacity: 0.25, duration: 0.4 }, at + 0.9);
+          };
+          const F0 = 5.0, PD = 0.42;
+          let t = F0;
+          flash("#n-raw", t); lightState(0, t);
+          t = packet("raw_disc", t, PD); flash("#n-disc", t);
+          t = packet("disc_val", t, PD); flash("#n-val", t); lightState(1, t);
+          t = packet("val_gate", t, PD);
+          const gatePulse = (at) => {
+            tl.to("#n-gate-dia", { boxShadow: "0 0 34px rgba(255,138,115,0.7)", duration: 0.25 }, at);
+            tl.to("#n-gate-dia", { boxShadow: "0 0 0px rgba(255,138,115,0)", duration: 0.25 }, at + 0.25);
+          };
+          gatePulse(t);
+          packet("llm_build", t, PD, COL.model);
+          t = packet("gate_build", t, PD); flash("#n-build", t); lightState(2, t);
+          t = packet("build_land", t, PD); flash("#n-land", t); lightState(3, t);
+          t = packet("land_wh", t, PD); flash("#n-wh", t);
+          packet("build_dbt", t - 0.2, PD + 0.2);
+          t = packet("wh_dbt", t, PD + 0.2); flash("#n-dbt", t); lightState(4, t);
+          t = packet("dbt_marts", t, PD); flash("#n-marts", t); lightState(5, t);
+          packet("key_eval", t, PD);
+          t = packet("marts_eval", t, PD); flash("#n-eval", t);
+          // fallback path: a dirty drop trips the gate -> HALTED -> a person signs the contract -> next drop enforces it
+          let u = t + 0.4;
+          gatePulse(u);
+          u = packet("gate_halt", u, PD, COL.risk); flash("#n-halt", u);
+          u = packet("halt_hum", u, PD, COL.risk); flash("#n-hum", u);
+          u = packet("hum_con", u, PD + 0.2, COL.eval); flash("#n-con", u);
+          packet("con_val", u, PD, COL.data); packet("con_disc", u, PD + 0.2, COL.data);
+
+          /* ---------- phase 3: highlight the critical path ---------- */
+          const CP = ["raw_disc", "disc_val", "val_gate", "gate_build", "build_land", "land_wh", "wh_dbt", "dbt_marts"];
+          const OFF = Object.keys(W).filter((k) => !CP.includes(k) && k !== "build_dbt");
+          const HL = Math.max(u + 0.5, 11.2);
+          OFF.forEach((k) => {
+            tl.to(W[k].el, { attr: { opacity: 0.18 }, duration: 0.5 }, HL);
+            tl.to("#arch-h-" + k, { attr: { opacity: 0.18 }, duration: 0.5 }, HL);
+          });
+          CP.concat(["build_dbt"]).forEach((k) => tl.to(W[k].el, { attr: { "stroke-width": 6, opacity: 1 }, duration: 0.5 }, HL));
+          tl.to(["#n-llm", "#n-halt", "#n-hum", "#n-con", "#n-eval", "#n-key", "#wl-con", "#wl-sign", "#wl-bad", "#wl-par"], { opacity: 0.35, duration: 0.5 }, HL);
+          tl.fromTo("#arch-cp", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, HL + 0.2);
+          for (let k = 0; k < 6; k++) tl.to("#stl-" + k, { opacity: 1, duration: 0.25 }, HL + 0.2 + k * 0.12);
+          let v = HL + 0.4;
+          CP.forEach((k) => { v = packet(k, v, 0.3, "#ffffff"); });
+          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["arch"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

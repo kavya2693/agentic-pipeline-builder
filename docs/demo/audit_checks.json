@@ -1,0 +1,478 @@
+{
+ "generated": "2026-10-14 14:13",
+ "commit": "cbcb816890b0cb816098c9b2e8f9850dc959f944",
+ "checks": [
+  {
+   "id": "F-01",
+   "shown": "3 chips",
+   "type": "general-knowledge",
+   "status": "manual",
+   "computed": "-",
+   "reason": "Context statement, not a repo output."
+  },
+  {
+   "id": "F-02",
+   "shown": "4 problem cards",
+   "type": "general-knowledge",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-03",
+   "shown": "7 files",
+   "type": "direct",
+   "computed": "7",
+   "expect": "7",
+   "status": "pass"
+  },
+  {
+   "id": "F-04",
+   "shown": "1.86M rows",
+   "type": "derived",
+   "computed": "1.86M",
+   "expect": "1.86M",
+   "status": "pass"
+  },
+  {
+   "id": "F-05",
+   "shown": "45,677 planted defects",
+   "type": "direct",
+   "computed": "45,677",
+   "expect": "45,677",
+   "status": "pass"
+  },
+  {
+   "id": "F-06",
+   "shown": "csv \u00b7 json \u00b7 jsonl \u00b7 parquet",
+   "type": "direct",
+   "computed": "csv \u00b7 json \u00b7 jsonl \u00b7 parquet",
+   "expect": "csv \u00b7 json \u00b7 jsonl \u00b7 parquet",
+   "status": "pass"
+  },
+  {
+   "id": "F-07",
+   "shown": "two date formats in one column",
+   "type": "direct",
+   "computed": "2",
+   "expect": "2",
+   "status": "pass"
+  },
+  {
+   "id": "F-08",
+   "shown": "9 defect types at known rows",
+   "type": "direct",
+   "computed": "9",
+   "expect": "9",
+   "status": "pass"
+  },
+  {
+   "id": "F-09",
+   "shown": "ONE STATE MACHINE / orchestrator.py band",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-10",
+   "shown": "too many bad rows? stop / quarantine > 5%? any table / HALTED",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-11",
+   "shown": "build, test, retry once / retried once",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-12",
+   "shown": "every type right / bad rows caught / dbt build green",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-13",
+   "shown": "93.0%",
+   "type": "direct",
+   "computed": "93.0%",
+   "expect": "93.0%",
+   "status": "pass"
+  },
+  {
+   "id": "F-14",
+   "shown": "20.8%",
+   "type": "direct",
+   "computed": "20.8%",
+   "expect": "20.8%",
+   "status": "pass"
+  },
+  {
+   "id": "F-15",
+   "shown": "92.0%",
+   "type": "direct",
+   "computed": "92.0%",
+   "expect": "92.0%",
+   "status": "pass"
+  },
+  {
+   "id": "F-16",
+   "shown": "91.3%",
+   "type": "direct",
+   "computed": "91.3%",
+   "expect": "91.3%",
+   "status": "pass"
+  },
+  {
+   "id": "F-17",
+   "shown": "red bar 0.9300 -> 0.2075, green bar 0.9197 -> 0.9126 of full width",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-18",
+   "shown": "39 s \u00b7 44 s \u00b7 0.14 s \u00b7 6 s \u00b7 11 s",
+   "type": "derived",
+   "computed": "39 s \u00b7 44 s \u00b7 0.14 s \u00b7 6 s \u00b7 11 s",
+   "expect": "39 s \u00b7 44 s \u00b7 0.14 s \u00b7 6 s \u00b7 11 s",
+   "status": "pass"
+  },
+  {
+   "id": "F-19",
+   "shown": "100 s (slides 05, 06 title, 08) / 99.9 s (slide 06 log)",
+   "type": "direct",
+   "computed": "100 s",
+   "expect": "100 s",
+   "status": "pass"
+  },
+  {
+   "id": "F-20",
+   "shown": "136 rules",
+   "type": "direct",
+   "computed": "136",
+   "expect": "136",
+   "status": "pass"
+  },
+  {
+   "id": "F-21",
+   "shown": "39 files / 39 dbt files",
+   "type": "direct",
+   "computed": "39",
+   "expect": "39",
+   "status": "pass"
+  },
+  {
+   "id": "F-22",
+   "shown": "DAG \u00b7 nightly 03:00",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-23",
+   "shown": "31 models",
+   "type": "direct",
+   "computed": "31",
+   "expect": "31",
+   "status": "pass"
+  },
+  {
+   "id": "F-24",
+   "shown": "91 tests pass",
+   "type": "direct",
+   "computed": "91",
+   "expect": "91",
+   "status": "pass"
+  },
+  {
+   "id": "F-25",
+   "shown": "file tags on the boxes",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-26",
+   "shown": "--contract into Discover and Validate",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-27",
+   "shown": "row-for-row check",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-28",
+   "shown": "Local LLM \u00b7 opt-in \u00b7 wording only",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-29",
+   "shown": "54 columns \u00b7 7 keys \u00b7 7 joins",
+   "type": "direct",
+   "computed": "54 columns \u00b7 7 keys \u00b7 7 joins",
+   "expect": "54 columns \u00b7 7 keys \u00b7 7 joins",
+   "status": "pass"
+  },
+  {
+   "id": "F-30",
+   "shown": "38.67 \u00b7 44.15 \u00b7 0.14 \u00b7 5.93 \u00b7 10.99",
+   "type": "direct",
+   "computed": "38.67 \u00b7 44.15 \u00b7 0.14 \u00b7 5.93 \u00b7 10.99",
+   "expect": "38.67 \u00b7 44.15 \u00b7 0.14 \u00b7 5.93 \u00b7 10.99",
+   "status": "pass"
+  },
+  {
+   "id": "F-31",
+   "shown": "88-line DAG",
+   "type": "direct",
+   "computed": "88",
+   "expect": "88",
+   "status": "pass"
+  },
+  {
+   "id": "F-32",
+   "shown": "5 warn",
+   "type": "direct",
+   "computed": "5",
+   "expect": "5",
+   "status": "pass"
+  },
+  {
+   "id": "F-33",
+   "shown": "DONE \u00b7 0 tests failed",
+   "type": "direct",
+   "computed": "DONE \u00b7 0 failed",
+   "expect": "DONE \u00b7 0 failed",
+   "status": "pass"
+  },
+  {
+   "id": "F-34",
+   "shown": "orders 2.86% 11,507 \u00b7 order_items 2.00% 19,452 \u00b7 customers 1.99% 1,200 \u00b7 payments 1.83% 7,409 \u00b7 returns 0.50% 98 \u00b7 products 0.00% 0 \u00b7 stores 0.00% 0",
+   "type": "direct",
+   "computed": "orders 2.86% 11,507 \u00b7 order_items 2.00% 19,452 \u00b7 customers 1.99% 1,200 \u00b7 payments 1.83% 7,409 \u00b7 returns 0.50% 98 \u00b7 products 0.00% 0 \u00b7 stores 0.00% 0",
+   "expect": "orders 2.86% 11,507 \u00b7 order_items 2.00% 19,452 \u00b7 customers 1.99% 1,200 \u00b7 payments 1.83% 7,409 \u00b7 returns 0.50% 98 \u00b7 products 0.00% 0 \u00b7 stores 0.00% 0",
+   "status": "pass"
+  },
+  {
+   "id": "F-35",
+   "shown": "the same 39,666 rows",
+   "type": "derived",
+   "computed": "39,666",
+   "expect": "39,666",
+   "status": "pass"
+  },
+  {
+   "id": "F-36",
+   "shown": "9 bars",
+   "type": "direct",
+   "computed": "duplicate_row 4,316 100.0% \u00b7 null_required 9,179 100.0% \u00b7 orphan_fk 6,961 100.0% \u00b7 type_corruption 6,863 100.0% \u00b7 negative_value 6,879 100.0% \u00b7 future_date 2,300 100.0% \u00b7 malformed_email 300 100.0% \u00b7 invalid_enum 4,016 63.4% \u00b7 outlier_value 4,863 22.8%",
+   "expect": "duplicate_row 4,316 100.0% \u00b7 null_required 9,179 100.0% \u00b7 orphan_fk 6,961 100.0% \u00b7 type_corruption 6,863 100.0% \u00b7 negative_value 6,879 100.0% \u00b7 future_date 2,300 100.0% \u00b7 malformed_email 300 100.0% \u00b7 invalid_enum 4,016 63.4% \u00b7 outlier_value 4,863 22.8%",
+   "status": "pass"
+  },
+  {
+   "id": "F-37",
+   "shown": "88.6%",
+   "type": "direct",
+   "computed": "88.6%",
+   "expect": "88.6%",
+   "status": "pass"
+  },
+  {
+   "id": "F-38",
+   "shown": "100% for duplicate_row and null_required, 0% for the other seven",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-39",
+   "shown": "order_id unique 2,000 \u00b7 customer_id not null 2,000 \u00b7 customer_id in customers 2,000 \u00b7 ordered_at date in window 2,000 \u00b7 order_total is decimal 2,000 \u00b7 status one of 7 values 1,515",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-40",
+   "shown": "11,507 of 402,000 rows held back (2.86%)",
+   "type": "direct",
+   "computed": "11,507 of 402,000 (2.86%)",
+   "expect": "11,507 of 402,000 (2.86%)",
+   "status": "pass"
+  },
+  {
+   "id": "F-41",
+   "shown": "stg_orders 390,493",
+   "type": "derived",
+   "computed": "390,493",
+   "expect": "390,493",
+   "status": "pass"
+  },
+  {
+   "id": "F-42",
+   "shown": "+ 17 more rules on orders (16 flag no rows)",
+   "type": "derived",
+   "computed": "17 more (16 flag no rows)",
+   "expect": "17 more (16 flag no rows)",
+   "status": "pass"
+  },
+  {
+   "id": "F-43",
+   "shown": "cancel, pending_x ringed in the status value set",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-44",
+   "shown": "under the 5% gate",
+   "type": "derived",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-45",
+   "shown": "Days of detective work become a review.",
+   "type": "general-knowledge",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-47",
+   "shown": "100% (54/54)",
+   "type": "direct",
+   "computed": "100%",
+   "expect": "100%",
+   "status": "pass"
+  },
+  {
+   "id": "F-48",
+   "shown": "pandas 68.5% \u00b7 DuckDB 81.5%",
+   "type": "direct",
+   "computed": "pandas 68.5% \u00b7 DuckDB 81.5%",
+   "expect": "pandas 68.5% \u00b7 DuckDB 81.5%",
+   "status": "pass"
+  },
+  {
+   "id": "F-50",
+   "shown": "hand-written pass: 29.5%",
+   "type": "direct",
+   "computed": "29.5%",
+   "expect": "29.5%",
+   "status": "pass"
+  },
+  {
+   "id": "F-51",
+   "shown": "98.4%",
+   "type": "direct",
+   "computed": "98.4%",
+   "expect": "98.4%",
+   "status": "pass"
+  },
+  {
+   "id": "F-52",
+   "shown": "hand-written pass: 3.4%",
+   "type": "direct",
+   "computed": "3.4%",
+   "expect": "3.4%",
+   "status": "pass"
+  },
+  {
+   "id": "F-58",
+   "shown": "16.3%",
+   "type": "direct",
+   "computed": "16.3%",
+   "expect": "16.3%",
+   "status": "pass"
+  },
+  {
+   "id": "F-59",
+   "shown": "91.5%",
+   "type": "direct",
+   "computed": "91.5%",
+   "expect": "91.5%",
+   "status": "pass"
+  },
+  {
+   "id": "F-60",
+   "shown": "primary keys found: 4 of 7",
+   "type": "direct",
+   "computed": "4/7",
+   "expect": "4/7",
+   "status": "pass"
+  },
+  {
+   "id": "F-61",
+   "shown": "every profiler tolerance sits near 1%",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-62",
+   "shown": "10%-scale drops",
+   "type": "direct",
+   "computed": "0.1",
+   "expect": "0.1",
+   "status": "pass"
+  },
+  {
+   "id": "F-63",
+   "shown": "OPEN SOURCE \u00b7 MIT",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-64",
+   "shown": "dbt \u00b7 DuckDB \u00b7 Airflow DAG \u00b7 pandas \u00b7 Python",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-65",
+   "shown": "$ make e2e   # generate 1.86M rows, build, dbt build, score",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  },
+  {
+   "id": "F-66",
+   "shown": "RUNS ON A LAPTOP",
+   "type": "direct",
+   "computed": "true",
+   "expect": "true",
+   "status": "pass"
+  }
+ ]
+}

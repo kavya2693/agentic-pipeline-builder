@@ -1,0 +1,494 @@
+# Audit facts for the agentic-pipeline-builder demo video.
+# Read by docs/demo/source/tools/build_audit_report.py (paths below are relative to this file).
+#
+# Check expressions are Python, evaluated with these helpers (paths relative to the repo root;
+# a "demo:" prefix means relative to the demo project folder):
+#   R(path) -> pandas DataFrame from CSV      J(path) -> parsed JSON
+#   row(path, **eq) -> the single CSV row matching all equalities (a pandas Series)
+#   T(path) -> file text                      grep(path, regex) -> True/False
+#   plus the helpers defined at the bottom of this file (Y, M, S, ...)
+# A check passes when fmt.format(value) == expect (or, with fmt "bool", when value is True).
+# Only committed files are read (outputs/, examples/, src/, README.md); data/ and generated/ are gitignored.
+
+project:
+  name: agentic-pipeline-builder
+  title: "agentic-pipeline-builder: demo video audit report"
+  repo_url: https://github.com/kavya2693/agentic-pipeline-builder
+  repo_dir: ../../../..
+  demo_dir: ..
+  demo_display: docs/demo/source
+  out_dir: ../..
+  video: docs/demo/demo.mp4
+  video_duration_s: 86.0
+  outputs_dir: outputs
+  venv_python: .venv/bin/python
+  version_packages: [pandas, numpy, duckdb, yaml, pyarrow]
+  regenerate:
+    - "make e2e                                   # data/raw + answer key, then discover, validate, build, dbt build, score -> outputs/metrics.json, report.md"
+    - "make stress                                # outputs/stress.json, stress.md (10%-scale defect-rate sweep)"
+    - "PYTHONPATH=src .venv/bin/python docs/demo/source/tools/export_contract_sheet.py docs/demo/source/assets/contract_sheet.json"
+    - "python3 docs/demo/source/tools/inject_contract.py docs/demo/source/assets/contract_sheet.json docs/demo/source/compositions/value.html --rules orders__pk__unique,orders__customer_id__not_null,orders__customer_id__references_customers,orders__ordered_at__window,orders__order_total__type,orders__status__in_set"
+    - "cd docs/demo/source && npx --yes hyperframes@0.8.156 check && npx --yes hyperframes@0.8.156 render -f 30 -q looks -o renders/agentic-pipeline-builder-master.mp4 && cd -"
+    - "ffmpeg -y -i docs/demo/source/renders/agentic-pipeline-builder-master.mp4 -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p -movflags +faststart -an docs/demo/demo.mp4"
+    - "python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/facts.yaml   # stills, checks, MD/DOCX/PDF"
+  seeds: {data_seed: 7, stress_baseline_seed: 3, defect_rate: 0.005, as_of: "2026-02-01"}
+  run_time: "metrics.json seconds_raw_to_built = 99.9 s for the pipeline run (data generation not included); the contract-sheet export re-runs discovery + validation in about 40 s"
+
+assumptions:
+  - id: A-01
+    statement: "All data is synthetic: a seeded generator writes a regional retailer's nightly drop (60k customers, 400k orders, 973k order lines, 405k payments, 20k returns, 4,000 products, 120 stores). The generator and the inference rules were written by the same person, so 100% type accuracy is an upper bound, not evidence that the rules generalise."
+    source: "scripts/generate_data.py:14-18 (scale 1.0, seed 7); src/pipeline_builder/datagen.py; README 'The data'"
+    figures: []
+    all_figures: true
+    edit: ["src/pipeline_builder/datagen.py", "scripts/generate_data.py"]
+    rerun: ["make e2e", "make stress"]
+  - id: A-02
+    statement: "Defects are planted at 0.5% of rows per defect type (nine types) at known rows; the answer key in data/ground_truth holds every type, key, relationship and defect."
+    source: "scripts/generate_data.py:15 (--defect-rate 0.005); README 'The data'"
+    figures: [F-05, F-08, F-36, F-37, F-38, F-50, F-51, F-52]
+    edit: ["scripts/generate_data.py:15"]
+    rerun: ["make e2e"]
+  - id: A-03
+    statement: "The drop is judged as of 2026-02-01: date-window rules reject dates after the run date."
+    source: "Makefile:4 (AS_OF ?= 2026-02-01); validation.py (date window rule)"
+    figures: [F-34, F-36, F-39, F-40]
+    edit: ["Makefile:4"]
+    rerun: ["make e2e", "export_contract_sheet.py + inject_contract.py"]
+  - id: A-04
+    statement: "Quarantine gate: the run halts before building if any table would quarantine more than 5% of its rows."
+    source: "src/pipeline_builder/orchestrator.py:35 (max_quarantine_rate = 0.05), :143 (too_many_rejects -> HALTED); cli.py:201"
+    figures: [F-10, F-34, F-44]
+    edit: ["src/pipeline_builder/orchestrator.py:35 or --max-quarantine-rate"]
+    rerun: ["make e2e"]
+  - id: A-05
+    statement: "Profiler tolerances sit near 1%: a type needs 98% of values to parse, a required column at most 1% nulls, a key 99% distinct and at most 1% nulls, a non-negative column 99% non-negative, a category at least 0.1% of rows; outliers are flagged above 10x the p99."
+    source: "src/pipeline_builder/discovery.py:27, :30-31, :33; validation.py:25, :28, :31, :33"
+    figures: [F-03, F-20, F-29, F-36, F-47, F-13, F-14, F-58, F-61]
+    edit: ["src/pipeline_builder/discovery.py:27-35", "src/pipeline_builder/validation.py:25-36"]
+    rerun: ["make e2e", "make stress"]
+  - id: A-06
+    statement: "Retry policy: only DBT_BUILD and LAND are retried (2 attempts each); a rule that fails on the data fails the same way twice."
+    source: "src/pipeline_builder/orchestrator.py:153 (MAX_ATTEMPTS)"
+    figures: [F-11]
+    edit: ["src/pipeline_builder/orchestrator.py:153"]
+    rerun: ["make e2e"]
+  - id: A-07
+    statement: "Timings are wall-clock seconds from one run on the author's laptop and vary with the machine and its load."
+    source: "outputs/metrics.json state_log, seconds_raw_to_built; README 'The result'"
+    figures: [F-18, F-19, F-30]
+    edit: ["-"]
+    rerun: ["make e2e"]
+  - id: A-08
+    statement: "Stress runs are at 10% scale (about 40,000 orders) with defect rates 0.5%, 2%, 5%, 10% per type (seed 7); the frozen contract is learned once on a separate 0.5% drop (seed 3) and enforced unchanged."
+    source: "scripts/stress_defect_rate.py:93, :99-103; outputs/stress.md"
+    figures: [F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-62]
+    edit: ["scripts/stress_defect_rate.py:93-103"]
+    rerun: ["make stress"]
+  - id: A-09
+    statement: "Scoring: a defect is caught when a rule flags its row on its column (a duplicate row by any uniqueness rule). Row precision = flagged rows that carry any planted defect / all flagged rows."
+    source: "src/pipeline_builder/evaluate.py:143-183 (score_flags)"
+    figures: [F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59]
+    edit: ["src/pipeline_builder/evaluate.py:143"]
+    rerun: ["make e2e", "make stress"]
+  - id: A-10
+    statement: "The 'hand-written first pass' baseline is every column required plus the first column unique."
+    source: "src/pipeline_builder/validation.py:276 (naive_rules)"
+    figures: [F-38, F-50, F-52]
+    edit: ["src/pipeline_builder/validation.py:276"]
+    rerun: ["make e2e"]
+  - id: A-11
+    statement: "The local LLM (Ollama) is off by default and only words column descriptions; types, keys, rules and SQL are deterministic code. The headline run did not use it (descriptions.model_leads = 0)."
+    source: "src/pipeline_builder/describe.py:1-7; cli.py:141, :203; outputs/metrics.json descriptions"
+    figures: [F-28]
+    edit: ["--llm flag"]
+    rerun: ["uv run pipeline-builder run ... --llm llama3.2"]
+  - id: A-12
+    statement: "Video rounding: percentages to 1 decimal (the type-accuracy card to 0), seconds to whole numbers on slides 05 and 08 (BUILD 0.14 s kept) and 2 decimals in the slide 06 log; 1.86M = 1,863,774 rows."
+    source: "this audit (display convention)"
+    figures: [F-04, F-18, F-19, F-36, F-37, F-47, F-48, F-50, F-51, F-52]
+    edit: ["the composition file named on each slide"]
+    rerun: ["hyperframes render"]
+  - id: A-13
+    statement: "Slide 01 (industry, everyday problems) is general data-engineering knowledge used as context, echoed by the README's problem statement. It is not a result of this repo and carries no numbers."
+    source: "author's framing; README 'The problem', 'Why it is hard'"
+    figures: [F-01, F-02]
+    edit: ["compositions/s01-context.html"]
+    rerun: ["hyperframes render"]
+  - id: A-14
+    statement: "Slide 07's scene is schematic: the row tokens are illustrative (every 11th goes to quarantine); the counters, the contract rows and the ringed values come from the export. 'cancel' and 'pending_x' are typos learned as allowed values (README 'Known limitations')."
+    source: "compositions/value.html CONFIG; README 'Known limitations'"
+    figures: [F-39, F-41, F-43]
+    edit: ["compositions/value.html (CONFIG)"]
+    rerun: ["hyperframes render"]
+
+figures:
+  # ---- slide 01
+  - {id: F-01, slides: ["01"], label: "Who relates: retail & e-commerce data teams, analytics engineers, data platform & integration", shown: "3 chips", type: general-knowledge, source: "author's framing", key: "-", formula: "-", manual: "Context statement, not a repo output."}
+  - {id: F-02, slides: ["01"], label: "Four everyday problems (days per source; types guessed wrong; status typo becomes a category; common mess looks normal)", shown: "4 problem cards", type: general-knowledge, source: "README 'The problem', 'Why it is hard'", key: "README lines 16-34", formula: "-",
+     check: {expr: "grep('README.md', r'takes days per source') and grep('README.md', r'status typo that becomes its own category') and grep('README.md', r'common enough looks normal') and grep('README.md', r'postal_code. is text')", fmt: bool}}
+  # ---- slide 02
+  - {id: F-03, slides: ["02", "05", "08"], label: "Source files in the drop", shown: "7 files", type: direct, source: "examples/catalog.yml", key: "tables", formula: "count of tables",
+     check: {expr: "len(Y('examples/catalog.yml')['tables'])", fmt: "{:d}", expect: "7"}}
+  - {id: F-04, slides: ["02", "05", "06", "08"], label: "Rows in the full-size drop", shown: "1.86M rows", type: derived, source: "outputs/metrics.json", key: "quarantine[*].rows", formula: "60,300 + 972,645 + 402,000 + 405,134 + 4,000 + 19,575 + 120 = 1,863,774",
+     check: {expr: "sum(q['rows'] for q in M()['quarantine']) / 1e6", fmt: "{:.2f}M", expect: "1.86M"}}
+  - {id: F-05, slides: ["02", "06", "08"], label: "Planted defects", shown: "45,677 planted defects", type: direct, source: "outputs/metrics.json", key: "dq.agent.injected", formula: "-",
+     check: {expr: "M()['dq']['agent']['injected']", fmt: "{:,d}", expect: "45,677"}}
+  - {id: F-06, slides: ["02"], label: "File formats in the drop", shown: "csv · json · jsonl · parquet", type: direct, source: "examples/catalog.yml", key: "tables[*].file extensions", formula: "set of extensions",
+     check: {expr: "' · '.join(sorted({t['file'].rsplit('.', 1)[1] for t in Y('examples/catalog.yml')['tables'].values()}))", fmt: "{}", expect: "csv · json · jsonl · parquet"}}
+  - {id: F-07, slides: ["02"], label: "Two date formats in one column", shown: "two date formats in one column", type: direct, source: "examples/catalog.yml", key: "customers.signup_date formats ['%m/%d/%Y', '%Y-%m-%d']", formula: "-",
+     check: {expr: "len([c for c in Y('examples/catalog.yml')['tables']['customers']['columns'] if c['name'] == 'signup_date'][0]['formats'])", fmt: "{:d}", expect: "2"}}
+  - {id: F-08, slides: ["02"], label: "Defect types planted", shown: "9 defect types at known rows", type: direct, source: "outputs/metrics.json", key: "dq.agent.by_defect", formula: "count of keys",
+     check: {expr: "len(M()['dq']['agent']['by_defect'])", fmt: "{:d}", expect: "9"}}
+  # ---- slide 03
+  - {id: F-09, slides: ["03", "05"], label: "One state machine: discover, validate, build, land, dbt build", shown: "ONE STATE MACHINE / orchestrator.py band", type: direct, source: "src/pipeline_builder/orchestrator.py:131-148", key: "STATES, TRANSITIONS", formula: "-",
+     check: {expr: "all(grep('src/pipeline_builder/orchestrator.py', '\"%s\": %s_state' % (s, f)) for s, f in [('DISCOVER', 'discover'), ('VALIDATE', 'validate'), ('BUILD', 'build'), ('LAND', 'land'), ('DBT_BUILD', 'dbt')])", fmt: bool}}
+  - {id: F-10, slides: ["03", "05"], label: "Gate: too many bad rows stops the run (> 5% of any table)", shown: "too many bad rows? stop / quarantine > 5%? any table / HALTED", type: direct, source: "src/pipeline_builder/orchestrator.py:35, :93-95, :143", key: "max_quarantine_rate = 0.05; too_many_rejects -> HALTED", formula: "-",
+     check: {expr: "grep('src/pipeline_builder/orchestrator.py', r'max_quarantine_rate: float = 0\\.05') and grep('src/pipeline_builder/orchestrator.py', r'\\(\"VALIDATE\", \"too_many_rejects\"\\): \"HALTED\"')", fmt: bool}}
+  - {id: F-11, slides: ["03", "05"], label: "dbt build retried once", shown: "build, test, retry once / retried once", type: direct, source: "src/pipeline_builder/orchestrator.py:153", key: "MAX_ATTEMPTS DBT_BUILD = 2", formula: "2 attempts = 1 retry",
+     check: {expr: "grep('src/pipeline_builder/orchestrator.py', r'MAX_ATTEMPTS = \\{\"DBT_BUILD\": 2')", fmt: bool}}
+  - {id: F-12, slides: ["03"], label: "Outcome badges: every type right, bad rows caught, dbt build green", shown: "every type right / bad rows caught / dbt build green", type: derived, source: "outputs/metrics.json", key: "schema.types.agent, quarantine, dbt", formula: "agent types correct == total; quarantined rows > 0; dbt.ok and no failed tests",
+     check: {expr: "(lambda m: m['schema']['types']['agent']['correct'] == m['schema']['types']['agent']['total'] and sum(q['quarantined'] for q in m['quarantine']) > 0 and m['dbt']['ok'] and m['dbt']['failed'] == [])(M())", fmt: bool}}
+  # ---- slide 04
+  - {id: F-13, slides: ["04", "09"], label: "Re-learned rules, 0.5% defects per type: recall", shown: "93.0%", type: direct, source: "outputs/stress.json", key: "sweep['0.005'].dq_recall", formula: "-",
+     check: {expr: "S()['sweep']['0.005']['dq_recall']", fmt: "{:.1%}", expect: "93.0%"}}
+  - {id: F-14, slides: ["04", "09"], label: "Re-learned rules, 2% defects per type: recall", shown: "20.8%", type: direct, source: "outputs/stress.json", key: "sweep['0.02'].dq_recall", formula: "-",
+     check: {expr: "S()['sweep']['0.02']['dq_recall']", fmt: "{:.1%}", expect: "20.8%"}}
+  - {id: F-15, slides: ["04"], label: "Frozen contract, 0.5% defects per type: recall", shown: "92.0%", type: direct, source: "outputs/stress.json", key: "frozen_contract['0.005'].dq_recall", formula: "-",
+     check: {expr: "S()['frozen_contract']['0.005']['dq_recall']", fmt: "{:.1%}", expect: "92.0%"}}
+  - {id: F-16, slides: ["04"], label: "Frozen contract, 2% defects per type: recall", shown: "91.3%", type: direct, source: "outputs/stress.json", key: "frozen_contract['0.02'].dq_recall", formula: "-",
+     check: {expr: "S()['frozen_contract']['0.02']['dq_recall']", fmt: "{:.1%}", expect: "91.3%"}}
+  - {id: F-17, slides: ["04"], label: "Slide 04 bar lengths follow the stress recalls (0.5% -> 2%)", shown: "red bar 0.9300 -> 0.2075, green bar 0.9197 -> 0.9126 of full width", type: derived, source: "demo:compositions/explainer.html; outputs/stress.json", key: "scaleX targets", formula: "scaleX = recall (4 decimals, as stored)",
+     check: {expr: "explainer_bars_match()", fmt: bool}}
+  # ---- slide 05
+  - {id: F-18, slides: ["05"], label: "State durations in the orchestrator band", shown: "39 s · 44 s · 0.14 s · 6 s · 11 s", type: derived, source: "outputs/metrics.json", key: "state_log[*].seconds (DISCOVER..DBT_BUILD)", formula: "38.67, 44.15, 0.14, 5.93, 10.99 rounded (BUILD kept to 2 decimals)",
+     check: {expr: "band_seconds()", fmt: "{}", expect: "39 s · 44 s · 0.14 s · 6 s · 11 s"}}
+  - {id: F-19, slides: ["05", "06", "08"], label: "Raw folder to green dbt build", shown: "100 s (slides 05, 06 title, 08) / 99.9 s (slide 06 log)", type: direct, source: "outputs/metrics.json", key: "seconds_raw_to_built = 99.9", formula: "rounded to whole seconds",
+     check: {expr: "M()['seconds_raw_to_built']", fmt: "{:.0f} s", expect: "100 s"}}
+  - {id: F-20, slides: ["05", "06"], label: "Rules written by the validation agent", shown: "136 rules", type: direct, source: "outputs/metrics.json; examples/rules.yml", key: "rules", formula: "-",
+     check: {expr: "M()['rules'] if M()['rules'] == len(Y('examples/rules.yml')['rules']) else -1", fmt: "{:d}", expect: "136"}}
+  - {id: F-21, slides: ["05", "06"], label: "Generated dbt files", shown: "39 files / 39 dbt files", type: direct, source: "outputs/metrics.json", key: "generated.dbt_files", formula: "-",
+     check: {expr: "M()['generated']['dbt_files']", fmt: "{:d}", expect: "39"}}
+  - {id: F-22, slides: ["05"], label: "Generated Airflow DAG runs nightly at 03:00", shown: "DAG · nightly 03:00", type: direct, source: "examples/raw_drop_pipeline.py:25", key: "schedule='0 3 * * *'", formula: "-",
+     check: {expr: "grep('examples/raw_drop_pipeline.py', r'schedule=\"0 3 \\* \\* \\*\"')", fmt: bool}}
+  - {id: F-23, slides: ["05", "06", "08"], label: "dbt models built", shown: "31 models", type: direct, source: "outputs/metrics.json", key: "dbt.models.success", formula: "-",
+     check: {expr: "M()['dbt']['models']['success']", fmt: "{:d}", expect: "31"}}
+  - {id: F-24, slides: ["05", "06", "08"], label: "dbt tests passing", shown: "91 tests pass", type: direct, source: "outputs/metrics.json", key: "dbt.tests.pass", formula: "-",
+     check: {expr: "M()['dbt']['tests']['pass']", fmt: "{:d}", expect: "91"}}
+  - {id: F-25, slides: ["05"], label: "Every architecture box maps to a file in the repo", shown: "file tags on the boxes", type: direct, source: "src/pipeline_builder/*.py; README", key: "orchestrator, discovery, validation, describe, builder, sql, runtime, dbt_run, evaluate", formula: "-",
+     check: {expr: "boxes_exist()", fmt: bool}}
+  - {id: F-26, slides: ["05"], label: "Later drops enforce the reviewed contract", shown: "--contract into Discover and Validate", type: direct, source: "src/pipeline_builder/orchestrator.py:69-90", key: "cfg.contract -> catalog.yml, rules.yml", formula: "-",
+     check: {expr: "grep('src/pipeline_builder/orchestrator.py', r'ctx.cfg.contract / \"catalog.yml\"') and grep('src/pipeline_builder/orchestrator.py', r'ctx.cfg.contract / \"rules.yml\"')", fmt: bool}}
+  - {id: F-27, slides: ["05", "06"], label: "SQL quarantine and pandas runner agree row for row", shown: "row-for-row check", type: direct, source: "outputs/metrics.json", key: "sql_vs_pandas[*].only_sql, only_pandas", formula: "all zero",
+     check: {expr: "all(v['only_sql'] == 0 and v['only_pandas'] == 0 for v in M()['sql_vs_pandas'].values())", fmt: bool}}
+  - {id: F-28, slides: ["05"], label: "Local LLM is opt-in and only words descriptions", shown: "Local LLM · opt-in · wording only", type: direct, source: "src/pipeline_builder/describe.py:1-7, :24-27; cli.py:203", key: "ollama_client, --llm default None", formula: "-",
+     check: {expr: "grep('src/pipeline_builder/describe.py', r'localhost:11434') and grep('src/pipeline_builder/cli.py', r'\"--llm\", default=None') and M()['descriptions']['model_leads'] == 0", fmt: bool}}
+  - {id: F-29, slides: ["06"], label: "Discovery result: columns, keys, joins", shown: "54 columns · 7 keys · 7 joins", type: direct, source: "outputs/metrics.json", key: "schema.types.agent.total, primary_keys.correct, foreign_keys.found", formula: "-",
+     check: {expr: "'%d columns · %d keys · %d joins' % (M()['schema']['types']['agent']['total'], M()['schema']['primary_keys']['correct'], M()['schema']['foreign_keys']['found'])", fmt: "{}", expect: "54 columns · 7 keys · 7 joins"}}
+  # ---- slide 06
+  - {id: F-30, slides: ["06"], label: "State log seconds", shown: "38.67 · 44.15 · 0.14 · 5.93 · 10.99", type: direct, source: "outputs/metrics.json", key: "state_log[*].seconds", formula: "-",
+     check: {expr: "' · '.join('%.2f' % e['seconds'] for e in M()['state_log'][:5])", fmt: "{}", expect: "38.67 · 44.15 · 0.14 · 5.93 · 10.99"}}
+  - {id: F-31, slides: ["06"], label: "Generated DAG length", shown: "88-line DAG", type: direct, source: "outputs/metrics.json", key: "generated.dag_lines", formula: "-",
+     check: {expr: "M()['generated']['dag_lines']", fmt: "{:d}", expect: "88"}}
+  - {id: F-32, slides: ["06"], label: "dbt tests warned (relationship tests at warn severity)", shown: "5 warn", type: direct, source: "outputs/metrics.json", key: "dbt.tests.warn", formula: "-",
+     check: {expr: "M()['dbt']['tests']['warn']", fmt: "{:d}", expect: "5"}}
+  - {id: F-33, slides: ["06"], label: "Final state and failed tests", shown: "DONE · 0 tests failed", type: direct, source: "outputs/metrics.json", key: "final_state, dbt.failed", formula: "-",
+     check: {expr: "'%s · %d failed' % (M()['final_state'], len(M()['dbt']['failed']))", fmt: "{}", expect: "DONE · 0 failed"}}
+  - {id: F-34, slides: ["06"], label: "Quarantine per table (rate, rows)", shown: "orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0", type: direct, source: "outputs/metrics.json", key: "quarantine[*]", formula: "quarantine_rate x 100 to 2 decimals",
+     check: {expr: "quarantine_line()", fmt: "{}", expect: "orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0"}}
+  - {id: F-35, slides: ["06", "08"], label: "Rows quarantined, identical in dbt SQL and pandas", shown: "the same 39,666 rows", type: derived, source: "outputs/metrics.json", key: "sql_vs_pandas[*].both", formula: "1,200 + 19,452 + 11,507 + 7,409 + 98 = 39,666 (sql = pandas = both)",
+     check: {expr: "(lambda v: sum(x['both'] for x in v) if all(x['sql'] == x['pandas'] == x['both'] for x in v) else -1)(list(M()['sql_vs_pandas'].values()))", fmt: "{:,d}", expect: "39,666"}}
+  - {id: F-36, slides: ["06"], label: "Defects caught by type (planted, recall)", shown: "9 bars", type: direct, source: "outputs/metrics.json", key: "dq.agent.by_defect", formula: "-",
+     check: {expr: "defect_line()", fmt: "{}", expect: "duplicate_row 4,316 100.0% · null_required 9,179 100.0% · orphan_fk 6,961 100.0% · type_corruption 6,863 100.0% · negative_value 6,879 100.0% · future_date 2,300 100.0% · malformed_email 300 100.0% · invalid_enum 4,016 63.4% · outlier_value 4,863 22.8%"}}
+  - {id: F-37, slides: ["06", "08"], label: "Overall defect recall, validation agent", shown: "88.6%", type: direct, source: "outputs/metrics.json", key: "dq.agent.recall = 0.8856", formula: "-",
+     check: {expr: "M()['dq']['agent']['recall']", fmt: "{:.1%}", expect: "88.6%"}}
+  - {id: F-38, slides: ["06"], label: "Hand-written first pass per type (thin grey bars)", shown: "100% for duplicate_row and null_required, 0% for the other seven", type: direct, source: "outputs/metrics.json", key: "dq.naive_baseline.by_defect", formula: "-",
+     check: {expr: "sorted(k for k, v in M()['dq']['naive_baseline']['by_defect'].items() if v['recall'] == 1.0) == ['duplicate_row', 'null_required'] and all(v['recall'] == 0 for k, v in M()['dq']['naive_baseline']['by_defect'].items() if k not in ('duplicate_row', 'null_required'))", fmt: bool}}
+  # ---- slide 07
+  - {id: F-39, slides: ["07"], label: "Contract sheet rows (orders) equal the export and the committed rules", shown: "order_id unique 2,000 · customer_id not null 2,000 · customer_id in customers 2,000 · ordered_at date in window 2,000 · order_total is decimal 2,000 · status one of 7 values 1,515", type: derived, source: "demo:assets/contract_sheet.json (tools/export_contract_sheet.py re-runs discovery + validation on data/raw); examples/rules.yml", key: "rules[*].rows_flagged, evidence, severity", formula: "rows held per rule = unique rows the rule flags",
+     check: {expr: "sheet_rows_match()", fmt: bool}}
+  - {id: F-40, slides: ["07"], label: "Orders held back", shown: "11,507 of 402,000 rows held back (2.86%)", type: direct, source: "outputs/metrics.json", key: "quarantine[table=orders]", formula: "11,507 / 402,000 = 2.86%",
+     check: {expr: "orders_line()", fmt: "{}", expect: "11,507 of 402,000 (2.86%)"}}
+  - {id: F-41, slides: ["07"], label: "Clean orders after quarantine", shown: "stg_orders 390,493", type: derived, source: "outputs/metrics.json", key: "orders rows - quarantined; marts.fct_orders", formula: "402,000 - 11,507 = 390,493 (equals the fct_orders row count)",
+     check: {expr: "clean_orders()", fmt: "{:,d}", expect: "390,493"}}
+  - {id: F-42, slides: ["07"], label: "Further rules on orders", shown: "+ 17 more rules on orders (16 flag no rows)", type: derived, source: "examples/rules.yml; demo:assets/contract_sheet.json", key: "orders rules = 23", formula: "23 - 6 shown = 17; 16 of them flag 0 rows (the order_total outlier warning flags 17)",
+     check: {expr: "more_line()", fmt: "{}", expect: "17 more (16 flag no rows)"}}
+  - {id: F-43, slides: ["07"], label: "Typos learned as allowed status values", shown: "cancel, pending_x ringed in the status value set", type: direct, source: "examples/rules.yml orders__status__in_set; README 'Known limitations'", key: "kwargs.value_set", formula: "-",
+     check: {expr: "typos_in_value_set()", fmt: bool}}
+  - {id: F-44, slides: ["06", "07"], label: "Every table under the 5% gate", shown: "under the 5% gate", type: derived, source: "outputs/metrics.json", key: "max quarantine_rate = 0.02862", formula: "max rate < 0.05",
+     check: {expr: "max(q['quarantine_rate'] for q in M()['quarantine']) < 0.05", fmt: bool}}
+  - {id: F-45, slides: ["07"], label: "Days of detective work become a review", shown: "Days of detective work become a review.", type: general-knowledge, source: "README 'The problem' (days per source) and 'Known limitations' (first contract needs a person)", key: "-", formula: "-",
+     check: {expr: "grep('README.md', r'takes days per source') and grep('README.md', r'still needs a person to read')", fmt: bool}}
+  # ---- slide 08
+  - {id: F-47, slides: ["08", "03"], label: "Column types inferred right", shown: "100% (54/54)", type: direct, source: "outputs/metrics.json", key: "schema.types.agent.accuracy", formula: "-",
+     check: {expr: "M()['schema']['types']['agent']['accuracy']", fmt: "{:.0%}", expect: "100%"}}
+  - {id: F-48, slides: ["08"], label: "Type accuracy of default readers", shown: "pandas 68.5% · DuckDB 81.5%", type: direct, source: "outputs/metrics.json", key: "schema.types.pandas_default / duckdb_sniff accuracy", formula: "-",
+     check: {expr: "'pandas %.1f%% · DuckDB %.1f%%' % (100 * M()['schema']['types']['pandas_default']['accuracy'], 100 * M()['schema']['types']['duckdb_sniff']['accuracy'])", fmt: "{}", expect: "pandas 68.5% · DuckDB 81.5%"}}
+  - {id: F-50, slides: ["08"], label: "Recall of the hand-written first pass", shown: "hand-written pass: 29.5%", type: direct, source: "outputs/metrics.json", key: "dq.naive_baseline.recall", formula: "-",
+     check: {expr: "M()['dq']['naive_baseline']['recall']", fmt: "{:.1%}", expect: "29.5%"}}
+  - {id: F-51, slides: ["08"], label: "Row precision of the validation agent", shown: "98.4%", type: direct, source: "outputs/metrics.json", key: "dq.agent.row_precision", formula: "-",
+     check: {expr: "M()['dq']['agent']['row_precision']", fmt: "{:.1%}", expect: "98.4%"}}
+  - {id: F-52, slides: ["08"], label: "Row precision of the hand-written first pass", shown: "hand-written pass: 3.4%", type: direct, source: "outputs/metrics.json", key: "dq.naive_baseline.row_precision", formula: "-",
+     check: {expr: "M()['dq']['naive_baseline']['row_precision']", fmt: "{:.1%}", expect: "3.4%"}}
+  # ---- slide 09
+  - {id: F-58, slides: ["09"], label: "Re-learned rules, 10% defects per type: recall", shown: "16.3%", type: direct, source: "outputs/stress.json", key: "sweep['0.1'].dq_recall", formula: "-",
+     check: {expr: "S()['sweep']['0.1']['dq_recall']", fmt: "{:.1%}", expect: "16.3%"}}
+  - {id: F-59, slides: ["09"], label: "Frozen contract, 10% defects per type: recall", shown: "91.5%", type: direct, source: "outputs/stress.json", key: "frozen_contract['0.1'].dq_recall", formula: "-",
+     check: {expr: "S()['frozen_contract']['0.1']['dq_recall']", fmt: "{:.1%}", expect: "91.5%"}}
+  - {id: F-60, slides: ["09"], label: "Primary keys found at 2% defects", shown: "primary keys found: 4 of 7", type: direct, source: "outputs/stress.json", key: "sweep['0.02'].primary_keys", formula: "-",
+     check: {expr: "S()['sweep']['0.02']['primary_keys']", fmt: "{}", expect: "4/7"}}
+  - {id: F-61, slides: ["09"], label: "Every profiler tolerance sits near 1%", shown: "every profiler tolerance sits near 1%", type: direct, source: "src/pipeline_builder/discovery.py:30-31; validation.py:25, :31", key: "KEY_MAX_NULL 0.01, KEY_MIN_DISTINCT 0.99, NOT_NULL_MAX 0.01, NON_NEGATIVE_SHARE 0.99", formula: "-",
+     check: {expr: "grep('src/pipeline_builder/discovery.py', r'^KEY_MAX_NULL = 0\\.01') and grep('src/pipeline_builder/discovery.py', r'^KEY_MIN_DISTINCT = 0\\.99') and grep('src/pipeline_builder/validation.py', r'^NOT_NULL_MAX = 0\\.01') and grep('src/pipeline_builder/validation.py', r'^NON_NEGATIVE_SHARE = 0\\.99')", fmt: bool}}
+  - {id: F-62, slides: ["09"], label: "Stress runs at 10% scale", shown: "10%-scale drops", type: direct, source: "outputs/stress.json", key: "scale", formula: "-",
+     check: {expr: "S()['scale']", fmt: "{:.1f}", expect: "0.1"}}
+  # ---- slide 10
+  - {id: F-63, slides: ["10"], label: "Open source, MIT", shown: "OPEN SOURCE · MIT", type: direct, source: "LICENSE", key: "-", formula: "-",
+     check: {expr: "grep('LICENSE', r'^MIT License')", fmt: bool}}
+  - {id: F-64, slides: ["10"], label: "Stack: dbt, DuckDB, Airflow DAG, pandas, Python", shown: "dbt · DuckDB · Airflow DAG · pandas · Python", type: direct, source: "pyproject.toml; examples/raw_drop_pipeline.py", key: "dependencies; airflow import", formula: "-",
+     check: {expr: "grep('pyproject.toml', r'dbt-duckdb') and grep('pyproject.toml', r'\"duckdb') and grep('pyproject.toml', r'\"pandas') and grep('examples/raw_drop_pipeline.py', r'from airflow')", fmt: bool}}
+  - {id: F-65, slides: ["10"], label: "make e2e generates the data and runs the pipeline", shown: "$ make e2e   # generate 1.86M rows, build, dbt build, score", type: direct, source: "Makefile", key: "e2e: data run", formula: "-",
+     check: {expr: "grep('Makefile', r'^e2e: data run') and grep('Makefile', r'--truth data/ground_truth')", fmt: bool}}
+  - {id: F-66, slides: ["10"], label: "Runs on a laptop", shown: "RUNS ON A LAPTOP", type: direct, source: "README 'The result'", key: "'green build in 100 s on a laptop'", formula: "-",
+     check: {expr: "grep('README.md', r'green build in 100 s on a laptop')", fmt: bool}}
+
+slides:
+  - id: "01"
+    title: "The industry"
+    image: slides/slide-01.jpg
+    time: "0.0-7.2 s"
+    composition: "compositions/s01-context.html"
+    text:
+      - "01 · THE INDUSTRY"
+      - "A new source arrives as a folder of messy files."
+      - "WHO LIVES WITH THIS · Retail & e-commerce data teams · Analytics engineers · Data platform & integration"
+      - "01 Days of detective work per new source — Open every file, guess every column"
+      - "02 Types guessed wrong on read — A postcode read as a number loses its leading zero"
+      - "03 Bad rows slip in quietly — A status typo becomes its own category on a dashboard"
+      - "04 Checks learned from dirty data — Common enough mess starts to look normal"
+      - "THIS PROJECT turns the raw folder into a tested pipeline · discover → validate → build → run"
+    assumptions: [A-13]
+    illustrative: ["The whole slide is context; no repo figures."]
+    change: "Edit the chips (#ctx-c1..3) and cards (#ctx-k1..4) in compositions/s01-context.html."
+  - id: "02"
+    title: "This project"
+    image: slides/slide-02.jpg
+    time: "6.8-11.6 s"
+    composition: "compositions/s02-hook.html"
+    text:
+      - "02 · THIS PROJECT"
+      - "7 files, 1.86M rows. 45,677 planted defects. Out: a tested dbt pipeline."
+      - "csv · json · jsonl · parquet · two date formats in one column · 9 defect types at known rows"
+    assumptions: [A-01, A-02, A-12]
+    illustrative: ["Rings in the background are decoration."]
+    change: "Headline spans #hook-l1..l3 and chips #hook-f1..f3 in compositions/s02-hook.html; sizes come from make e2e (outputs/metrics.json)."
+  - id: "03"
+    title: "How it works (white chapter, slide A)"
+    image: slides/slide-03.jpg
+    time: "11.3-19.3 s"
+    composition: "compositions/explainer.html (CONFIG.blocks, CONFIG.groups, CONFIG.loop)"
+    text:
+      - "03 · HOW IT WORKS"
+      - "From a raw folder to a pipeline"
+      - "RAW FILES messy CSV, JSON, Parquet → [ONE STATE MACHINE: DISCOVER types, keys, joins → VALIDATE rules + their evidence → GATE too many bad rows? stop → BUILD dbt models + a nightly DAG] → PIPELINE OUT ✓ every type right ✓ bad rows caught ✓ dbt build green"
+      - "build, test, retry once (loop over BUILD)"
+    assumptions: [A-04, A-06]
+    illustrative: ["Icons and colours are a visual language, not data."]
+    change: "Edit CONFIG in compositions/explainer.html; badge truth is F-12."
+  - id: "04"
+    title: "The key idea (white chapter, slide B)"
+    image: slides/slide-04.jpg
+    time: "19.3-26.3 s"
+    composition: "compositions/explainer.html (#ex-b ...)"
+    text:
+      - "04 · THE KEY IDEA"
+      - "The rules become a signed contract"
+      - "The first run drafts the rules — each one with the evidence behind it"
+      - "A person reviews and signs them — fixing anything that looks wrong"
+      - "Later drops are checked against them — instead of re-learning from dirty data"
+      - "AS THE NIGHTLY DROP GETS DIRTIER: CLEANER → DIRTIER; Rules re-learned each night · defects caught (red bar shrinks); Signed contract · defects caught (green bar holds). Re-learned rules start treating the dirt as normal. The signed contract keeps catching it."
+      - "Stress run, 0.5% → 2% defects per type: re-learned rules 93.0% → 20.8% caught; frozen contract 92.0% → 91.3%."
+    assumptions: [A-05, A-08, A-09]
+    illustrative: ["The slider is schematic (cleaner → dirtier = 0.5% → 2%); bar lengths are the stress recalls (F-17)."]
+    change: "Markup under #ex-b in compositions/explainer.html; the footnote figures are F-13..F-16."
+  - id: "05"
+    title: "Architecture"
+    image: slides/slide-05a.jpg
+    image2: slides/slide-05b.jpg
+    time: "26.0-40.6 s"
+    composition: "compositions/s03-architecture.html"
+    text:
+      - "05 · ARCHITECTURE"
+      - "Three code agents, one quarantine gate, one signed contract."
+      - "orchestrator.py: DISCOVER 39 s → VALIDATE 44 s → BUILD 0.14 s → LAND 6 s → DBT_BUILD 11 s → DONE → run_state.json"
+      - "SOURCES: data/raw/ Raw drop (7 files, 1.86M rows) · Contract store (catalog.yml, rules.yml) --contract → Discover, Validate"
+      - "AGENTS: discovery.py Discover (types, keys, joins; parse rates, no LLM) → catalog.yml → validation.py Validate (136 rules, each with evidence) · Engineer (reviews, signs rules.yml) → signs → Contract"
+      - "CONTROL: describe.py Local LLM (opt-in, wording only; dashed = external) · quarantine > 5%? any table (≤ 5% → Build; > 5% → HALTED: nothing built until signed → Engineer)"
+      - "BUILD + RUN: builder.py · sql.py Build (dbt SQL · 39 files, DAG · nightly 03:00) → runtime.py Land (text + row position) → raw.* as text → Warehouse (warehouse.duckdb)"
+      - "SERVE + SCORE: dbt_run.py dbt build (31 models · 91 tests pass, retried once · 11 s) → 31 models → generated dbt/ Marts + quarantine (stg_* + stg_*__rejected; dim · fct · agg_daily) → row-for-row check → evaluate.py Score (vs answer key, metrics.json) ← answer key"
+      - "Legend: data · control / review · decision · store. Critical path · raw → green build 100 s"
+    assumptions: [A-04, A-05, A-06, A-07, A-11]
+    illustrative: ["Packets moving along the wires and the state chips lighting up show execution order, not timing; the real durations are the labels in the band."]
+    change: "NODES and W (wires) in compositions/s03-architecture.html; the band chips are static text."
+  - id: "06"
+    title: "The system running"
+    image: slides/slide-06a.jpg
+    image2: slides/slide-06b.jpg
+    time: "40.2-54.2 s"
+    composition: "compositions/s04-routes.html"
+    text:
+      - "06 · THE SYSTEM RUNNING"
+      - "One run: a raw folder to a green dbt build in 100 s."
+      - "$ pipeline-builder run --raw data/raw --out generated · DISCOVER ok 38.67 s 54 columns · 7 keys · 7 joins · VALIDATE ok 44.15 s 136 rules · BUILD ok 0.14 s 39 dbt files · 88-line DAG · LAND ok 5.93 s 7 tables in warehouse.duckdb · DBT_BUILD ok 10.99 s 31 models · 91 pass · 5 warn · DONE raw → green build 99.9 s · 0 tests failed"
+      - "QUARANTINE PER TABLE (rows held back by blocking rules): orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0 · 5% gate"
+      - "Every table stays under the 5% gate, so the run goes on. dbt SQL and pandas quarantine the same 39,666 rows."
+      - "Phase 2: Defects caught, by type: seven at 100%, two well short. 45,677 DEFECTS PLANTED AT KNOWN ROWS · 1.86M ROWS · overall recall 88.6% · per-type bars (F-36) with the hand-written first pass as thin grey bars (F-38)"
+    assumptions: [A-02, A-03, A-04, A-07, A-09, A-10]
+    illustrative: ["The terminal is a styled rendering of the state log in outputs/metrics.json, not a screen recording; the command line is the one make e2e runs (without its report flags)."]
+    change: "LOG, Q and DQ arrays in compositions/s04-routes.html (copied from outputs/metrics.json)."
+  - id: "07"
+    title: "End-user value (white)"
+    image: slides/slide-07.jpg
+    time: "53.9-66.9 s"
+    composition: "compositions/value.html (SHEET injected by tools/inject_contract.py; CONFIG)"
+    text:
+      - "07 · END-USER VALUE"
+      - "What the data engineer gets"
+      - "DATA CONTRACT · orders.csv · DRAFT → REVIEWED · SIGNED"
+      - "COLUMN / CHECK / EVIDENCE / ON FAIL / ROWS HELD: order_id unique (inferred primary key) block 2,000 · customer_id not null (null rate 0.50% (required at <= 1%)) block 2,000 · customer_id in customers (99.50% of rows resolve to customers.customer_id) block 2,000 · ordered_at date in window (dates must fall between 1990-01-01 and the run date 2026-02-01) block 2,000 · order_total is decimal (decimal inferred) block 2,000 · status one of 7 values (7 values cover 99.62%; rarer values excluded) block 1,515"
+      - "+ 17 more rules on orders (16 flag no rows)"
+      - "11,507 of 402,000 rows held back (2.86%) · under the 5% gate"
+      - "Scene: ENGINEER · REVIEWS rules.yml — status · one of 7 values: cancelled, delivered, placed, returned, shipped, cancel (ringed), pending_x (ringed) · typos learned as values · SIGNED stamp"
+      - "TONIGHT'S DROP: orders.csv → rules → stg_orders 390,493 / __rejected 11,507 · dbt build green"
+      - "Rules they can read and sign; bad rows held back with reasons. Days of detective work become a review."
+    assumptions: [A-03, A-04, A-14]
+    illustrative: ["Row tokens flowing to the bins are schematic (every 11th to quarantine); the counters are real.", "The review (ringing two values, the SIGNED stamp) shows the human step the README asks for; the counts shown are from the draft run, before any edit."]
+    change: "Re-run tools/export_contract_sheet.py, then tools/inject_contract.py with --rules; scene layout in CONFIG of compositions/value.html."
+  - id: "08"
+    title: "Results"
+    image: slides/slide-08.jpg
+    time: "66.6-75.4 s"
+    composition: "compositions/s05-results.html"
+    text:
+      - "08 · RESULTS · FULL-SIZE DROP, SCORED VS THE ANSWER KEY"
+      - "Every type right, most defects caught, green in 100 s."
+      - "DISCOVERY 100% column types inferred right · pandas 68.5% · DuckDB 81.5%"
+      - "VALIDATION 88.6% planted defects caught · hand-written pass: 29.5%"
+      - "VALIDATION 98.4% of flagged rows are real defects · hand-written pass: 3.4%"
+      - "BUILD + RUN 100 s raw folder to a green dbt build · 31 models · 91 tests pass"
+      - "7 files · 1.86M rows · 45,677 planted defects · dbt SQL and pandas quarantine the same 39,666 rows"
+    assumptions: [A-01, A-07, A-09, A-10, A-12]
+    illustrative: ["The mini bars under each number are the number as a share of 100%; the 100 s card's bar is full by design."]
+    change: "The stats array and card text in compositions/s05-results.html."
+  - id: "09"
+    title: "What didn't win"
+    image: slides/slide-09.jpg
+    time: "75.0-82.0 s"
+    composition: "compositions/s06-twist.html"
+    text:
+      - "09 · WHAT DIDN'T WIN"
+      - "Rules re-learned from a dirty drop fall off a cliff at 2%."
+      - "Stress run, 10%-scale drops · share of planted defects caught as the defect rate per type rises"
+      - "Re-learned · 0.5% (the headline setting) 93.0% · Re-learned · 2% (primary keys found: 4 of 7) 20.8% · Re-learned · 10% 16.3% · Frozen contract · 10% (rules from last month's drop) 91.5%"
+      - "Why: every profiler tolerance sits near 1%, so past it the rule is never written. A first run on a dirty source still needs a person to read rules.yml."
+    assumptions: [A-05, A-08, A-09]
+    illustrative: ["Bar widths are recall x 1000 px."]
+    change: "Rows #twist-r1..r4 in compositions/s06-twist.html (values from outputs/stress.json)."
+  - id: "10"
+    title: "End card"
+    image: slides/slide-10.jpg
+    time: "81.6-86.0 s"
+    composition: "compositions/s07-end.html"
+    text:
+      - "10 · OPEN SOURCE · MIT · RUNS ON A LAPTOP"
+      - "agentic-pipeline-builder"
+      - "github.com/kavya2693/agentic-pipeline-builder"
+      - "dbt · DuckDB · Airflow DAG · pandas · Python"
+      - "$ make e2e   # generate 1.86M rows, build, dbt build, score"
+    assumptions: [A-12]
+    illustrative: ["The faint five-node loop on the right is decoration (a state-machine motif)."]
+    change: "Text in compositions/s07-end.html."
+
+caveats:
+  - "All data is synthetic and the generator and inference rules share an author: 100% type accuracy is an upper bound (A-01). The format-shift stress arm (outputs/stress.md) is the honest measure and drops type accuracy to 94.4% without a warning; it is not on screen."
+  - "Slide 04's footnote and slide 09 use the 10%-scale stress runs; slides 02, 06 and 08 use the full-size drop. The two 0.5% recalls differ (93.0% at 10% scale vs 88.6% full size)."
+  - "Timings (39/44/0.14/6/11 s, 100 s) are one run on the author's laptop (A-07)."
+  - "The Airflow DAG is generated and checked against stub modules, not run on a live Airflow (README 'Known limitations'); the end card's 'Airflow DAG' chip means the generated file."
+  - "Inflated prices are mostly missed (22.8%) and 322 orders with the rare real status 'disputed' are quarantined as typos (README); slide 07's status row (1,515 rows held) includes those 322."
+  - "Slide 07's review step is shown, not measured: the counts on the sheet are from the draft rules, before any edit."
+  - "Slide 01 statements are general data-engineering knowledge (A-13)."
+
+stills:
+  master: renders/agentic-pipeline-builder-master.mp4   # relative to demo_dir
+  width: 1600
+  times: {"01": 6.4, "02": 11.1, "03": 18.9, "04": 25.6, "05a": 34.5, "05b": 39.6, "06a": 46.5, "06b": 53.6, "07": 65.9, "08": 74.8, "09": 81.6, "10": 85.8}
+
+# Extra check helpers (Python), available to check expressions.
+helpers: |
+  import re as _re
+  import yaml as _yaml
+  SHOWN = ['orders__pk__unique', 'orders__customer_id__not_null', 'orders__customer_id__references_customers',
+           'orders__ordered_at__window', 'orders__order_total__type', 'orders__status__in_set']
+  def Y(p):
+      return _yaml.safe_load(T(p))
+  def M():
+      return J('outputs/metrics.json')
+  def S():
+      return J('outputs/stress.json')
+  def _orders():
+      return [x for x in M()['quarantine'] if x['table'] == 'orders'][0]
+  def band_seconds():
+      s = [e['seconds'] for e in M()['state_log'][:5]]
+      return ' · '.join(['%.0f s' % s[0], '%.0f s' % s[1], '%.2f s' % s[2], '%.0f s' % s[3], '%.0f s' % s[4]])
+  def quarantine_line():
+      order = ['orders', 'order_items', 'customers', 'payments', 'returns', 'products', 'stores']
+      q = {x['table']: x for x in M()['quarantine']}
+      return ' · '.join('%s %.2f%% %s' % (t, 100 * q[t]['quarantine_rate'], format(q[t]['quarantined'], ',')) for t in order)
+  def defect_line():
+      order = ['duplicate_row', 'null_required', 'orphan_fk', 'type_corruption', 'negative_value', 'future_date',
+               'malformed_email', 'invalid_enum', 'outlier_value']
+      b = M()['dq']['agent']['by_defect']
+      return ' · '.join('%s %s %.1f%%' % (k, format(b[k]['injected'], ','), 100 * b[k]['recall']) for k in order)
+  def explainer_bars_match():
+      html = T('demo:compositions/explainer.html')
+      s = S()
+      want = [s['sweep']['0.005']['dq_recall'], s['frozen_contract']['0.005']['dq_recall'],
+              s['sweep']['0.02']['dq_recall'], s['frozen_contract']['0.02']['dq_recall']]
+      got = [float(x) for x in _re.findall(r'scaleX: (0\.\d{4})', html)]
+      return [round(w, 4) for w in want] == got
+  def boxes_exist():
+      mods = ('orchestrator', 'discovery', 'validation', 'describe', 'builder', 'sql', 'runtime', 'dbt_run', 'evaluate')
+      ok = all(len(T('src/pipeline_builder/%s.py' % m)) > 0 for m in mods)
+      return ok and grep('README.md', r'data/ground_truth') and grep('src/pipeline_builder/orchestrator.py', r'run_state\.json') and grep('src/pipeline_builder/runtime.py', r'def land_frame')
+  def orders_line():
+      q = _orders()
+      return '%s of %s (%.2f%%)' % (format(q['quarantined'], ','), format(q['rows'], ','), 100 * q['quarantined'] / q['rows'])
+  def clean_orders():
+      q = _orders()
+      n = q['rows'] - q['quarantined']
+      return n if n == M()['marts']['fct_orders'] else -1
+  def more_line():
+      committed = [r for r in Y('examples/rules.yml')['rules'] if r['table'] == 'orders']
+      exported = [r for r in J('demo:assets/contract_sheet.json')['rules'] if r['id'] not in SHOWN]
+      if len(committed) != len(exported) + len(SHOWN):
+          return 'mismatch'
+      return '%d more (%d flag no rows)' % (len(exported), sum(r['rows_flagged'] == 0 for r in exported))
+  def typos_in_value_set():
+      r = [r for r in Y('examples/rules.yml')['rules'] if r['id'] == 'orders__status__in_set'][0]
+      vs = r['kwargs']['value_set']
+      return {'cancel', 'pending_x'} <= set(vs) and len(vs) == 7 and grep('README.md', r'`cancel`, `pending_x`')
+  def sheet_rows_match():
+      """The SHEET block injected in value.html must equal the exported contract sheet and the committed rules."""
+      html = T('demo:compositions/value.html')
+      m = _re.search(r"const SHEET = (\{.*?\}); /\* SHEET:END", html, _re.S)
+      sheet = json.loads(m.group(1))
+      src = {r['id']: r for r in J('demo:assets/contract_sheet.json')['rules']}
+      committed = {r['id']: r for r in Y('examples/rules.yml')['rules']}
+      if [r['id'] for r in sheet['rows_shown']] != SHOWN:
+          return False
+      for r in sheet['rows_shown']:
+          s = src[r['id']]
+          if r['held'] != s['rows_flagged'] or r['evidence'] != s['evidence'] or r['severity'] != s['severity']:
+              return False
+          if committed[r['id']]['evidence'] != s['evidence']:
+              return False
+      q = _orders()
+      return sheet['quarantined'] == q['quarantined'] and sheet['rows'] == q['rows']

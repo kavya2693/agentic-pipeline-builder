@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #hook-root { position: absolute; inset: 0; }
+        #hook-root .rings { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 1500px 560px; }
+        #hook-root .lines { position: absolute; left: 120px; top: 240px; width: 1680px; }
+        #hook-root .line { display: block; font-size: 116px; font-weight: 900; letter-spacing: -0.035em; line-height: 1.08; }
+        #hook-root .line .num { font-family: var(--mono); font-weight: 700; color: var(--c-opt); letter-spacing: -0.04em; }
+        #hook-root .line .num.d { color: var(--c-data); }
+        #hook-root .line .num.r { color: var(--c-risk); }
+        #hook-root .line.soft { color: var(--ink-soft); font-weight: 700; }
+        #hook-root .facts { position: absolute; left: 120px; top: 770px; display: flex; gap: 20px; }
+        #hook-root .fact {
+          display: block; font-family: var(--mono); font-size: 28px; padding: 14px 24px; border-radius: 10px;
+          border: 2px solid var(--line); background: rgba(15, 26, 38, 0.9); color: var(--ink);
+        }
+        #hook-root .fact.risk { border-color: rgba(255, 138, 115, 0.6); color: var(--c-risk); }
+      </style>
+      <div id="hook-root" data-composition-id="hook" data-width="1920" data-height="1080">
+        <div class="scene" id="hook-in">
+          <svg class="rings" id="hook-rings" aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+          <div class="eyebrow" data-layout-allow-overlap id="hook-eyebrow">02 · This project</div>
+          <div class="lines">
+            <span class="line" id="hook-l1"><span class="num">7</span> files, <span class="num d">1.86M</span> rows.</span>
+            <span class="line" id="hook-l2"><span class="num r">45,677</span> planted defects.</span>
+            <span class="line soft" id="hook-l3">Out: a tested dbt pipeline.</span>
+          </div>
+          <div class="facts">
+            <span class="fact" id="hook-f1">csv · json · jsonl · parquet</span>
+            <span class="fact" id="hook-f2">two date formats in one column</span>
+            <span class="fact risk" id="hook-f3">9 defect types at known rows</span>
+          </div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const NS = "http://www.w3.org/2000/svg";
+          const svg = document.getElementById("hook-rings");
+          const cx = 1500, cy = 560;
+          [[120, 0.2], [240, 0.14], [360, 0.1], [480, 0.07]].forEach(([r, a]) => {
+            const c = document.createElementNS(NS, "circle");
+            c.setAttribute("cx", cx); c.setAttribute("cy", cy); c.setAttribute("r", r);
+            c.setAttribute("fill", "none"); c.setAttribute("stroke", "rgba(63,216,168," + a + ")"); c.setAttribute("stroke-width", "2");
+            svg.appendChild(c);
+          });
+          for (let k = 0; k < 16; k++) {
+            const a = (2 * Math.PI * k) / 16, l = document.createElementNS(NS, "line");
+            l.setAttribute("x1", cx); l.setAttribute("y1", cy);
+            l.setAttribute("x2", (cx + 470 * Math.cos(a)).toFixed(0)); l.setAttribute("y2", (cy + 470 * Math.sin(a)).toFixed(0));
+            l.setAttribute("stroke", "rgba(127,168,255,0.08)"); l.setAttribute("stroke-width", "2");
+            svg.appendChild(l);
+          }
+          const tl = gsap.timeline({ paused: true });
+          const D = 4.8;
+          tl.fromTo("#hook-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#hook-rings", { rotation: 0, scale: 0.94 }, { rotation: 10, scale: 1.02, duration: D, ease: "none" }, 0);
+          tl.fromTo("#hook-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#hook-l1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+          tl.fromTo("#hook-l2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.6);
+          tl.fromTo("#hook-l3", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.7, ease: "expo.out" }, 1.1);
+          ["#hook-f1", "#hook-f2", "#hook-f3"].forEach((f, i) =>
+            tl.fromTo(f, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.8 + i * 0.15));
+          tl.to("#hook-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["hook"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

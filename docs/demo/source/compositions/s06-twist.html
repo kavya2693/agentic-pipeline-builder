@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #twist-root { position: absolute; inset: 0; }
+        #twist-root .eyebrow { color: var(--c-risk); }
+        #twist-root .sub { position: absolute; left: 120px; top: 200px; font-size: 32px; color: var(--ink-soft); }
+        #twist-root .bars { position: absolute; left: 120px; top: 310px; width: 1680px; }
+        #twist-root .row { display: flex; align-items: center; height: 112px; }
+        #twist-root .who { width: 470px; font-size: 36px; font-weight: 700; color: var(--ink); }
+        #twist-root .who small { display: block; font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--ink-mute); }
+        #twist-root .track { position: relative; width: 1000px; height: 44px; border-radius: 8px; background: rgba(178, 191, 204, 0.08); }
+        #twist-root .fill { position: absolute; left: 0; top: 0; height: 44px; border-radius: 8px; background: var(--ink-mute); transform-origin: left center; }
+        #twist-root .val { width: 210px; text-align: right; font-family: var(--mono); font-size: 44px; font-weight: 700; color: var(--ink-soft); }
+        #twist-root .bad .fill { background: var(--c-risk); }
+        #twist-root .bad .val { color: var(--c-risk); }
+        #twist-root .good .fill { background: var(--c-opt); }
+        #twist-root .good .val { color: var(--c-opt); }
+        #twist-root .verdict {
+          position: absolute; left: 120px; top: 806px; width: 1680px; padding: 22px 28px; border-radius: 12px;
+          border: 2px solid rgba(255, 138, 115, 0.45); background: rgba(255, 138, 115, 0.07);
+          font-size: 30px; line-height: 1.4; color: var(--ink);
+        }
+        #twist-root .verdict b { color: var(--c-risk); }
+      </style>
+      <div id="twist-root" data-composition-id="twist" data-width="1920" data-height="1080">
+        <div class="scene" id="twist-in">
+          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · What didn't win</div>
+          <div class="scene-title" data-layout-allow-overlap id="twist-title">Rules re-learned from a dirty drop fall off a cliff at 2%.</div>
+          <div class="sub" id="twist-sub">Stress run, 10%-scale drops · share of planted defects caught as the defect rate per type rises</div>
+          <div class="bars">
+            <div class="row" id="twist-r1"><div class="who">Re-learned · 0.5%<small>the headline setting</small></div>
+              <div class="track"><div class="fill" id="twist-b1" style="width: 930px"></div></div><div class="val">93.0%</div></div>
+            <div class="row bad" id="twist-r2"><div class="who">Re-learned · 2%<small>primary keys found: 4 of 7</small></div>
+              <div class="track"><div class="fill" id="twist-b2" style="width: 208px"></div></div><div class="val">20.8%</div></div>
+            <div class="row bad" id="twist-r3"><div class="who">Re-learned · 10%</div>
+              <div class="track"><div class="fill" id="twist-b3" style="width: 163px"></div></div><div class="val">16.3%</div></div>
+            <div class="row good" id="twist-r4"><div class="who">Frozen contract · 10%<small>rules from last month's drop</small></div>
+              <div class="track"><div class="fill" id="twist-b4" style="width: 915px"></div></div><div class="val">91.5%</div></div>
+          </div>
+          <div class="verdict" id="twist-verdict"><b>Why:</b> every profiler tolerance sits near 1%, so past it the rule is never written. A first run on a dirty source still needs a person to read rules.yml.</div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 7.0;
+          tl.fromTo("#twist-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#twist-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#twist-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#twist-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
+          [1, 2, 3, 4].forEach((n, i) => {
+            tl.fromTo("#twist-r" + n, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.15);
+            tl.fromTo("#twist-b" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 1.0 + i * 0.15);
+          });
+          tl.fromTo("#twist-verdict", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.4);
+          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["twist"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #bg-root { position: absolute; inset: 0; overflow: hidden; }
+      /* ================= persistent background ================= */
+      #bg-root .grid {
+        position: absolute;
+        left: -80px;
+        top: -80px;
+        width: 2080px;
+        height: 1240px;
+        background-image:
+          linear-gradient(rgba(127, 168, 255, 0.05) 2px, transparent 2px),
+          linear-gradient(90deg, rgba(127, 168, 255, 0.05) 2px, transparent 2px);
+        background-size: 80px 80px;
+      }
+      #bg-root .glow {
+        position: absolute;
+        border-radius: 50%;
+      }
+      #bg-root .glow-a {
+        left: 1150px;
+        top: -320px;
+        width: 1100px;
+        height: 1100px;
+        background: radial-gradient(circle, rgba(8, 121, 93, 0.3) 0%, rgba(8, 121, 93, 0) 65%);
+      }
+      #bg-root .glow-b {
+        left: -420px;
+        top: 560px;
+        width: 1000px;
+        height: 1000px;
+        background: radial-gradient(circle, rgba(90, 110, 210, 0.18) 0%, rgba(90, 110, 210, 0) 65%);
+      }
+      #bg-root .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, rgba(10, 17, 25, 0) 55%, rgba(5, 9, 14, 0.7) 100%);
+      }
+
+      </style>
+      <div id="bg-root" data-composition-id="bg" data-width="1920" data-height="1080">
+        <div class="grid" id="bg-grid"></div>
+        <div class="glow glow-a" id="bg-glow-a" data-layout-allow-overflow></div>
+        <div class="glow glow-b" id="bg-glow-b" data-layout-allow-overflow></div>
+        <div class="vignette"></div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const TOTAL = 86;
+          tl.fromTo("#bg-grid", { x: 0, y: 0 }, { x: -80, y: -40, duration: TOTAL, ease: "none" }, 0);
+          tl.fromTo("#bg-glow-a", { scale: 0.92 }, { scale: 1.08, duration: 14, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+          tl.fromTo("#bg-glow-b", { scale: 1.08 }, { scale: 0.92, duration: 11, ease: "sine.inOut", yoyo: true, repeat: 4 }, 0);
+          window.__timelines["bg"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

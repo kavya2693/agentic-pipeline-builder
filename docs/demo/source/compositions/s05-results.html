@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #results-root { position: absolute; inset: 0; }
+        #results-root .eyebrow { color: var(--c-eval); }
+        #results-root .cards { position: absolute; left: 120px; top: 290px; width: 1680px; display: flex; gap: 30px; }
+        #results-root .card {
+          position: relative; flex: 1 1 0; height: 500px; border-radius: 16px; border: 2px solid var(--line);
+          background: var(--panel); padding: 44px 34px 36px; display: flex; flex-direction: column; overflow: hidden;
+        }
+        #results-root .card .bar { position: absolute; left: 0; top: 0; width: 100%; height: 6px; }
+        #results-root .card .layer { font-family: var(--mono); font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; }
+        #results-root .card .big {
+          margin-top: 18px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 104px;
+          font-weight: 700; letter-spacing: -0.05em; line-height: 1; white-space: nowrap;
+        }
+        #results-root .card .lab { margin-top: 22px; font-size: 32px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+        #results-root .mini { position: relative; margin-top: 26px; width: 100%; height: 12px; border-radius: 6px; background: rgba(178, 191, 204, 0.16); }
+        #results-root .mini-fill { position: absolute; left: 0; top: 0; width: 100%; height: 12px; border-radius: 6px; transform-origin: left center; }
+        #results-root .card .foot {
+          margin-top: auto; padding-top: 18px; border-top: 2px solid var(--line);
+          font-family: var(--mono); font-size: 20px; color: var(--ink-soft); white-space: nowrap;
+        }
+        #results-root .opt .bar, #results-root .opt .mini-fill { background: var(--c-opt); }
+        #results-root .opt .big, #results-root .opt .layer { color: var(--c-opt); }
+        #results-root .mod .bar, #results-root .mod .mini-fill { background: var(--c-model); }
+        #results-root .mod .big, #results-root .mod .layer { color: var(--c-model); }
+        #results-root .ev .bar, #results-root .ev .mini-fill { background: var(--c-eval); }
+        #results-root .ev .big, #results-root .ev .layer { color: var(--c-eval); }
+        #results-root .footnote { position: absolute; left: 120px; top: 840px; font-family: var(--mono); font-size: 24px; color: var(--ink-mute); }
+      </style>
+      <div id="results-root" data-composition-id="results" data-width="1920" data-height="1080">
+        <div class="scene" id="results-in">
+          <div class="eyebrow" data-layout-allow-overlap id="results-eyebrow">08 · Results · full-size drop, scored vs the answer key</div>
+          <div class="scene-title" data-layout-allow-overlap id="results-title">Every type right, most defects caught, green in 100 s.</div>
+          <div class="cards">
+            <div class="card mod" id="results-c1"><div class="bar"></div><div class="layer">discovery</div>
+              <div class="big"><span id="results-v1">0</span>%</div><div class="lab">column types inferred right</div>
+              <div class="mini"><div class="mini-fill" id="results-m1"></div></div><div class="foot">pandas 68.5% · DuckDB 81.5%</div></div>
+            <div class="card ev" id="results-c2"><div class="bar"></div><div class="layer">validation</div>
+              <div class="big"><span id="results-v2">0.0</span>%</div><div class="lab">planted defects caught</div>
+              <div class="mini"><div class="mini-fill" id="results-m2"></div></div><div class="foot">hand-written pass: 29.5%</div></div>
+            <div class="card ev" id="results-c3"><div class="bar"></div><div class="layer">validation</div>
+              <div class="big"><span id="results-v3">0.0</span>%</div><div class="lab">of flagged rows are real defects</div>
+              <div class="mini"><div class="mini-fill" id="results-m3"></div></div><div class="foot">hand-written pass: 3.4%</div></div>
+            <div class="card opt" id="results-c4"><div class="bar"></div><div class="layer">build + run</div>
+              <div class="big"><span id="results-v4">0</span> s</div><div class="lab">raw folder to a green dbt build</div>
+              <div class="mini"><div class="mini-fill" id="results-m4"></div></div><div class="foot">31 models · 91 tests pass</div></div>
+          </div>
+          <div class="footnote" id="results-foot">7 files · 1.86M rows · 45,677 planted defects · dbt SQL and pandas quarantine the same 39,666 rows</div>
+        </div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const D = 8.8;
+          tl.fromTo("#results-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
+          tl.fromTo("#results-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+          tl.fromTo("#results-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          const stats = [
+            { v: "results-v1", m: "#results-m1", from: 0, to: 100, d: 0, r: 54 / 54 },
+            { v: "results-v2", m: "#results-m2", from: 0, to: 88.6, d: 1, r: 0.886 },
+            { v: "results-v3", m: "#results-m3", from: 0, to: 98.4, d: 1, r: 0.984 },
+            { v: "results-v4", m: "#results-m4", from: 0, to: 99.9, d: 0, r: 1 },
+          ];
+          stats.forEach((s, i) => {
+            const at = 0.7 + i * 0.16;
+            tl.fromTo("#results-c" + (i + 1), { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, at);
+            const o = { v: s.from };
+            const el = document.getElementById(s.v);
+            tl.to(o, { v: s.to, duration: 1.6, ease: "power3.out", onUpdate: () => { el.textContent = o.v.toFixed(s.d).replace("-", "−"); } }, at + 0.3);
+            tl.fromTo(s.m, { scaleX: 0 }, { scaleX: s.r, duration: 1.6, ease: "power3.out" }, at + 0.3);
+          });
+          tl.fromTo("#results-foot", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 2.8);
+          tl.to("#results-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          window.__timelines["results"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

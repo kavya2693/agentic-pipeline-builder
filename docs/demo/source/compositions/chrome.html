@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <style>
+        #chrome-root { position: absolute; inset: 0; }
+      /* ================= persistent chrome ================= */
+      #chrome-root .label {
+        position: absolute;
+        left: 120px;
+        bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: var(--mono);
+        font-size: 22px;
+        color: var(--ink-mute);
+        letter-spacing: 0.04em;
+      }
+      #chrome-root .label .mark {
+        display: block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        background: var(--c-opt);
+      }
+      #chrome-root .pager {
+        position: absolute;
+        right: 120px;
+        bottom: 40px;
+        width: 160px;
+        height: 30px;
+        font-family: var(--mono);
+        font-size: 22px;
+        color: var(--ink-mute);
+      }
+      #chrome-root .pager .n {
+        position: absolute;
+        right: 0;
+        top: 0;
+        opacity: 0;
+        white-space: nowrap;
+      }
+      #chrome-root .pager .n b {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      #chrome-root .progress-track {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 1920px;
+        height: 4px;
+        background: rgba(178, 191, 204, 0.1);
+      }
+      #chrome-root .progress {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 1920px;
+        height: 4px;
+        background: var(--c-opt);
+        transform-origin: left center;
+      }
+      </style>
+      <div id="chrome-root" data-composition-id="chrome" data-width="1920" data-height="1080">
+        <div class="label" id="chrome-label"><span class="mark"></span>agentic-pipeline-builder</div>
+        <div class="pager" id="chrome-pager"></div>
+        <div class="progress-track"></div>
+        <div class="progress" id="chrome-progress"></div>
+      </div>
+      <script>
+        (() => {
+          const tl = gsap.timeline({ paused: true });
+          const TOTAL = 86;
+          // slide starts: keep in sync with the scene hosts in index.html
+          const SLIDES = [0, 6.8, 11.3, 19.3, 26, 40.2, 53.9, 66.6, 75, 81.6];
+          // white "how it works" chapter: chrome switches to dark ink while it is on screen
+          const WHITE = [[11.3, 26.3], [53.9, 66.9]];
+          tl.fromTo("#chrome-progress", { scaleX: 0 }, { scaleX: 1, duration: TOTAL, ease: "none" }, 0);
+          tl.fromTo("#chrome-label", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.4);
+          const pager = document.getElementById("chrome-pager");
+          SLIDES.forEach((t, i) => {
+            const n = document.createElement("span");
+            n.className = "n";
+            n.id = "pager-" + (i + 1);
+            n.innerHTML = "<b>" + String(i + 1).padStart(2, "0") + "</b> / " + String(SLIDES.length).padStart(2, "0");
+            pager.appendChild(n);
+            tl.to(n, { opacity: 1, duration: 0.25 }, t + 0.45);
+            if (i + 1 < SLIDES.length) tl.to(n, { opacity: 0, duration: 0.2 }, SLIDES[i + 1] + 0.2);
+          });
+          const toDark = { color: "#4b5563" }, toLight = { color: "#8494a6" };
+          WHITE.forEach(([a, b]) => {
+            tl.to(["#chrome-label", "#chrome-pager"], Object.assign({ duration: 0.4 }, toDark), a + 0.3);
+            tl.to(["#chrome-label", "#chrome-pager"], Object.assign({ duration: 0.4 }, toLight), b - 0.6);
+            tl.to("#chrome-pager b", { color: "#111827", duration: 0.4 }, a + 0.3);
+            tl.to("#chrome-pager b", { color: "#eef2f6", duration: 0.4 }, b - 0.6);
+          });
+          window.__timelines["chrome"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
