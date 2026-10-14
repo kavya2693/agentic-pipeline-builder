@@ -73,11 +73,11 @@
       <script>
         (() => {
           const tl = gsap.timeline({ paused: true });
-          const TOTAL = 86;
+          const TOTAL = 88.4;
           // slide starts: keep in sync with the scene hosts in index.html
-          const SLIDES = [0, 6.8, 11.3, 19.3, 26, 40.2, 53.9, 66.6, 75, 81.6];
+          const SLIDES = [0, 6.8, 11.7, 19.7, 26.4, 40.6, 54.3, 67, 75.4, 84];
           // white "how it works" chapter: chrome switches to dark ink while it is on screen
-          const WHITE = [[11.3, 26.3], [53.9, 66.9]];
+          const WHITE = [[11.7, 26.7], [54.3, 67.3]];
           tl.fromTo("#chrome-progress", { scaleX: 0 }, { scaleX: 1, duration: TOTAL, ease: "none" }, 0);
           tl.fromTo("#chrome-label", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.4);
           const pager = document.getElementById("chrome-pager");
@@ -90,7 +90,7 @@
             tl.to(n, { opacity: 1, duration: 0.25 }, t + 0.45);
             if (i + 1 < SLIDES.length) tl.to(n, { opacity: 0, duration: 0.2 }, SLIDES[i + 1] + 0.2);
           });
-          const toDark = { color: "#4b5563" }, toLight = { color: "#8494a6" };
+          const toDark = { color: "#4b5563" }, toLight = { color: "#9fb0c2" };
           WHITE.forEach(([a, b]) => {
             tl.to(["#chrome-label", "#chrome-pager"], Object.assign({ duration: 0.4 }, toDark), a + 0.3);
             tl.to(["#chrome-label", "#chrome-pager"], Object.assign({ duration: 0.4 }, toLight), b - 0.6);

@@ -2,9 +2,9 @@
 
 **Repository:** https://github.com/kavya2693/agentic-pipeline-builder  
 **Numbers taken from commit:** `cbcb816` (outputs last changed in `cbcb816 (2026-10-13 22:10:14 +0400)`)  
-**Video:** `docs/demo/demo.mp4` (86.0 s, 1920x1080, 30 fps, silent)  
-**Generated:** 2026-10-14 14:13  
-**Automated checks:** 58 pass · 0 fail · 1 manual (of 59 figures)
+**Video:** `docs/demo/demo.mp4` (88.4 s, 1920x1080, 30 fps, silent)  
+**Generated:** 2026-10-14 18:36  
+**Automated checks:** 61 pass · 0 fail · 1 manual (of 62 figures)
 
 ## How to use this report
 
@@ -42,8 +42,8 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-12 | every type right / bad rows caught / dbt build green | 03 | `outputs/metrics.json` | schema.types.agent, quarantine, dbt | agent types correct == total; quarantined rows > 0; dbt.ok and no failed tests | derived | ✓ verified |
 | F-13 | 93.0% | 04, 09 | `outputs/stress.json` | sweep['0.005'].dq_recall | - | direct | ✓ verified |
 | F-14 | 20.8% | 04, 09 | `outputs/stress.json` | sweep['0.02'].dq_recall | - | direct | ✓ verified |
-| F-15 | 92.0% | 04 | `outputs/stress.json` | frozen_contract['0.005'].dq_recall | - | direct | ✓ verified |
-| F-16 | 91.3% | 04 | `outputs/stress.json` | frozen_contract['0.02'].dq_recall | - | direct | ✓ verified |
+| F-15 | 92.0% | 04, 09 | `outputs/stress.json` | frozen_contract['0.005'].dq_recall | - | direct | ✓ verified |
+| F-16 | 91.3% (slide 09 panel and payoff strip) | 04, 09 | `outputs/stress.json` | frozen_contract['0.02'].dq_recall | - | direct | ✓ verified |
 | F-17 | red bar 0.9300 -> 0.2075, green bar 0.9197 -> 0.9126 of full width | 04 | `demo:compositions/explainer.html; outputs/stress.json` | scaleX targets | scaleX = recall (4 decimals, as stored) | derived | ✓ verified |
 | F-18 | 39 s · 44 s · 0.14 s · 6 s · 11 s | 05 | `outputs/metrics.json` | state_log[*].seconds (DISCOVER..DBT_BUILD) | 38.67, 44.15, 0.14, 5.93, 10.99 rounded (BUILD kept to 2 decimals) | derived | ✓ verified |
 | F-19 | 100 s (slides 05, 06 title, 08) / 99.9 s (slide 06 log) | 05, 06, 08 | `outputs/metrics.json` | seconds_raw_to_built = 99.9 | rounded to whole seconds | direct | ✓ verified |
@@ -63,9 +63,9 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-33 | DONE · 0 tests failed | 06 | `outputs/metrics.json` | final_state, dbt.failed | - | direct | ✓ verified |
 | F-34 | orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0 | 06 | `outputs/metrics.json` | quarantine[*] | quarantine_rate x 100 to 2 decimals | direct | ✓ verified |
 | F-35 | the same 39,666 rows | 06, 08 | `outputs/metrics.json` | sql_vs_pandas[*].both | 1,200 + 19,452 + 11,507 + 7,409 + 98 = 39,666 (sql = pandas = both) | derived | ✓ verified |
-| F-36 | 9 bars | 06 | `outputs/metrics.json` | dq.agent.by_defect | - | direct | ✓ verified |
+| F-36 | 9 bars with plain names | 06 | `outputs/metrics.json; src/pipeline_builder/datagen.py:515-569` | dq.agent.by_defect | on-screen names: duplicate_row = Duplicate row, null_required = Missing required value, orphan_fk = ID with no match, type_corruption = Text in a number field, negative_value = Negative amount, future_date = Date in the future, malformed_email = Broken email, invalid_enum = Status or method typo (orders.status, payments.method), outlier_value = Price inflated 100x (order_items.unit_price x 100) | direct | ✓ verified |
 | F-37 | 88.6% | 06, 08 | `outputs/metrics.json` | dq.agent.recall = 0.8856 | - | direct | ✓ verified |
-| F-38 | 100% for duplicate_row and null_required, 0% for the other seven | 06 | `outputs/metrics.json` | dq.naive_baseline.by_defect | - | direct | ✓ verified |
+| F-38 | 100% for Duplicate row and Missing required value, 0% for the other seven | 06 | `outputs/metrics.json` | dq.naive_baseline.by_defect | - | direct | ✓ verified |
 | F-39 | order_id unique 2,000 · customer_id not null 2,000 · customer_id in customers 2,000 · ordered_at date in window 2,000 · order_total is decimal 2,000 · status one of 7 values 1,515 | 07 | `demo:assets/contract_sheet.json (tools/export_contract_sheet.py re-runs discovery + validation on data/raw); examples/rules.yml` | rules[*].rows_flagged, evidence, severity | rows held per rule = unique rows the rule flags | derived | ✓ verified |
 | F-40 | 11,507 of 402,000 rows held back (2.86%) | 07 | `outputs/metrics.json` | quarantine[table=orders] | 11,507 / 402,000 = 2.86% | direct | ✓ verified |
 | F-41 | stg_orders 390,493 | 07 | `outputs/metrics.json` | orders rows - quarantined; marts.fct_orders | 402,000 - 11,507 = 390,493 (equals the fct_orders row count) | derived | ✓ verified |
@@ -74,21 +74,24 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-44 | under the 5% gate | 06, 07 | `outputs/metrics.json` | max quarantine_rate = 0.02862 | max rate < 0.05 | derived | ✓ verified |
 | F-45 | Days of detective work become a review. | 07 | `README 'The problem' (days per source) and 'Known limitations' (first contract needs a person)` | - | - | general knowledge | ✓ verified |
 | F-47 | 100% (54/54) | 08, 03 | `outputs/metrics.json` | schema.types.agent.accuracy | - | direct | ✓ verified |
-| F-48 | pandas 68.5% · DuckDB 81.5% | 08 | `outputs/metrics.json` | schema.types.pandas_default / duckdb_sniff accuracy | - | direct | ✓ verified |
-| F-50 | hand-written pass: 29.5% | 08 | `outputs/metrics.json` | dq.naive_baseline.recall | - | direct | ✓ verified |
+| F-48 | plain pandas read: 68.5% / plain DuckDB read: 81.5% | 08 | `outputs/metrics.json` | schema.types.pandas_default / duckdb_sniff accuracy | - | direct | ✓ verified |
+| F-50 | hand-written checks / catch 29.5% | 08 | `outputs/metrics.json` | dq.naive_baseline.recall | - | direct | ✓ verified |
 | F-51 | 98.4% | 08 | `outputs/metrics.json` | dq.agent.row_precision | - | direct | ✓ verified |
-| F-52 | hand-written pass: 3.4% | 08 | `outputs/metrics.json` | dq.naive_baseline.row_precision | - | direct | ✓ verified |
+| F-52 | hand-written checks / precision 3.4% | 08 | `outputs/metrics.json` | dq.naive_baseline.row_precision | - | direct | ✓ verified |
 | F-58 | 16.3% | 09 | `outputs/stress.json` | sweep['0.1'].dq_recall | - | direct | ✓ verified |
 | F-59 | 91.5% | 09 | `outputs/stress.json` | frozen_contract['0.1'].dq_recall | - | direct | ✓ verified |
-| F-60 | primary keys found: 4 of 7 | 09 | `outputs/stress.json` | sweep['0.02'].primary_keys | - | direct | ✓ verified |
-| F-61 | every profiler tolerance sits near 1% | 09 | `src/pipeline_builder/discovery.py:30-31; validation.py:25, :31` | KEY_MAX_NULL 0.01, KEY_MIN_DISTINCT 0.99, NOT_NULL_MAX 0.01, NON_NEGATIVE_SHARE 0.99 | - | direct | ✓ verified |
-| F-62 | 10%-scale drops | 09 | `outputs/stress.json` | scale | - | direct | ✓ verified |
+| F-60 | 2% dirty · 4 of 7 keys found | 09 | `outputs/stress.json` | sweep['0.02'].primary_keys | - | direct | ✓ verified |
+| F-61 | Every learned limit sits near 1%, so past it the check is never written, and nothing warns. | 09 | `src/pipeline_builder/discovery.py:30-31; validation.py:25, :31` | KEY_MAX_NULL 0.01, KEY_MIN_DISTINCT 0.99, NOT_NULL_MAX 0.01, NON_NEGATIVE_SHARE 0.99 | - | direct | ✓ verified |
+| F-67 | Enforce last month's signed rules / run with --contract / The run loads the signed rules.yml instead of re-learning it, and a test pins this. | 09 | `src/pipeline_builder/orchestrator.py:39-41, :69-90; cli.py:206; tests/test_pipeline.py:125-142` | RunConfig.contract; discover_state, validate_state; test_frozen_contract_still_catches_defects_on_a_much_dirtier_drop | - | direct | ✓ verified |
+| F-68 | 242 · 54 · 42 · 239 · 237 · 238 px | 09 | `demo:compositions/s06-twist.html; outputs/stress.json` | #twist-lb1..3, #twist-rb1..3 widths | round(recall x 260) | derived | ✓ verified |
+| F-69 | 0.5% to 10% of rows carry each defect; rows 0.5% · 2% · 10% dirty | 09 | `outputs/stress.json` | sweep keys, frozen_contract keys | - | direct | ✓ verified |
+| F-70 | make stress reruns the lesson on slide 09 | 10 | `Makefile` | stress: scripts/stress_defect_rate.py | - | direct | ✓ verified |
 | F-63 | OPEN SOURCE · MIT | 10 | `LICENSE` | - | - | direct | ✓ verified |
 | F-64 | dbt · DuckDB · Airflow DAG · pandas · Python | 10 | `pyproject.toml; examples/raw_drop_pipeline.py` | dependencies; airflow import | - | direct | ✓ verified |
 | F-65 | $ make e2e   # generate 1.86M rows, build, dbt build, score | 10 | `Makefile` | e2e: data run | - | direct | ✓ verified |
 | F-66 | RUNS ON A LAPTOP | 10 | `README 'The result'` | 'green build in 100 s on a laptop' | - | direct | ✓ verified |
 
-## 2. Automated check run (2026-10-14 14:13)
+## 2. Automated check run (2026-10-14 18:36)
 
 | ID | Expected on slide | Recomputed from repo | Result |
 |---|---|---|---|
@@ -146,7 +149,10 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-59 | 91.5% | 91.5% | ✓ pass |
 | F-60 | 4/7 | 4/7 | ✓ pass |
 | F-61 | true | true | ✓ pass |
-| F-62 | 0.1 | 0.1 | ✓ pass |
+| F-67 | true | true | ✓ pass |
+| F-68 | true | true | ✓ pass |
+| F-69 | 0.5% to 10% | 0.5% to 10% | ✓ pass |
+| F-70 | true | true | ✓ pass |
 | F-63 | true | true | ✓ pass |
 | F-64 | true | true | ✓ pass |
 | F-65 | true | true | ✓ pass |
@@ -163,8 +169,8 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | A-05 | Profiler tolerances sit near 1%: a type needs 98% of values to parse, a required column at most 1% nulls, a key 99% distinct and at most 1% nulls, a non-negative column 99% non-negative, a category at least 0.1% of rows; outliers are flagged above 10x the p99. | `src/pipeline_builder/discovery.py:27, :30-31, :33; validation.py:25, :28, :31, :33` | F-03, F-20, F-29, F-36, F-47, F-13, F-14, F-58, F-61 | figures F-03, F-20, F-29, F-36, F-47, F-13, F-14, F-58, F-61 and slides 02, 03, 04, 05, 06, 08, 09 change |
 | A-06 | Retry policy: only DBT_BUILD and LAND are retried (2 attempts each); a rule that fails on the data fails the same way twice. | `src/pipeline_builder/orchestrator.py:153 (MAX_ATTEMPTS)` | F-11 | figures F-11 and slides 03, 05 change |
 | A-07 | Timings are wall-clock seconds from one run on the author's laptop and vary with the machine and its load. | `outputs/metrics.json state_log, seconds_raw_to_built; README 'The result'` | F-18, F-19, F-30 | figures F-18, F-19, F-30 and slides 05, 06, 08 change |
-| A-08 | Stress runs are at 10% scale (about 40,000 orders) with defect rates 0.5%, 2%, 5%, 10% per type (seed 7); the frozen contract is learned once on a separate 0.5% drop (seed 3) and enforced unchanged. | `scripts/stress_defect_rate.py:93, :99-103; outputs/stress.md` | F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-62 | figures F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-62 and slides 04, 09 change |
-| A-09 | Scoring: a defect is caught when a rule flags its row on its column (a duplicate row by any uniqueness rule). Row precision = flagged rows that carry any planted defect / all flagged rows. | `src/pipeline_builder/evaluate.py:143-183 (score_flags)` | F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59 | figures F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59 and slides 04, 06, 08, 09 change |
+| A-08 | Stress runs are at 10% scale (about 40,000 orders) with defect rates 0.5%, 2%, 5%, 10% per type (seed 7); the frozen contract is learned once on a separate 0.5% drop (seed 3) and enforced unchanged. | `scripts/stress_defect_rate.py:93, :99-103; outputs/stress.md` | F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-68, F-69 | figures F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-68, F-69 and slides 04, 09 change |
+| A-09 | Scoring: a defect is caught when a rule flags its row on its column (a duplicate row by any uniqueness rule). Row precision = flagged rows that carry any planted defect / all flagged rows. | `src/pipeline_builder/evaluate.py:143-183 (score_flags)` | F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59, F-68 | figures F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59, F-68 and slides 04, 06, 08, 09 change |
 | A-10 | The 'hand-written first pass' baseline is every column required plus the first column unique. | `src/pipeline_builder/validation.py:276 (naive_rules)` | F-38, F-50, F-52 | figures F-38, F-50, F-52 and slides 06, 08 change |
 | A-11 | The local LLM (Ollama) is off by default and only words column descriptions; types, keys, rules and SQL are deterministic code. The headline run did not use it (descriptions.model_leads = 0). | `src/pipeline_builder/describe.py:1-7; cli.py:141, :203; outputs/metrics.json descriptions` | F-28 | figures F-28 and slides 05 change |
 | A-12 | Video rounding: percentages to 1 decimal (the type-accuracy card to 0), seconds to whole numbers on slides 05 and 08 (BUILD 0.14 s kept) and 2 decimals in the slide 06 log; 1.86M = 1,863,774 rows. | `this audit (display convention)` | F-04, F-18, F-19, F-36, F-37, F-47, F-48, F-50, F-51, F-52 | figures F-04, F-18, F-19, F-36, F-37, F-47, F-48, F-50, F-51, F-52 and slides 02, 03, 05, 06, 08 change |
@@ -182,6 +188,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 01 · THE INDUSTRY  
 > A new source arrives as a folder of messy files.  
+> Who receives new data sources, and the four problems that slow them down.  
 > WHO LIVES WITH THIS · Retail & e-commerce data teams · Analytics engineers · Data platform & integration  
 > 01 Days of detective work per new source — Open every file, guess every column  
 > 02 Types guessed wrong on read — A postcode read as a number loses its leading zero  
@@ -202,18 +209,20 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 - The whole slide is context; no repo figures.
 
-**To change this slide:** Edit the chips (#ctx-c1..3) and cards (#ctx-k1..4) in compositions/s01-context.html. (project folder `docs/demo/source`).
+**To change this slide:** Edit the chips (#ctx-c1..3), cards (#ctx-k1..4) and subtitle (#ctx-sub) in compositions/s01-context.html. (project folder `docs/demo/source`).
 
 ### Slide 02: This project  
-*6.8-11.6 s · composition `compositions/s02-hook.html`*
+*6.8-12.0 s · composition `compositions/s02-hook.html`*
 
 ![Slide 02](slides/slide-02.jpg)
 
 **On-screen text (verbatim)**
 
 > 02 · THIS PROJECT  
+> The project in one line: messy files in, a checked and tested data pipeline out.  
 > 7 files, 1.86M rows. 45,677 planted defects. Out: a tested dbt pipeline.  
 > csv · json · jsonl · parquet · two date formats in one column · 9 defect types at known rows  
+> Planted defect = a bad value added at a known row, so every catch is scored. dbt = tested SQL tables.  
 
 **Figures on this slide**
 
@@ -232,10 +241,10 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 - Rings in the background are decoration.
 
-**To change this slide:** Headline spans #hook-l1..l3 and chips #hook-f1..f3 in compositions/s02-hook.html; sizes come from make e2e (outputs/metrics.json). (project folder `docs/demo/source`).
+**To change this slide:** Headline spans #hook-l1..l3, chips #hook-f1..f3 and the definition line #hook-def in compositions/s02-hook.html; sizes come from make e2e (outputs/metrics.json). (project folder `docs/demo/source`).
 
 ### Slide 03: How it works (white chapter, slide A)  
-*11.3-19.3 s · composition `compositions/explainer.html (CONFIG.blocks, CONFIG.groups, CONFIG.loop)`*
+*11.7-19.7 s · composition `compositions/explainer.html (CONFIG.blocks, CONFIG.groups, CONFIG.loop)`*
 
 ![Slide 03](slides/slide-03.jpg)
 
@@ -243,6 +252,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 03 · HOW IT WORKS  
 > From a raw folder to a pipeline  
+> Read left to right: learn what the files hold, write checks, stop on bad data, then build the pipeline.  
 > RAW FILES messy CSV, JSON, Parquet → [ONE STATE MACHINE: DISCOVER types, keys, joins → VALIDATE rules + their evidence → GATE too many bad rows? stop → BUILD dbt models + a nightly DAG] → PIPELINE OUT ✓ every type right ✓ bad rows caught ✓ dbt build green  
 > build, test, retry once (loop over BUILD)  
 
@@ -262,10 +272,10 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 - Icons and colours are a visual language, not data.
 
-**To change this slide:** Edit CONFIG in compositions/explainer.html; badge truth is F-12. (project folder `docs/demo/source`).
+**To change this slide:** Edit CONFIG and #ex-a-sub in compositions/explainer.html; badge truth is F-12. (project folder `docs/demo/source`).
 
 ### Slide 04: The key idea (white chapter, slide B)  
-*19.3-26.3 s · composition `compositions/explainer.html (#ex-b ...)`*
+*19.7-26.7 s · composition `compositions/explainer.html (#ex-b ...)`*
 
 ![Slide 04](slides/slide-04.jpg)
 
@@ -273,6 +283,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 04 · THE KEY IDEA  
 > The rules become a signed contract  
+> Each night's files get dirtier. Bars show the share of bad rows caught; longer is better.  
 > The first run drafts the rules — each one with the evidence behind it  
 > A person reviews and signs them — fixing anything that looks wrong  
 > Later drops are checked against them — instead of re-learning from dirty data  
@@ -286,7 +297,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-13 | 93.0% | `outputs/stress.json` · sweep['0.005'].dq_recall | - | ✓ |
 | F-14 | 20.8% | `outputs/stress.json` · sweep['0.02'].dq_recall | - | ✓ |
 | F-15 | 92.0% | `outputs/stress.json` · frozen_contract['0.005'].dq_recall | - | ✓ |
-| F-16 | 91.3% | `outputs/stress.json` · frozen_contract['0.02'].dq_recall | - | ✓ |
+| F-16 | 91.3% (slide 09 panel and payoff strip) | `outputs/stress.json` · frozen_contract['0.02'].dq_recall | - | ✓ |
 | F-17 | red bar 0.9300 -> 0.2075, green bar 0.9197 -> 0.9126 of full width | `demo:compositions/explainer.html; outputs/stress.json` · scaleX targets | scaleX = recall (4 decimals, as stored) | ✓ |
 
 **Assumptions:** A-05, A-08, A-09
@@ -298,7 +309,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 **To change this slide:** Markup under #ex-b in compositions/explainer.html; the footnote figures are F-13..F-16. (project folder `docs/demo/source`).
 
 ### Slide 05: Architecture  
-*26.0-40.6 s · composition `compositions/s03-architecture.html`*
+*26.4-41.0 s · composition `compositions/s03-architecture.html`*
 
 ![Slide 05](slides/slide-05a.jpg)
 
@@ -308,6 +319,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 05 · ARCHITECTURE  
 > Three code agents, one quarantine gate, one signed contract.  
+> Each box is a file in the repo. Data flows left to right; the gate stops the run if over 5% of rows are bad.  
 > orchestrator.py: DISCOVER 39 s → VALIDATE 44 s → BUILD 0.14 s → LAND 6 s → DBT_BUILD 11 s → DONE → run_state.json  
 > SOURCES: data/raw/ Raw drop (7 files, 1.86M rows) · Contract store (catalog.yml, rules.yml) --contract → Discover, Validate  
 > AGENTS: discovery.py Discover (types, keys, joins; parse rates, no LLM) → catalog.yml → validation.py Validate (136 rules, each with evidence) · Engineer (reviews, signs rules.yml) → signs → Contract  
@@ -342,11 +354,12 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 **Illustrative, not data:**
 
 - Packets moving along the wires and the state chips lighting up show execution order, not timing; the real durations are the labels in the band.
+- In phase B the off-path boxes dim to 75% opacity (still readable) to spotlight the critical path.
 
 **To change this slide:** NODES and W (wires) in compositions/s03-architecture.html; the band chips are static text. (project folder `docs/demo/source`).
 
 ### Slide 06: The system running  
-*40.2-54.2 s · composition `compositions/s04-routes.html`*
+*40.6-54.6 s · composition `compositions/s04-routes.html`*
 
 ![Slide 06](slides/slide-06a.jpg)
 
@@ -356,10 +369,12 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 06 · THE SYSTEM RUNNING  
 > One run: a raw folder to a green dbt build in 100 s.  
+> Left: the real run log. Right: share of each table's rows held back; under the 5% line, the run goes on.  
 > $ pipeline-builder run --raw data/raw --out generated · DISCOVER ok 38.67 s 54 columns · 7 keys · 7 joins · VALIDATE ok 44.15 s 136 rules · BUILD ok 0.14 s 39 dbt files · 88-line DAG · LAND ok 5.93 s 7 tables in warehouse.duckdb · DBT_BUILD ok 10.99 s 31 models · 91 pass · 5 warn · DONE raw → green build 99.9 s · 0 tests failed  
-> QUARANTINE PER TABLE (rows held back by blocking rules): orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0 · 5% gate  
+> QUARANTINE PER TABLE (% of rows held back · rows held): orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0 · 5% gate  
 > Every table stays under the 5% gate, so the run goes on. dbt SQL and pandas quarantine the same 39,666 rows.  
-> Phase 2: Defects caught, by type: seven at 100%, two well short. 45,677 DEFECTS PLANTED AT KNOWN ROWS · 1.86M ROWS · overall recall 88.6% · per-type bars (F-36) with the hand-written first pass as thin grey bars (F-38)  
+> Phase 2: Defects caught, by type: seven at 100%, two well short. Recall = share of planted defects caught; a longer bar is better. One row per kind of defect.  
+> 45,677 DEFECTS PLANTED AT KNOWN ROWS · 1.86M ROWS · overall recall 88.6% · Duplicate row · Missing required value · ID with no match · Text in a number field · Negative amount · Date in the future · Broken email (all 100.0%) · Status or method typo 63.4% · Price inflated 100x 22.8% (F-36); key: validation agent · hand-written checks, for comparison (F-38) · grey number = defects planted  
 
 **Figures on this slide**
 
@@ -380,9 +395,9 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-33 | DONE · 0 tests failed | `outputs/metrics.json` · final_state, dbt.failed | - | ✓ |
 | F-34 | orders 2.86% 11,507 · order_items 2.00% 19,452 · customers 1.99% 1,200 · payments 1.83% 7,409 · returns 0.50% 98 · products 0.00% 0 · stores 0.00% 0 | `outputs/metrics.json` · quarantine[*] | quarantine_rate x 100 to 2 decimals | ✓ |
 | F-35 | the same 39,666 rows | `outputs/metrics.json` · sql_vs_pandas[*].both | 1,200 + 19,452 + 11,507 + 7,409 + 98 = 39,666 (sql = pandas = both) | ✓ |
-| F-36 | 9 bars | `outputs/metrics.json` · dq.agent.by_defect | - | ✓ |
+| F-36 | 9 bars with plain names | `outputs/metrics.json; src/pipeline_builder/datagen.py:515-569` · dq.agent.by_defect | on-screen names: duplicate_row = Duplicate row, null_required = Missing required value, orphan_fk = ID with no match, type_corruption = Text in a number field, negative_value = Negative amount, future_date = Date in the future, malformed_email = Broken email, invalid_enum = Status or method typo (orders.status, payments.method), outlier_value = Price inflated 100x (order_items.unit_price x 100) | ✓ |
 | F-37 | 88.6% | `outputs/metrics.json` · dq.agent.recall = 0.8856 | - | ✓ |
-| F-38 | 100% for duplicate_row and null_required, 0% for the other seven | `outputs/metrics.json` · dq.naive_baseline.by_defect | - | ✓ |
+| F-38 | 100% for Duplicate row and Missing required value, 0% for the other seven | `outputs/metrics.json` · dq.naive_baseline.by_defect | - | ✓ |
 | F-44 | under the 5% gate | `outputs/metrics.json` · max quarantine_rate = 0.02862 | max rate < 0.05 | ✓ |
 
 **Assumptions:** A-02, A-03, A-04, A-07, A-09, A-10
@@ -390,11 +405,12 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 **Illustrative, not data:**
 
 - The terminal is a styled rendering of the state log in outputs/metrics.json, not a screen recording; the command line is the one make e2e runs (without its report flags).
+- Defect names are plain-English labels for the generator's defect keys (mapping in F-36).
 
-**To change this slide:** LOG, Q and DQ arrays in compositions/s04-routes.html (copied from outputs/metrics.json). (project folder `docs/demo/source`).
+**To change this slide:** LOG, Q, DQ and PLAIN in compositions/s04-routes.html (numbers copied from outputs/metrics.json). (project folder `docs/demo/source`).
 
 ### Slide 07: End-user value (white)  
-*53.9-66.9 s · composition `compositions/value.html (SHEET injected by tools/inject_contract.py; CONFIG)`*
+*54.3-67.3 s · composition `compositions/value.html (SHEET injected by tools/inject_contract.py; CONFIG)`*
 
 ![Slide 07](slides/slide-07.jpg)
 
@@ -402,6 +418,7 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 07 · END-USER VALUE  
 > What the data engineer gets  
+> Each row is one check on orders.csv, its evidence, and the bad rows it held back. Right: a person signs, then tonight's file runs.  
 > DATA CONTRACT · orders.csv · DRAFT → REVIEWED · SIGNED  
 > COLUMN / CHECK / EVIDENCE / ON FAIL / ROWS HELD: order_id unique (inferred primary key) block 2,000 · customer_id not null (null rate 0.50% (required at <= 1%)) block 2,000 · customer_id in customers (99.50% of rows resolve to customers.customer_id) block 2,000 · ordered_at date in window (dates must fall between 1990-01-01 and the run date 2026-02-01) block 2,000 · order_total is decimal (decimal inferred) block 2,000 · status one of 7 values (7 values cover 99.62%; rarer values excluded) block 1,515  
 > + 17 more rules on orders (16 flag no rows)  
@@ -428,11 +445,12 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 - Row tokens flowing to the bins are schematic (every 11th to quarantine); the counters are real.
 - The review (ringing two values, the SIGNED stamp) shows the human step the README asks for; the counts shown are from the draft run, before any edit.
+- Long evidence strings are cut with an ellipsis on screen; the full text is in examples/rules.yml.
 
 **To change this slide:** Re-run tools/export_contract_sheet.py, then tools/inject_contract.py with --rules; scene layout in CONFIG of compositions/value.html. (project folder `docs/demo/source`).
 
 ### Slide 08: Results  
-*66.6-75.4 s · composition `compositions/s05-results.html`*
+*67.0-75.8 s · composition `compositions/s05-results.html`*
 
 ![Slide 08](slides/slide-08.jpg)
 
@@ -440,10 +458,11 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 > 08 · RESULTS · FULL-SIZE DROP, SCORED VS THE ANSWER KEY  
 > Every type right, most defects caught, green in 100 s.  
-> DISCOVERY 100% column types inferred right · pandas 68.5% · DuckDB 81.5%  
-> VALIDATION 88.6% planted defects caught · hand-written pass: 29.5%  
-> VALIDATION 98.4% of flagged rows are real defects · hand-written pass: 3.4%  
-> BUILD + RUN 100 s raw folder to a green dbt build · 31 models · 91 tests pass  
+> Each score is checked against the answer key of planted defects. Higher is better; the bottom line compares a simpler way.  
+> DISCOVERY 100% column types inferred right · plain pandas read: 68.5% · plain DuckDB read: 81.5%  
+> VALIDATION 88.6% planted defects caught (recall) · hand-written checks catch 29.5%  
+> VALIDATION 98.4% of flagged rows are real defects (precision) · hand-written checks precision 3.4%  
+> BUILD + RUN 100 s raw folder to a green dbt build · 31 models built · 91 tests pass  
 > 7 files · 1.86M rows · 45,677 planted defects · dbt SQL and pandas quarantine the same 39,666 rows  
 
 **Figures on this slide**
@@ -459,10 +478,10 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | F-35 | the same 39,666 rows | `outputs/metrics.json` · sql_vs_pandas[*].both | 1,200 + 19,452 + 11,507 + 7,409 + 98 = 39,666 (sql = pandas = both) | ✓ |
 | F-37 | 88.6% | `outputs/metrics.json` · dq.agent.recall = 0.8856 | - | ✓ |
 | F-47 | 100% (54/54) | `outputs/metrics.json` · schema.types.agent.accuracy | - | ✓ |
-| F-48 | pandas 68.5% · DuckDB 81.5% | `outputs/metrics.json` · schema.types.pandas_default / duckdb_sniff accuracy | - | ✓ |
-| F-50 | hand-written pass: 29.5% | `outputs/metrics.json` · dq.naive_baseline.recall | - | ✓ |
+| F-48 | plain pandas read: 68.5% / plain DuckDB read: 81.5% | `outputs/metrics.json` · schema.types.pandas_default / duckdb_sniff accuracy | - | ✓ |
+| F-50 | hand-written checks / catch 29.5% | `outputs/metrics.json` · dq.naive_baseline.recall | - | ✓ |
 | F-51 | 98.4% | `outputs/metrics.json` · dq.agent.row_precision | - | ✓ |
-| F-52 | hand-written pass: 3.4% | `outputs/metrics.json` · dq.naive_baseline.row_precision | - | ✓ |
+| F-52 | hand-written checks / precision 3.4% | `outputs/metrics.json` · dq.naive_baseline.row_precision | - | ✓ |
 
 **Assumptions:** A-01, A-07, A-09, A-10, A-12
 
@@ -472,18 +491,21 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 
 **To change this slide:** The stats array and card text in compositions/s05-results.html. (project folder `docs/demo/source`).
 
-### Slide 09: What didn't win  
-*75.0-82.0 s · composition `compositions/s06-twist.html`*
+### Slide 09: Lesson and fix  
+*75.4-84.4 s · composition `compositions/s06-twist.html`*
 
 ![Slide 09](slides/slide-09.jpg)
 
 **On-screen text (verbatim)**
 
-> 09 · WHAT DIDN'T WIN  
-> Rules re-learned from a dirty drop fall off a cliff at 2%.  
-> Stress run, 10%-scale drops · share of planted defects caught as the defect rate per type rises  
-> Re-learned · 0.5% (the headline setting) 93.0% · Re-learned · 2% (primary keys found: 4 of 7) 20.8% · Re-learned · 10% 16.3% · Frozen contract · 10% (rules from last month's drop) 91.5%  
-> Why: every profiler tolerance sits near 1%, so past it the rule is never written. A first run on a dirty source still needs a person to read rules.yml.  
+> 09 · LESSON AND FIX  
+> Dirty data teaches bad rules. So I freeze a signed contract.  
+> Test drops where 0.5% to 10% of rows carry each defect. Recall = share of defects caught; higher is better.  
+> THE LESSON — Rules re-learned from dirty data miss it. Recall, rules learned again from each drop: 0.5% dirty (near-clean drop) 93.0% · 2% dirty (4 of 7 keys found) 20.8% TRAP · 10% dirty 16.3%  
+> Every learned limit sits near 1%, so past it the check is never written, and nothing warns.  
+> THE FIX, IN THE REPO — Enforce last month's signed rules. Recall, the same drops, run with --contract: 0.5% dirty 92.0% · 2% dirty 91.3% HOLDS · 10% dirty 91.5%  
+> The run loads the signed rules.yml instead of re-learning it, and a test pins this.  
+> PAYOFF — At 2% dirty, recall 91.3% with the contract vs 20.8% re-learned · the first contract still needs a review  
 
 **Figures on this slide**
 
@@ -491,22 +513,27 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 |---|---|---|---|---|
 | F-13 | 93.0% | `outputs/stress.json` · sweep['0.005'].dq_recall | - | ✓ |
 | F-14 | 20.8% | `outputs/stress.json` · sweep['0.02'].dq_recall | - | ✓ |
+| F-15 | 92.0% | `outputs/stress.json` · frozen_contract['0.005'].dq_recall | - | ✓ |
+| F-16 | 91.3% (slide 09 panel and payoff strip) | `outputs/stress.json` · frozen_contract['0.02'].dq_recall | - | ✓ |
 | F-58 | 16.3% | `outputs/stress.json` · sweep['0.1'].dq_recall | - | ✓ |
 | F-59 | 91.5% | `outputs/stress.json` · frozen_contract['0.1'].dq_recall | - | ✓ |
-| F-60 | primary keys found: 4 of 7 | `outputs/stress.json` · sweep['0.02'].primary_keys | - | ✓ |
-| F-61 | every profiler tolerance sits near 1% | `src/pipeline_builder/discovery.py:30-31; validation.py:25, :31` · KEY_MAX_NULL 0.01, KEY_MIN_DISTINCT 0.99, NOT_NULL_MAX 0.01, NON_NEGATIVE_SHARE 0.99 | - | ✓ |
-| F-62 | 10%-scale drops | `outputs/stress.json` · scale | - | ✓ |
+| F-60 | 2% dirty · 4 of 7 keys found | `outputs/stress.json` · sweep['0.02'].primary_keys | - | ✓ |
+| F-61 | Every learned limit sits near 1%, so past it the check is never written, and nothing warns. | `src/pipeline_builder/discovery.py:30-31; validation.py:25, :31` · KEY_MAX_NULL 0.01, KEY_MIN_DISTINCT 0.99, NOT_NULL_MAX 0.01, NON_NEGATIVE_SHARE 0.99 | - | ✓ |
+| F-67 | Enforce last month's signed rules / run with --contract / The run loads the signed rules.yml instead of re-learning it, and a test pins this. | `src/pipeline_builder/orchestrator.py:39-41, :69-90; cli.py:206; tests/test_pipeline.py:125-142` · RunConfig.contract; discover_state, validate_state; test_frozen_contract_still_catches_defects_on_a_much_dirtier_drop | - | ✓ |
+| F-68 | 242 · 54 · 42 · 239 · 237 · 238 px | `demo:compositions/s06-twist.html; outputs/stress.json` · #twist-lb1..3, #twist-rb1..3 widths | round(recall x 260) | ✓ |
+| F-69 | 0.5% to 10% of rows carry each defect; rows 0.5% · 2% · 10% dirty | `outputs/stress.json` · sweep keys, frozen_contract keys | - | ✓ |
 
 **Assumptions:** A-05, A-08, A-09
 
 **Illustrative, not data:**
 
-- Bar widths are recall x 1000 px.
+- Both panels share one bar scale: 100% recall = 260 px (F-68).
+- Left bars are neutral grey (coral only on the TRAP label and lesson tag); right bars are mint because they are the fix the code implements.
 
-**To change this slide:** Rows #twist-r1..r4 in compositions/s06-twist.html (values from outputs/stress.json). (project folder `docs/demo/source`).
+**To change this slide:** Rows #twist-l1..l3 / #twist-r1..r3 and the payoff strip in compositions/s06-twist.html (values from outputs/stress.json via make stress). (project folder `docs/demo/source`).
 
 ### Slide 10: End card  
-*81.6-86.0 s · composition `compositions/s07-end.html`*
+*84.0-88.4 s · composition `compositions/s07-end.html`*
 
 ![Slide 10](slides/slide-10.jpg)
 
@@ -517,11 +544,13 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 > github.com/kavya2693/agentic-pipeline-builder  
 > dbt · DuckDB · Airflow DAG · pandas · Python  
 > $ make e2e   # generate 1.86M rows, build, dbt build, score  
+> One command rebuilds the main results; make stress reruns the lesson on slide 09.  
 
 **Figures on this slide**
 
 | ID | Shown | Source · key | Calculation | Check |
 |---|---|---|---|---|
+| F-70 | make stress reruns the lesson on slide 09 | `Makefile` · stress: scripts/stress_defect_rate.py | - | ✓ |
 | F-63 | OPEN SOURCE · MIT | `LICENSE` · - | - | ✓ |
 | F-64 | dbt · DuckDB · Airflow DAG · pandas · Python | `pyproject.toml; examples/raw_drop_pipeline.py` · dependencies; airflow import | - | ✓ |
 | F-65 | $ make e2e   # generate 1.86M rows, build, dbt build, score | `Makefile` · e2e: data run | - | ✓ |
@@ -546,8 +575,8 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 | A-05: Profiler tolerances sit near 1%: a type needs 98% of values to parse, a required column at most 1% nulls, a key 99% distinct and at most 1% nulls, a non-negative column 99% non-negative, a category at least 0 | F-03, F-20, F-29, F-36, F-47, F-13, F-14, F-58, F-61 | 02, 03, 04, 05, 06, 08, 09 | `src/pipeline_builder/discovery.py:27-35; src/pipeline_builder/validation.py:25-36` | `make e2e; make stress` |
 | A-06: Retry policy: only DBT_BUILD and LAND are retried (2 attempts each); a rule that fails on the data fails the same way twice | F-11 | 03, 05 | `src/pipeline_builder/orchestrator.py:153` | `make e2e` |
 | A-07: Timings are wall-clock seconds from one run on the author's laptop and vary with the machine and its load | F-18, F-19, F-30 | 05, 06, 08 | `-` | `make e2e` |
-| A-08: Stress runs are at 10% scale (about 40,000 orders) with defect rates 0 | F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-62 | 04, 09 | `scripts/stress_defect_rate.py:93-103` | `make stress` |
-| A-09: Scoring: a defect is caught when a rule flags its row on its column (a duplicate row by any uniqueness rule) | F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59 | 04, 06, 08, 09 | `src/pipeline_builder/evaluate.py:143` | `make e2e; make stress` |
+| A-08: Stress runs are at 10% scale (about 40,000 orders) with defect rates 0 | F-13, F-14, F-15, F-16, F-17, F-58, F-59, F-60, F-68, F-69 | 04, 09 | `scripts/stress_defect_rate.py:93-103` | `make stress` |
+| A-09: Scoring: a defect is caught when a rule flags its row on its column (a duplicate row by any uniqueness rule) | F-36, F-37, F-38, F-50, F-51, F-52, F-13, F-14, F-15, F-16, F-58, F-59, F-68 | 04, 06, 08, 09 | `src/pipeline_builder/evaluate.py:143` | `make e2e; make stress` |
 | A-10: The 'hand-written first pass' baseline is every column required plus the first column unique | F-38, F-50, F-52 | 06, 08 | `src/pipeline_builder/validation.py:276` | `make e2e` |
 | A-11: The local LLM (Ollama) is off by default and only words column descriptions; types, keys, rules and SQL are deterministic code | F-28 | 05 | `--llm flag` | `uv run pipeline-builder run ... --llm llama3.2` |
 | A-12: Video rounding: percentages to 1 decimal (the type-accuracy card to 0), seconds to whole numbers on slides 05 and 08 (BUILD 0 | F-04, F-18, F-19, F-36, F-37, F-47, F-48, F-50, F-51, F-52 | 02, 03, 05, 06, 08 | `the composition file named on each slide` | `hyperframes render` |
@@ -562,6 +591,8 @@ python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/fact
 - The Airflow DAG is generated and checked against stub modules, not run on a live Airflow (README 'Known limitations'); the end card's 'Airflow DAG' chip means the generated file.
 - Inflated prices are mostly missed (22.8%) and 322 orders with the rare real status 'disputed' are quarantined as typos (README); slide 07's status row (1,515 rows held) includes those 322.
 - Slide 07's review step is shown, not measured: the counts on the sheet are from the draft rules, before any edit.
+- Slide 09 shows the stress sweep at 0.5%, 2% and 10%; the 5% row (re-learned 16.3%, frozen 91.6%) and the format-shift arm (type accuracy 94.4%, no warning) are dropped from the slide and still reported in outputs/stress.md and the README section 'The run that embarrasses the headline'.
+- On slide 09 the near-clean 0.5% drop scores slightly higher with re-learned rules (93.0%) than with the frozen contract (92.0%); both are shown. The fix is not free: the first contract still needs a person to read rules.yml (README 'Known limitations').
 - Slide 01 statements are general data-engineering knowledge (A-13).
 
 ## Appendix: environment

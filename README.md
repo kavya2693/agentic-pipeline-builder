@@ -8,9 +8,9 @@ A folder of messy source exports in; a typed, tested dbt project, a quarantine f
 rows and an Airflow DAG out, with every inferred type, key and rule checked against a
 known answer.
 
-[![86-second silent walkthrough: the onboarding problem, how the agents work, the architecture, the run log, the orders contract and the results](docs/demo/demo.gif)](https://kavya2693.github.io/work-demos/agentic-pipeline-builder.mp4)
+[![88-second silent walkthrough: the onboarding problem, how the agents work, the architecture, the run log, the orders contract, the results, and the lesson with its fix](docs/demo/demo.gif)](https://kavya2693.github.io/work-demos/agentic-pipeline-builder.mp4)
 
-*~86-second silent walkthrough: the problem, the three agents, the run and what didn't win. [Play the full video](https://kavya2693.github.io/work-demos/agentic-pipeline-builder.mp4) · [download the MP4, 5 MB](docs/demo/demo.mp4).*
+*~88-second silent walkthrough: the problem, the three agents, the run, and the lesson with the fix the code makes. [Play the full video](https://kavya2693.github.io/work-demos/agentic-pipeline-builder.mp4) · [download the MP4, 5.5 MB](docs/demo/demo.mp4).*
 
 📄 **Audit report:** every figure and assumption in the video, traced to its source — [PDF](docs/demo/AUDIT_REPORT.pdf) · [Word](docs/demo/AUDIT_REPORT.docx) · [Markdown](docs/demo/AUDIT_REPORT.md)
 

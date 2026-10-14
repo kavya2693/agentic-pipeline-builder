@@ -55,6 +55,7 @@
         <div class="scene" id="ctx-in">
           <div class="eyebrow" data-layout-allow-overlap id="ctx-eyebrow">01 · The industry</div>
           <div class="scene-title" data-layout-allow-overlap id="ctx-title">A new source arrives as a folder of messy files.</div>
+          <div class="scene-sub" id="ctx-sub">Who receives new data sources, and the four problems that slow them down.</div>
           <div class="who" id="ctx-who">
             <span class="who-label">Who lives with this</span>
             <span class="chip" id="ctx-c1">Retail &amp; e-commerce data teams</span>
@@ -89,13 +90,14 @@
           const D = 7.2;
           tl.fromTo("#ctx-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#ctx-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#ctx-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
           tl.fromTo("#ctx-who", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.8);
           ["#ctx-c1", "#ctx-c2", "#ctx-c3"].forEach((c, i) =>
             tl.fromTo(c, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 0.9 + i * 0.12));
           ["#ctx-k1", "#ctx-k2", "#ctx-k3", "#ctx-k4"].forEach((c, i) =>
             tl.fromTo(c, { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.5 + i * 0.16));
           tl.fromTo("#ctx-next", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "expo.out" }, 4.0);
-          tl.to("#ctx-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#ctx-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["ctx"] = tl;
         })();
       </script>

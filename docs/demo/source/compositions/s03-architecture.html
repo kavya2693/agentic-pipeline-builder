@@ -5,19 +5,19 @@
     <template>
       <style>
         #arch-root { position: absolute; inset: 0; }
-        #arch-root .diagram { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+        #arch-root .diagram { position: absolute; left: 0; top: 12px; width: 1920px; height: 1080px; }
         #arch-root svg.wires { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
         #arch-root .wire { fill: none; stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
         /* orchestrator band */
         #arch-root .band {
-          position: absolute; left: 120px; top: 202px; width: 1680px; height: 60px; border-radius: 12px;
+          position: absolute; left: 120px; top: 218px; width: 1680px; height: 54px; border-radius: 12px;
           border: 2px solid var(--line); background: rgba(15, 26, 38, 0.92);
-          display: flex; align-items: center; gap: 10px; padding: 0 16px; font-family: var(--mono); font-size: 21px;
+          display: flex; align-items: center; gap: 8px; padding: 0 14px; font-family: var(--mono); font-size: 22px;
         }
         #arch-root .band .who { color: var(--ink-soft); padding-right: 8px; white-space: nowrap; }
         #arch-root .band .who b { color: var(--ink); font-weight: 700; }
         #arch-root .band .st {
-          position: relative; display: block; padding: 6px 12px; border-radius: 8px; border: 2px solid var(--line); color: var(--ink-soft);
+          position: relative; display: block; padding: 4px 10px; border-radius: 8px; border: 2px solid var(--line); color: var(--ink-soft);
           white-space: nowrap; background: var(--panel);
         }
         #arch-root .band .st i { font-style: normal; color: var(--ink-mute); }
@@ -25,7 +25,7 @@
         #arch-root .band .tot { margin-left: auto; color: var(--ink-mute); white-space: nowrap; }
         #arch-root .band .st-lit { position: absolute; inset: -2px; border-radius: 8px; border: 2px solid var(--c-opt); background: rgba(63, 216, 168, 0.16); opacity: 0; }
         /* layer headers */
-        #arch-root .lh { position: absolute; top: 290px; font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
+        #arch-root .lh { position: absolute; top: 288px; font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
         #arch-root .lh::after { content: ""; display: block; margin-top: 8px; height: 2px; width: 100%; background: currentColor; opacity: 0.35; }
         /* nodes */
         #arch-root .node {
@@ -33,9 +33,9 @@
           padding: 0 22px; border: 2px solid var(--line); border-radius: 12px; background: var(--panel);
         }
         #arch-root .node .t { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
-        #arch-root .node .s { font-family: var(--mono); font-size: 21px; color: var(--ink-soft); white-space: nowrap; }
+        #arch-root .node .s { font-family: var(--mono); font-size: 22px; color: var(--ink-soft); white-space: nowrap; }
         #arch-root .node .f {
-          position: absolute; right: 12px; top: -15px; font-family: var(--mono); font-size: 20px; padding: 1px 9px;
+          position: absolute; right: 12px; top: -16px; font-family: var(--mono); font-size: 22px; padding: 0 9px;
           border-radius: 6px; background: var(--bg); border: 2px solid var(--line); white-space: nowrap; z-index: 2;
         }
         #arch-root .node .glow { position: absolute; inset: -2px; border-radius: 12px; border: 3px solid currentColor; opacity: 0; pointer-events: none; }
@@ -77,17 +77,17 @@
         }
         #arch-root .gate .gt {
           position: absolute; left: 0; top: 0; width: 212px; height: 212px; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; font-family: var(--mono); font-size: 20px; line-height: 1.2; color: var(--ink); text-align: center;
+          align-items: center; justify-content: center; font-family: var(--mono); font-size: 22px; line-height: 1.2; color: var(--ink); text-align: center;
         }
         #arch-root .gate .gt b { color: var(--c-risk); font-size: 26px; }
-        #arch-root .wl { position: absolute; font-family: var(--mono); font-size: 20px; white-space: nowrap; }
+        #arch-root .wl { position: absolute; font-family: var(--mono); font-size: 22px; white-space: nowrap; }
         #arch-root .legend {
           position: absolute; left: 120px; top: 962px; display: flex; gap: 34px; align-items: center;
-          font-family: var(--mono); font-size: 20px; color: var(--ink-mute); white-space: nowrap;
+          font-family: var(--mono); font-size: 22px; color: var(--ink-mute); white-space: nowrap;
         }
         #arch-root .legend span { display: flex; align-items: center; gap: 10px; }
         #arch-root .cp {
-          position: absolute; left: 1225px; top: 956px; padding: 6px 16px; border-radius: 8px; border: 2px solid var(--c-opt);
+          position: absolute; left: 1225px; top: 948px; padding: 6px 16px; border-radius: 8px; border: 2px solid var(--c-opt);
           background: rgba(63, 216, 168, 0.12); font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--c-opt); white-space: nowrap;
         }
       </style>
@@ -96,6 +96,7 @@
         <div class="scene" id="arch-in">
           <div class="eyebrow" data-layout-allow-overlap id="arch-eyebrow">05 · Architecture</div>
           <div class="scene-title" data-layout-allow-overlap id="arch-title">Three code agents, one quarantine gate, one signed contract.</div>
+          <div class="scene-sub" id="arch-sub" style="top: 178px">Each box is a file in the repo. Data flows left to right; the gate stops the run if over 5% of rows are bad.</div>
           <div class="diagram" id="arch-diagram">
             <svg class="wires" viewBox="0 0 1920 1080" id="arch-svg"></svg>
 
@@ -124,20 +125,20 @@
             </div>
 
             <div class="wl" id="wl-cat" style="left: 568px; top: 510px; color: var(--c-model)">catalog.yml</div>
-            <div class="wl" id="wl-con" style="left: 238px; top: 516px; color: var(--c-data)">--contract</div>
+            <div class="wl" id="wl-con" style="left: 222px; top: 516px; color: var(--c-data)">--contract</div>
             <div class="wl" id="wl-ok" style="left: 902px; top: 492px; color: var(--c-opt)">≤ 5%</div>
             <div class="wl" id="wl-bad" style="left: 878px; top: 752px; color: var(--c-risk)">&gt; 5%</div>
             <div class="wl" id="wl-dbt" style="left: 1336px; top: 374px; color: var(--c-opt)">dbt/</div>
-            <div class="wl" id="wl-raw" style="left: 1186px; top: 690px; color: var(--c-opt)">raw.* as text</div>
+            <div class="wl" id="wl-raw" style="left: 1180px; top: 690px; color: var(--c-opt)">raw.* as text</div>
             <div class="wl" id="wl-mod" style="left: 1614px; top: 510px; color: var(--c-opt)">31 models</div>
             <div class="wl" id="wl-par" style="left: 1540px; top: 736px; color: var(--c-eval)">row-for-row check</div>
             <div class="wl" id="wl-sign" style="left: 254px; top: 878px; color: var(--c-eval)">signs</div>
 
             <div class="legend" id="arch-legend">
-              <span><svg width="44" height="10"><path d="M2 5h40" stroke="#b2bfcc" stroke-width="3.5"/></svg>data</span>
-              <span><svg width="44" height="10"><path d="M2 5h40" stroke="#b2bfcc" stroke-width="3.5" stroke-dasharray="7 6"/></svg>control / review</span>
+              <span><svg width="44" height="10"><path d="M2 5h40" stroke="#c8d3de" stroke-width="3.5"/></svg>data</span>
+              <span><svg width="44" height="10"><path d="M2 5h40" stroke="#c8d3de" stroke-width="3.5" stroke-dasharray="7 6"/></svg>control / review</span>
               <span><svg width="22" height="22"><rect x="4" y="4" width="14" height="14" transform="rotate(45 11 11)" fill="none" stroke="#ff8a73" stroke-width="2.5"/></svg>decision</span>
-              <span><svg width="26" height="22"><path d="M3 6v10a10 4 0 0 0 20 0V6M3 6a10 4 0 0 0 20 0a10 4 0 0 0-20 0" fill="none" stroke="#b2bfcc" stroke-width="2"/></svg>store</span>
+              <span><svg width="26" height="22"><path d="M3 6v10a10 4 0 0 0 20 0V6M3 6a10 4 0 0 0 20 0a10 4 0 0 0-20 0" fill="none" stroke="#c8d3de" stroke-width="2"/></svg>store</span>
             </div>
             <div class="cp" id="arch-cp">critical path · raw → green build 100 s</div>
           </div>
@@ -246,6 +247,7 @@
           tl.fromTo("#arch-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#arch-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#arch-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
+          tl.fromTo("#arch-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.45);
           tl.fromTo("#arch-band", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.6);
           const pop = (sel, at, from) =>
             tl.fromTo(sel, Object.assign({ opacity: 0, x: 0, y: 0 }, from), { opacity: 1, x: 0, y: 0, duration: 0.5, ease: "power3.out" }, at);
@@ -325,12 +327,12 @@
             tl.to("#arch-h-" + k, { attr: { opacity: 0.18 }, duration: 0.5 }, HL);
           });
           CP.concat(["build_dbt"]).forEach((k) => tl.to(W[k].el, { attr: { "stroke-width": 6, opacity: 1 }, duration: 0.5 }, HL));
-          tl.to(["#n-llm", "#n-halt", "#n-hum", "#n-con", "#n-eval", "#n-key", "#wl-con", "#wl-sign", "#wl-bad", "#wl-par"], { opacity: 0.35, duration: 0.5 }, HL);
+          tl.to(["#n-llm", "#n-halt", "#n-hum", "#n-con", "#n-eval", "#n-key", "#wl-con", "#wl-sign", "#wl-bad", "#wl-par"], { opacity: 0.75, duration: 0.5 }, HL); // spotlight dim stays >= 75% so the text stays readable
           tl.fromTo("#arch-cp", { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, HL + 0.2);
           for (let k = 0; k < 6; k++) tl.to("#stl-" + k, { opacity: 1, duration: 0.25 }, HL + 0.2 + k * 0.12);
           let v = HL + 0.4;
           CP.forEach((k) => { v = packet(k, v, 0.3, "#ffffff"); });
-          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.to("#arch-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["arch"] = tl;
         })();
       </script>

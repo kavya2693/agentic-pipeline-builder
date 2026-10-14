@@ -4,59 +4,128 @@
   <body>
     <template>
       <style>
+        /* 09 LESSON AND FIX (agentic-pipeline-builder): left = the finding with its evidence, right = what the repo does about it + the measured payoff.
+           Colour meaning: neutral grey bars for every option, coral only for the "trap" label, mint for the fix. */
         #twist-root { position: absolute; inset: 0; }
-        #twist-root .eyebrow { color: var(--c-risk); }
-        #twist-root .sub { position: absolute; left: 120px; top: 200px; font-size: 32px; color: var(--ink-soft); }
-        #twist-root .bars { position: absolute; left: 120px; top: 310px; width: 1680px; }
-        #twist-root .row { display: flex; align-items: center; height: 112px; }
-        #twist-root .who { width: 470px; font-size: 36px; font-weight: 700; color: var(--ink); }
-        #twist-root .who small { display: block; font-family: var(--mono); font-size: 22px; font-weight: 400; color: var(--ink-mute); }
-        #twist-root .track { position: relative; width: 1000px; height: 44px; border-radius: 8px; background: rgba(178, 191, 204, 0.08); }
-        #twist-root .fill { position: absolute; left: 0; top: 0; height: 44px; border-radius: 8px; background: var(--ink-mute); transform-origin: left center; }
-        #twist-root .val { width: 210px; text-align: right; font-family: var(--mono); font-size: 44px; font-weight: 700; color: var(--ink-soft); }
-        #twist-root .bad .fill { background: var(--c-risk); }
-        #twist-root .bad .val { color: var(--c-risk); }
-        #twist-root .good .fill { background: var(--c-opt); }
-        #twist-root .good .val { color: var(--c-opt); }
-        #twist-root .verdict {
-          position: absolute; left: 120px; top: 806px; width: 1680px; padding: 22px 28px; border-radius: 12px;
-          border: 2px solid rgba(255, 138, 115, 0.45); background: rgba(255, 138, 115, 0.07);
-          font-size: 30px; line-height: 1.4; color: var(--ink);
+        #twist-root .eyebrow { color: var(--c-opt); }
+        #twist-root .panel {
+          position: absolute; top: 262px; width: 820px; height: 560px; border-radius: 16px; border: 2px solid var(--line);
+          background: var(--panel); padding: 30px 36px 0;
         }
-        #twist-root .verdict b { color: var(--c-risk); }
+        #twist-root .panel.fix { border: 3px solid var(--c-opt); background: #0f2629; }
+        #twist-root .tag {
+          display: inline-block; font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: 0.12em;
+          padding: 4px 14px; border-radius: 6px; color: #0a1119;
+        }
+        #twist-root .lesson .tag { background: var(--c-risk); }
+        #twist-root .fix .tag { background: var(--c-opt); }
+        #twist-root .head { margin-top: 18px; font-size: 34px; font-weight: 700; line-height: 1.2; color: var(--ink); }
+        #twist-root .metric { margin-top: 10px; font-size: 24px; font-weight: 500; color: var(--ink-soft); }
+        #twist-root .metric b { color: var(--ink); font-weight: 700; }
+        #twist-root .rows { margin-top: 22px; }
+        #twist-root .row { display: flex; align-items: center; height: 72px; }
+        #twist-root .who { flex: 0 0 236px; width: 236px; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+        #twist-root .who small { display: block; margin-top: 4px; font-size: 22px; font-weight: 500; color: var(--ink-soft); }
+        #twist-root .track { flex: 0 0 260px; position: relative; width: 260px; height: 30px; border-radius: 6px; background: rgba(200, 211, 222, 0.1); }
+        #twist-root .fill { position: absolute; left: 0; top: 0; height: 30px; border-radius: 6px; background: #6b7b8e; transform-origin: left center; }
+        #twist-root .val { flex: 0 0 136px; width: 136px; text-align: right; font-family: var(--mono); font-size: 32px; font-weight: 700; color: var(--ink); }
+        #twist-root .chip {
+          flex: 0 0 auto; margin-left: 14px; height: 34px; padding: 0 10px; border-radius: 6px; display: flex; align-items: center;
+          font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: 0.04em;
+        }
+        #twist-root .chip.trap { color: var(--c-risk); border: 2px solid var(--c-risk); }
+        #twist-root .chip.pick { color: #0a1119; background: var(--c-opt); }
+        #twist-root .row.win .fill { background: var(--c-opt); }
+        #twist-root .row.win .val { color: var(--c-opt); }
+        #twist-root .note {
+          position: absolute; left: 36px; right: 36px; bottom: 26px; padding-top: 16px; border-top: 2px solid var(--line);
+          font-size: 26px; line-height: 1.3; color: var(--ink-soft);
+        }
+        #twist-root .lesson .note em { font-style: normal; font-weight: 700; color: var(--c-risk); }
+        #twist-root .fix .note em { font-style: normal; font-weight: 700; color: var(--c-opt); }
+        #twist-root .arrow { position: absolute; left: 943px; top: 514px; width: 34px; height: 56px; }
+        #twist-root .payoff {
+          position: absolute; left: 120px; top: 848px; width: 1680px; height: 92px; padding: 0 30px; border-radius: 14px;
+          border: 2px solid rgba(63, 216, 168, 0.6); background: rgba(63, 216, 168, 0.08);
+          display: flex; align-items: center; gap: 22px; font-size: 28px; color: var(--ink); white-space: nowrap;
+        }
+        #twist-root .payoff .tag { background: var(--c-opt); flex: 0 0 auto; }
+        #twist-root .payoff b { color: var(--c-opt); font-family: var(--mono); }
+        #twist-root .payoff .soft { color: var(--ink-soft); }
+        #twist-root .payoff .plain { font-family: var(--mono); font-weight: 700; color: var(--ink); }
       </style>
       <div id="twist-root" data-composition-id="twist" data-width="1920" data-height="1080">
         <div class="scene" id="twist-in">
-          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · What didn't win</div>
-          <div class="scene-title" data-layout-allow-overlap id="twist-title">Rules re-learned from a dirty drop fall off a cliff at 2%.</div>
-          <div class="sub" id="twist-sub">Stress run, 10%-scale drops · share of planted defects caught as the defect rate per type rises</div>
-          <div class="bars">
-            <div class="row" id="twist-r1"><div class="who">Re-learned · 0.5%<small>the headline setting</small></div>
-              <div class="track"><div class="fill" id="twist-b1" style="width: 930px"></div></div><div class="val">93.0%</div></div>
-            <div class="row bad" id="twist-r2"><div class="who">Re-learned · 2%<small>primary keys found: 4 of 7</small></div>
-              <div class="track"><div class="fill" id="twist-b2" style="width: 208px"></div></div><div class="val">20.8%</div></div>
-            <div class="row bad" id="twist-r3"><div class="who">Re-learned · 10%</div>
-              <div class="track"><div class="fill" id="twist-b3" style="width: 163px"></div></div><div class="val">16.3%</div></div>
-            <div class="row good" id="twist-r4"><div class="who">Frozen contract · 10%<small>rules from last month's drop</small></div>
-              <div class="track"><div class="fill" id="twist-b4" style="width: 915px"></div></div><div class="val">91.5%</div></div>
+          <div class="eyebrow" data-layout-allow-overlap id="twist-eyebrow">09 · Lesson and fix</div>
+          <div class="scene-title" data-layout-allow-overlap id="twist-title">Dirty data teaches bad rules. So I freeze a signed contract.</div>
+          <div class="scene-sub" id="twist-sub">Test drops where 0.5% to 10% of rows carry each defect. Recall = share of defects caught; higher is better.</div>
+
+          <!-- bars on one shared scale in both panels: 100% recall = 260 px (outputs/stress.json, 10%-scale drops) -->
+          <div class="panel lesson" id="twist-left" style="left: 120px">
+            <span class="tag">THE LESSON</span>
+            <div class="head">Rules re-learned from dirty data miss it</div>
+            <div class="metric"><b>Recall</b>, rules learned again from each drop</div>
+            <div class="rows">
+              <div class="row" id="twist-l1"><div class="who">0.5% dirty<small>near-clean drop</small></div>
+                <div class="track"><div class="fill" id="twist-lb1" style="width: 242px"></div></div><div class="val">93.0%</div></div>
+              <div class="row" id="twist-l2"><div class="who">2% dirty<small>4 of 7 keys found</small></div>
+                <div class="track"><div class="fill" id="twist-lb2" style="width: 54px"></div></div><div class="val">20.8%</div><span class="chip trap">TRAP</span></div>
+              <div class="row" id="twist-l3"><div class="who">10% dirty</div>
+                <div class="track"><div class="fill" id="twist-lb3" style="width: 42px"></div></div><div class="val">16.3%</div></div>
+            </div>
+            <div class="note" id="twist-lnote">Every learned limit sits near 1%, so past it the check is <em>never written, and nothing warns.</em></div>
           </div>
-          <div class="verdict" id="twist-verdict"><b>Why:</b> every profiler tolerance sits near 1%, so past it the rule is never written. A first run on a dirty source still needs a person to read rules.yml.</div>
+
+          <svg class="arrow" id="twist-arrow" viewBox="0 0 34 56" aria-hidden="true">
+            <path d="M6 6 L27 28 L6 50" fill="none" stroke="#3fd8a8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+
+          <div class="panel fix" id="twist-right" style="left: 980px">
+            <span class="tag">THE FIX, IN THE REPO</span>
+            <div class="head">Enforce last month's signed rules</div>
+            <div class="metric"><b>Recall</b>, the same drops, run with <b>--contract</b></div>
+            <div class="rows">
+              <div class="row win" id="twist-r1"><div class="who">0.5% dirty</div>
+                <div class="track"><div class="fill" id="twist-rb1" style="width: 239px"></div></div><div class="val">92.0%</div></div>
+              <div class="row win" id="twist-r2"><div class="who">2% dirty</div>
+                <div class="track"><div class="fill" id="twist-rb2" style="width: 237px"></div></div><div class="val">91.3%</div><span class="chip pick">HOLDS</span></div>
+              <div class="row win" id="twist-r3"><div class="who">10% dirty</div>
+                <div class="track"><div class="fill" id="twist-rb3" style="width: 238px"></div></div><div class="val">91.5%</div></div>
+            </div>
+            <div class="note" id="twist-rnote">The run loads the signed rules.yml <em>instead of re-learning it</em>, and a test pins this.</div>
+          </div>
+
+          <div class="payoff" id="twist-payoff"><span class="tag">PAYOFF</span>
+            <span>At 2% dirty, recall <b>91.3%</b> with the contract vs <span class="plain">20.8%</span> re-learned</span>
+            <span class="soft">· the first contract still needs a review</span></div>
         </div>
       </div>
       <script>
         (() => {
           const tl = gsap.timeline({ paused: true });
-          const D = 7.0;
+          const D = 9;
           tl.fromTo("#twist-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#twist-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
           tl.fromTo("#twist-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.2);
           tl.fromTo("#twist-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.5);
-          [1, 2, 3, 4].forEach((n, i) => {
-            tl.fromTo("#twist-r" + n, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 0.8 + i * 0.15);
-            tl.fromTo("#twist-b" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 1.0 + i * 0.15);
+          // left: the lesson, with its evidence
+          tl.fromTo("#twist-left", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
+          [1, 2, 3].forEach((n, i) => {
+            tl.fromTo("#twist-l" + n, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 1.2 + i * 0.15);
+            tl.fromTo("#twist-lb" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 1.3 + i * 0.15);
           });
-          tl.fromTo("#twist-verdict", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.4);
-          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.fromTo("#twist-lnote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.3);
+          // right: the fix the repo implements, then its measured payoff
+          tl.fromTo("#twist-arrow", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 3.0);
+          tl.fromTo("#twist-right", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.2);
+          [1, 2, 3].forEach((n, i) => {
+            tl.fromTo("#twist-r" + n, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 3.6 + i * 0.15);
+            tl.fromTo("#twist-rb" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 3.7 + i * 0.15);
+          });
+          tl.fromTo("#twist-rnote", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 4.7);
+          tl.fromTo("#twist-payoff", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 5.4);
+          // dip: fully out before the end card starts
+          tl.to("#twist-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8);
           window.__timelines["twist"] = tl;
         })();
       </script>

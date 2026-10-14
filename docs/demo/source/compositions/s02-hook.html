@@ -12,7 +12,10 @@
         #hook-root .line .num.d { color: var(--c-data); }
         #hook-root .line .num.r { color: var(--c-risk); }
         #hook-root .line.soft { color: var(--ink-soft); font-weight: 700; }
-        #hook-root .facts { position: absolute; left: 120px; top: 770px; display: flex; gap: 20px; }
+        #hook-root .facts { position: absolute; left: 120px; top: 760px; display: flex; gap: 20px; }
+        #hook-root .scene-sub { top: 132px; }
+        #hook-root .def { position: absolute; left: 120px; top: 862px; width: 1680px; font-size: 28px; font-weight: 500; color: var(--ink-soft); }
+        #hook-root .def b { color: var(--ink); font-weight: 700; }
         #hook-root .fact {
           display: block; font-family: var(--mono); font-size: 28px; padding: 14px 24px; border-radius: 10px;
           border: 2px solid var(--line); background: rgba(15, 26, 38, 0.9); color: var(--ink);
@@ -23,6 +26,7 @@
         <div class="scene" id="hook-in">
           <svg class="rings" id="hook-rings" aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
           <div class="eyebrow" data-layout-allow-overlap id="hook-eyebrow">02 · This project</div>
+          <div class="scene-sub" id="hook-sub">The project in one line: messy files in, a checked and tested data pipeline out.</div>
           <div class="lines">
             <span class="line" id="hook-l1"><span class="num">7</span> files, <span class="num d">1.86M</span> rows.</span>
             <span class="line" id="hook-l2"><span class="num r">45,677</span> planted defects.</span>
@@ -33,6 +37,7 @@
             <span class="fact" id="hook-f2">two date formats in one column</span>
             <span class="fact risk" id="hook-f3">9 defect types at known rows</span>
           </div>
+          <div class="def" id="hook-def"><b>Planted defect</b> = a bad value added at a known row, so every catch is scored. <b>dbt</b> = tested SQL tables.</div>
         </div>
       </div>
       <script>
@@ -54,7 +59,7 @@
             svg.appendChild(l);
           }
           const tl = gsap.timeline({ paused: true });
-          const D = 4.8;
+          const D = 5.2;
           tl.fromTo("#hook-in", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0);
           tl.fromTo("#hook-rings", { rotation: 0, scale: 0.94 }, { rotation: 10, scale: 1.02, duration: D, ease: "none" }, 0);
           tl.fromTo("#hook-eyebrow", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.1);
@@ -63,7 +68,9 @@
           tl.fromTo("#hook-l3", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.7, ease: "expo.out" }, 1.1);
           ["#hook-f1", "#hook-f2", "#hook-f3"].forEach((f, i) =>
             tl.fromTo(f, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 1.8 + i * 0.15));
-          tl.to("#hook-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.4);
+          tl.fromTo("#hook-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.3);
+          tl.fromTo("#hook-def", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 2.4);
+          tl.to("#hook-in", { opacity: 0, duration: 0.4, ease: "power2.in" }, D - 0.8); // dip: fully out before the next scene starts
           window.__timelines["hook"] = tl;
         })();
       </script>

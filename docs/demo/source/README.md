@@ -15,7 +15,7 @@ Everything needed to rebuild the silent walkthrough (`docs/demo/demo.mp4`) and t
 | `compositions/s03-architecture.html` | Slide 05, the architecture diagram (`NODES` and `W` wires; every box names a file in `src/pipeline_builder/`) |
 | `compositions/s04-routes.html` | Slide 06, the run log, quarantine per table and defects caught by type (arrays copied from `outputs/metrics.json`) |
 | `compositions/value.html` | Slide 07, the orders data contract and the engineer scene (data injected by `tools/inject_contract.py`) |
-| `compositions/s05-results.html`, `s06-twist.html`, `s07-end.html` | Slides 08-10, results, what didn't win, end card |
+| `compositions/s05-results.html`, `s06-twist.html`, `s07-end.html` | Slides 08-10: results, lesson and fix (the stress finding and the `--contract` fix, from `outputs/stress.json`), end card |
 | `assets/contract_sheet.json` | Every rule the validation agent writes for `orders.csv`, with evidence and rows held, exported by `tools/export_contract_sheet.py` |
 | `audit/facts.yaml` | Every figure (F-xx), assumption (A-xx), slide text and check expression used by the report |
 | `tools/build_audit_report.py` | Builds the slide stills, re-checks every figure against the repo outputs, writes MD, DOCX and PDF |
@@ -49,7 +49,7 @@ python3 docs/demo/source/tools/inject_contract.py docs/demo/source/assets/contra
   docs/demo/source/compositions/value.html \
   --rules orders__pk__unique,orders__customer_id__not_null,orders__customer_id__references_customers,orders__ordered_at__window,orders__order_total__type,orders__status__in_set
 
-# 3. render (86 s, 1920x1080, 30 fps, silent) and compress
+# 3. render (88 s, 1920x1080, 30 fps, silent) and compress
 cd docs/demo/source
 npx --yes hyperframes@0.8.156 check
 npx --yes hyperframes@0.8.156 render -f 30 -q looks -o renders/agentic-pipeline-builder-master.mp4
@@ -59,8 +59,8 @@ ffmpeg -y -i docs/demo/source/renders/agentic-pipeline-builder-master.mp4 -c:v l
 
 # GIFs: slide 07 (end-user value) and the architecture data flow
 VF="fps=12,scale=800:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle"
-ffmpeg -y -ss 54.9 -t 12 -i docs/demo/source/renders/agentic-pipeline-builder-master.mp4 -vf "$VF" -loop 0 docs/demo/demo.gif
-ffmpeg -y -ss 30.6 -t 7.8 -i docs/demo/source/renders/agentic-pipeline-builder-master.mp4 -vf "$VF" -loop 0 docs/demo/architecture.gif
+ffmpeg -y -ss 55.3 -t 12 -i docs/demo/source/renders/agentic-pipeline-builder-master.mp4 -vf "$VF" -loop 0 docs/demo/demo.gif
+ffmpeg -y -ss 31.0 -t 7.8 -i docs/demo/source/renders/agentic-pipeline-builder-master.mp4 -vf "$VF" -loop 0 docs/demo/architecture.gif
 
 # 4. audit report: slide stills, automated checks, AUDIT_REPORT.md/.docx/.pdf
 python3 docs/demo/source/tools/build_audit_report.py docs/demo/source/audit/facts.yaml

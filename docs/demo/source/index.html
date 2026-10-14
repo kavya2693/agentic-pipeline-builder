@@ -15,8 +15,8 @@
         --panel-2: #132131;
         --line: #24364a;
         --ink: #eef2f6;
-        --ink-soft: #b2bfcc;
-        --ink-mute: #8494a6;
+        --ink-soft: #c8d3de;
+        --ink-mute: #9fb0c2;
         --c-data: #7fa8ff;
         --c-model: #b9a2ff;
         --c-opt: #3fd8a8;
@@ -85,6 +85,22 @@
         font-variant-numeric: tabular-nums;
       }
 
+      /* one plain-English line under every title: what you are looking at, and which direction is good */
+      .scene-sub {
+        position: absolute;
+        left: 120px;
+        top: 186px;
+        width: 1680px;
+        font-size: 28px;
+        font-weight: 500;
+        line-height: 1.3;
+        color: var(--ink-soft);
+      }
+      .mono {
+        font-family: var(--mono);
+        font-variant-numeric: tabular-nums;
+      }
+
     </style>
   </head>
   <body>
@@ -92,35 +108,36 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="86"
+      data-duration="88.4"
       data-width="1920"
       data-height="1080"
     >
       <div id="bg" data-composition-id="bg" data-composition-src="compositions/bg.html"
-        data-start="0" data-duration="86" data-track-index="0" data-width="1920" data-height="1080"></div>
+        data-start="0" data-duration="88.4" data-track-index="0" data-width="1920" data-height="1080"></div>
 
-      <!-- scenes: one sub-composition per slide; 0.4 s overlaps are crossfades -->
+      <!-- scenes: one sub-composition per slide; hosts overlap by 0.4 s, and each scene has fully faded out
+           before the next one starts fading in (a dip, never two slides of text on screen at once) -->
       <div id="s01" data-composition-id="ctx" data-composition-src="compositions/s01-context.html"
         data-start="0" data-duration="7.2" data-track-index="1" data-width="1920" data-height="1080"></div>
       <div id="s02" data-composition-id="hook" data-composition-src="compositions/s02-hook.html"
-        data-start="6.8" data-duration="4.8" data-track-index="2" data-width="1920" data-height="1080"></div>
+        data-start="6.8" data-duration="5.2" data-track-index="2" data-width="1920" data-height="1080"></div>
       <div id="s03" data-composition-id="explainer" data-composition-src="compositions/explainer.html" style="z-index: 5"
-        data-start="11.3" data-duration="15" data-track-index="9" data-width="1920" data-height="1080"></div>
+        data-start="11.7" data-duration="15" data-track-index="9" data-width="1920" data-height="1080"></div>
       <div id="s05" data-composition-id="arch" data-composition-src="compositions/s03-architecture.html"
-        data-start="26" data-duration="14.6" data-track-index="3" data-width="1920" data-height="1080"></div>
+        data-start="26.4" data-duration="14.6" data-track-index="3" data-width="1920" data-height="1080"></div>
       <div id="s06" data-composition-id="routes" data-composition-src="compositions/s04-routes.html"
-        data-start="40.2" data-duration="14" data-track-index="4" data-width="1920" data-height="1080"></div>
+        data-start="40.6" data-duration="14" data-track-index="4" data-width="1920" data-height="1080"></div>
       <div id="s07" data-composition-id="value" data-composition-src="compositions/value.html" style="z-index: 5"
-        data-start="53.9" data-duration="13" data-track-index="10" data-width="1920" data-height="1080"></div>
+        data-start="54.3" data-duration="13" data-track-index="10" data-width="1920" data-height="1080"></div>
       <div id="s08" data-composition-id="results" data-composition-src="compositions/s05-results.html"
-        data-start="66.6" data-duration="8.8" data-track-index="5" data-width="1920" data-height="1080"></div>
+        data-start="67" data-duration="8.8" data-track-index="5" data-width="1920" data-height="1080"></div>
       <div id="s09" data-composition-id="twist" data-composition-src="compositions/s06-twist.html"
-        data-start="75" data-duration="7" data-track-index="6" data-width="1920" data-height="1080"></div>
+        data-start="75.4" data-duration="9" data-track-index="6" data-width="1920" data-height="1080"></div>
       <div id="s10" data-composition-id="endcard" data-composition-src="compositions/s07-end.html"
-        data-start="81.6" data-duration="4.4" data-track-index="7" data-width="1920" data-height="1080"></div>
+        data-start="84" data-duration="4.4" data-track-index="7" data-width="1920" data-height="1080"></div>
 
       <div id="chrome" data-composition-id="chrome" data-composition-src="compositions/chrome.html" style="z-index: 6"
-        data-start="0" data-duration="86" data-track-index="8" data-width="1920" data-height="1080"></div>
+        data-start="0" data-duration="88.4" data-track-index="8" data-width="1920" data-height="1080"></div>
     </div>
 
     <script>

@@ -8,7 +8,7 @@
            review and the nightly run it controls (right). Data is inlined by tools/inject_contract.py between the SHEET markers. */
         #value-root {
           position: absolute; inset: 0;
-          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #6b7280; --w-line: #d1d5db; --w-faint: #f3f4f6;
+          --w-bg: #ffffff; --w-ink: #111827; --w-soft: #4b5563; --w-mute: #4b5563; --w-line: #d1d5db; --w-faint: #f3f4f6;
           --w-data: #d97706; --w-model: #6d3cf0; --w-tools: #1f8fa8; --w-risk: #dc2b4a; --w-opt: #0f9f6e;
           color: var(--w-ink); font-family: Inter, "Helvetica Neue", sans-serif;
         }
@@ -27,7 +27,7 @@
 
         /* sheet */
         #value-root .sheet {
-          position: absolute; left: 120px; top: 280px; width: 1050px; height: 640px; border: 3px solid var(--w-line);
+          position: absolute; left: 120px; top: 300px; width: 1050px; height: 616px; border: 3px solid var(--w-line);
           border-radius: 24px; background: #fff; box-shadow: 0 18px 40px rgba(17, 24, 39, 0.08); overflow: hidden;
         }
         #value-root .sheet-head {
@@ -37,21 +37,21 @@
         #value-root .sheet-head .hr { position: relative; color: #c4b5fd; }
         #value-root .sheet-head .hr .signed { position: absolute; right: 0; top: 0; color: #6ee7b7; opacity: 0; white-space: nowrap; }
         #value-root .row {
-          position: relative; display: flex; align-items: center; height: 66px; padding: 0 26px;
-          font-family: "JetBrains Mono", monospace; font-size: 21px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
+          position: relative; display: flex; align-items: center; height: 62px; padding: 0 26px;
+          font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-ink); border-bottom: 2px solid var(--w-faint);
         }
-        #value-root .row.hdr { height: 54px; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: var(--w-mute); background: #fafafa; }
+        #value-root .row.hdr { height: 54px; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: var(--w-mute); background: #fafafa; }
         #value-root .row .tint { position: absolute; inset: 0; opacity: 0; background: #fee2e2; }
         #value-root .c { position: relative; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #value-root .c1 { width: 180px; font-weight: 700; }
-        #value-root .c2 { width: 230px; }
-        #value-root .c3 { width: 360px; font-family: Inter, sans-serif; font-size: 21px; color: var(--w-soft); padding-right: 16px; }
-        #value-root .c4 { width: 96px; }
-        #value-root .c4 span { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 18px; font-weight: 700; }
+        #value-root .c1 { width: 175px; font-weight: 700; }
+        #value-root .c2 { width: 215px; }
+        #value-root .c3 { width: 344px; font-family: Inter, sans-serif; font-size: 22px; color: var(--w-soft); padding-right: 16px; }
+        #value-root .c4 { width: 104px; }
+        #value-root .c4 span { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 22px; font-weight: 700; }
         #value-root .c4 .block { background: #fee2e2; color: #b91c1c; }
         #value-root .c4 .warn { background: #fef3c7; color: #92400e; }
-        #value-root .c5 { width: 120px; text-align: right; font-weight: 700; }
-        #value-root .more { padding: 14px 30px 0; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--w-mute); }
+        #value-root .c5 { width: 138px; text-align: right; font-weight: 700; }
+        #value-root .more { padding: 12px 30px 0; font-family: "JetBrains Mono", monospace; font-size: 22px; color: var(--w-mute); }
         #value-root .totals {
           position: absolute; left: 0; bottom: 0; width: 100%; height: 66px; display: flex; align-items: center; gap: 14px; padding: 0 30px;
           background: #ecfdf5; border-top: 2px solid #a7f3d0; font-size: 23px; font-weight: 700; color: #065f46;
@@ -60,24 +60,24 @@
         #value-root .totals svg { position: absolute; left: 6px; top: 6px; width: 16px; height: 16px; }
 
         /* scene */
-        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); white-space: nowrap; }
-        #value-root .desk { position: absolute; left: 1220px; top: 312px; width: 600px; height: 250px; border-radius: 20px; background: var(--w-faint); }
+        #value-root .scene-lab { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.14em; color: var(--w-mute); white-space: nowrap; }
+        #value-root .desk { position: absolute; left: 1220px; top: 336px; width: 600px; height: 250px; border-radius: 20px; background: var(--w-faint); }
         #value-root .doc {
-          position: absolute; left: 1350px; top: 326px; width: 452px; height: 222px; border-radius: 14px; background: #fff;
+          position: absolute; left: 1350px; top: 346px; width: 452px; height: 226px; border-radius: 14px; background: #fff;
           border: 2px solid var(--w-line); box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08); padding: 14px 18px;
         }
-        #value-root .doc-h { font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; color: var(--w-ink); }
+        #value-root .doc-h { font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; color: var(--w-ink); }
         #value-root .doc-h span { color: var(--w-mute); font-weight: 400; }
         #value-root .chips { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 12px; }
         #value-root .chip {
           position: relative; display: block; padding: 3px 11px; border-radius: 8px; background: #eef2ff; color: #3730a3;
-          font-family: "JetBrains Mono", monospace; font-size: 20px;
+          font-family: "JetBrains Mono", monospace; font-size: 22px;
         }
         #value-root .chip .ring { position: absolute; inset: -4px; border: 3px solid var(--w-risk); border-radius: 10px; opacity: 0; }
-        #value-root .doc-note { position: absolute; left: 18px; bottom: 12px; font-size: 20px; color: var(--w-risk); font-weight: 700; opacity: 0; white-space: nowrap; }
+        #value-root .doc-note { position: absolute; left: 18px; bottom: 10px; font-size: 22px; color: #be123c; font-weight: 700; opacity: 0; white-space: nowrap; }
         #value-root .stamp {
-          position: absolute; left: 1650px; top: 478px; padding: 4px 14px; border: 4px solid var(--w-opt); border-radius: 10px;
-          font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.1em; color: var(--w-opt); background: rgba(255,255,255,0.9);
+          position: absolute; left: 1640px; top: 500px; padding: 4px 14px; border: 4px solid var(--w-opt); border-radius: 10px;
+          font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; letter-spacing: 0.1em; color: #047857; background: rgba(255,255,255,0.95);
         }
         #value-root .floor {
           position: absolute; left: 1220px; top: 600px; width: 600px; height: 320px; border-radius: 24px; border: 3px solid var(--w-line);
@@ -89,13 +89,13 @@
           position: absolute; width: 210px; height: 112px; border-radius: 16px; display: flex; flex-direction: column; justify-content: center;
           padding: 0 16px; font-family: "JetBrains Mono", monospace;
         }
-        #value-root .bin .bn { font-size: 20px; font-weight: 700; }
+        #value-root .bin .bn { font-size: 22px; font-weight: 700; }
         #value-root .bin .bc { margin-top: 4px; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
         #value-root .bin.ok { left: 1590px; top: 620px; background: #ecfdf5; border: 3px solid #6ee7b7; color: #065f46; }
         #value-root .bin.bad { left: 1590px; top: 788px; background: #fef2f2; border: 3px solid #fca5a5; color: #991b1b; }
         #value-root .dbt {
           position: absolute; left: 1240px; top: 862px; display: flex; align-items: center; gap: 10px; font-family: "JetBrains Mono", monospace;
-          font-size: 20px; font-weight: 700; color: #065f46; white-space: nowrap;
+          font-size: 22px; font-weight: 700; color: #065f46; white-space: nowrap;
         }
         #value-root .dbt b { display: block; width: 26px; height: 26px; border-radius: 50%; background: var(--w-opt); position: relative; }
         #value-root .dbt svg { position: absolute; left: 5px; top: 5px; width: 16px; height: 16px; }
@@ -104,6 +104,8 @@
           position: absolute; left: 120px; top: 944px; width: 1700px; font-size: 30px; font-weight: 700; color: var(--w-ink);
         }
         #value-root .caption span { color: var(--w-model); }
+        #value-root .subt { position: absolute; left: 120px; top: 248px; width: 1680px; font-size: 26px; font-weight: 500; color: var(--w-soft); }
+        #value-root .subt b { color: var(--w-ink); }
       </style>
 
       <div id="value-root" data-composition-id="value" data-width="1920" data-height="1080">
@@ -111,11 +113,12 @@
           <div class="kick" id="va-kick">07 · END-USER VALUE</div>
           <div class="ttl" id="va-ttl">What the <em>data engineer</em> gets</div>
           <div class="uline" id="va-ul"></div>
+          <div class="subt" id="va-sub">Each row is one check on orders.csv, its evidence, and the bad rows it held back. Right: a person signs, then <b>tonight's file runs.</b></div>
 
           <div class="sheet" id="va-sheet">
             <div class="sheet-head"><span id="va-head-l">DATA CONTRACT</span><span class="hr"><span id="va-head-r">DRAFT</span><span class="signed" id="va-head-s">REVIEWED · SIGNED</span></span></div>
             <div class="row hdr" id="va-hdr">
-              <div class="c c1">COLUMN</div><div class="c c2">CHECK</div><div class="c c3" style="font-family: 'JetBrains Mono', monospace; font-size: 18px">EVIDENCE</div>
+              <div class="c c1">COLUMN</div><div class="c c2">CHECK</div><div class="c c3" style="font-family: 'JetBrains Mono', monospace; font-size: 22px">EVIDENCE</div>
               <div class="c c4">ON FAIL</div><div class="c c5">ROWS HELD</div>
             </div>
             <div id="va-rows"></div>
@@ -123,7 +126,7 @@
             <div class="totals" id="va-totals"></div>
           </div>
 
-          <div class="scene-lab" id="va-lab-desk" style="left: 1220px; top: 280px">ENGINEER · REVIEWS rules.yml</div>
+          <div class="scene-lab" id="va-lab-desk" style="left: 1220px; top: 300px">ENGINEER · REVIEWS rules.yml</div>
           <div class="desk" id="va-desk"></div>
           <div class="doc" id="va-doc">
             <div class="doc-h" id="va-doc-h"></div>
@@ -152,7 +155,7 @@
             duration: 13.0,
             // values a reviewer strikes from the learned status set (README "Known limitations": visible typos)
             typos: ["cancel", "pending_x"],
-            person: { x: 1282, y: 440 },
+            person: { x: 1282, y: 462 },
             file: { x: 1290, y: 740 },
             gate: { x: 1460, y: 740 },
             okBin: { x: 1590, y: 676 },
@@ -214,12 +217,12 @@
           const fileG = el("g", { id: "va-file" });
           el("path", { d: "M" + (F.x - 30) + " " + (F.y - 40) + "h40l20 20v60h-60z", fill: "#fff7ed", stroke: "#d97706", "stroke-width": 3 }, fileG);
           el("path", { d: "M" + (F.x + 10) + " " + (F.y - 40) + "v20h20", fill: "none", stroke: "#d97706", "stroke-width": 3 }, fileG);
-          const ft = el("text", { x: F.x, y: F.y + 70, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#92400e" }, fileG);
+          const ft = el("text", { x: F.x, y: F.y + 70, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 22, "font-weight": 700, fill: "#92400e" }, fileG);
           ft.textContent = SHEET.file;
           const gateG = el("g", { id: "va-gate" });
           el("rect", { x: G.x - 36, y: G.y - 46, width: 72, height: 92, rx: 14, fill: "#111827" }, gateG);
           el("path", { d: "M" + G.x + " " + (G.y - 26) + "l18 7v13c0 11-8 19-18 22-10-3-18-11-18-22v-13z", fill: "none", stroke: "#fff", "stroke-width": 3, "stroke-linejoin": "round" }, gateG);
-          const gt = el("text", { x: G.x, y: G.y + 76, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 20, "font-weight": 700, fill: "#111827" }, gateG);
+          const gt = el("text", { x: G.x, y: G.y + 76, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": 22, "font-weight": 700, fill: "#111827" }, gateG);
           gt.textContent = "rules";
           // lanes
           el("path", { d: "M" + (F.x + 34) + " " + G.y + "H" + (G.x - 40), stroke: "#d1d5db", "stroke-width": 4, fill: "none", "stroke-dasharray": "2 10", "stroke-linecap": "round" });
@@ -234,6 +237,7 @@
           tl.fromTo("#va-kick", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
           tl.fromTo("#va-ttl", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.55);
           tl.fromTo("#va-ul", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 0.9);
+          tl.fromTo("#va-sub", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.0);
           tl.fromTo("#va-sheet", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.8);
           SHEET.rows_shown.forEach((_, i) => tl.fromTo("#va-r" + i, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 1.3 + i * 0.3));
           tl.fromTo("#va-more", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.3 + SHEET.rows_shown.length * 0.3);
@@ -255,7 +259,7 @@
           // hand-off: the signed contract moves from the desk into tonight's run
           const HO = RV + 2.6;
           tl.fromTo(["#va-floor", "#va-lab-floor", "#va-file", "#va-gate", "#va-bin-ok", "#va-bin-bad"], { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.6);
-          tl.fromTo("#va-card", { attr: { opacity: 0 }, x: 1690, y: 480 }, { attr: { opacity: 1 }, duration: 0.2 }, HO);
+          tl.fromTo("#va-card", { attr: { opacity: 0 }, x: 1690, y: 502 }, { attr: { opacity: 1 }, duration: 0.2 }, HO);
           tl.to("#va-card", { x: G.x, y: G.y, duration: 0.9, ease: "power2.inOut" }, HO + 0.1);
           tl.to("#va-card", { attr: { opacity: 0 }, scale: 0.6, duration: 0.25 }, HO + 1.0);
           tl.fromTo("#va-gate", { scale: 1 }, { scale: 1.08, svgOrigin: G.x + " " + G.y, duration: 0.2, yoyo: true, repeat: 1 }, HO + 1.0);
@@ -281,6 +285,9 @@
           document.querySelector("#va-dbt b").innerHTML = CHECK;
           tl.fromTo("#va-dbt", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, FLOW0 + FLOW + 0.4);
           tl.fromTo("#va-caption", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 9.6);
+          // all text fades fully out before the wipe, so no two slides' text is ever on screen together
+          tl.to(["#va-kick", "#va-ttl", "#va-ul", "#va-sub", "#va-sheet", "#va-lab-desk", "#va-desk", "#va-doc", "#va-stamp", "#va-lab-floor", "#va-floor",
+            "#va-bin-ok", "#va-bin-bad", "#va-dbt", "#va-svg", "#va-caption"], { opacity: 0, duration: 0.35, ease: "power2.in" }, D - 1.05);
           // wipe out (white -> dark), revealing the next dark scene underneath
           tl.to("#va-page", { clipPath: "inset(0px 0px 0px 100%)", duration: 0.7, ease: "power3.inOut" }, D - 0.7);
           tl.fromTo("#va-edge", { x: 0, opacity: 0 }, { x: 1920, opacity: 1, duration: 0.7, ease: "power3.inOut", immediateRender: false }, D - 0.7);
