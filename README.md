@@ -8,6 +8,184 @@ A folder of messy source exports in; a typed, tested dbt project, a quarantine f
 rows and an Airflow DAG out, with every inferred type, key and rule checked against a
 known answer.
 
+[![86-second silent walkthrough: the onboarding problem, how the agents work, the architecture, the run log, the orders contract and the results](docs/demo/demo.gif)](docs/demo/demo.mp4)
+
+*~86-second silent walkthrough: the problem, the three agents, the run and what didn't win. Click for the full video ([MP4, 5 MB](docs/demo/demo.mp4)).*
+
+📄 **Audit report:** every figure and assumption in the video, traced to its source — [PDF](docs/demo/AUDIT_REPORT.pdf) · [Word](docs/demo/AUDIT_REPORT.docx) · [Markdown](docs/demo/AUDIT_REPORT.md)
+
+## At a glance
+
+| | |
+|---|---|
+| **Problem** | Onboarding a new source system means days per source of manual detective work (real column types, keys, joins, bad values) before a single staging model is written, and the guesses made there break pipelines quietly. |
+| **Approach** | Three deterministic agents in a state machine: discovery infers types, keys and joins with the evidence for each; validation writes data-quality rules as YAML; the builder compiles them into a dbt project with a quarantine and an Airflow DAG. The first run's rules become a reviewed contract that later drops are checked against. |
+| **Result** | On a 1.86M-row, 7-file drop: **54/54 column types** (DuckDB auto-detect 44/54, pandas 37/54), 7/7 primary and foreign keys; **88.6% of 45,677 injected defects caught at 98.4% row precision**; dbt SQL and the pandas runner quarantine the same 39,666 rows; raw folder to green `dbt build` in 100 s. |
+| **What didn't win** | Rules re-learned from each drop collapse from 93.0% to **20.8% recall** once defects pass 2% per type (the frozen contract holds 91.3%). Prices inflated 100x are caught 22.8% of the time, category typos 63.4%. Unknown date and number formats fall back to text without a warning. The optional local model's column leads were rejected for 26 of 54 columns. |
+
+## Architecture
+
+![Animated architecture: raw drop through discovery, validation, the quarantine gate, the builder and dbt build](docs/demo/architecture.gif)
+
+```mermaid
+flowchart LR
+    subgraph SRC["Sources"]
+        RAW[("Nightly raw drop<br/>csv · json · jsonl · parquet")]
+        CON[("Reviewed contract<br/>catalog.yml + rules.yml")]
+        GT[("Answer key<br/>data/ground_truth/<br/>datagen.py")]
+    end
+
+    subgraph DATA["Data and typing"]
+        LOAD["Loader, every value as text<br/>discovery.py · load_raw"]
+        PARSE["Type parsers and formats<br/>typing_rules.py"]
+    end
+
+    subgraph AGENTS["Agents, deterministic"]
+        DISC["Discovery agent<br/>types · keys · relationships<br/>discovery.py"]
+        VAL["Validation agent<br/>profile to expectations<br/>validation.py"]
+        DESC["Column descriptions<br/>optional local model<br/>describe.py"]
+    end
+
+    subgraph DEC["Decision and build"]
+        ORCH["State machine<br/>TRANSITIONS · MAX_ATTEMPTS<br/>orchestrator.py"]
+        GATE{"Quarantine gate<br/>any table over 5%?"}
+        BUILD["Builder<br/>dbt models · schema.yml · DAG<br/>builder.py + sql.py"]
+        LAND["Landing<br/>raw.* as text + _row_id<br/>runtime.py"]
+        HALT["HALTED<br/>nothing built"]
+    end
+
+    subgraph OUT["Outputs"]
+        CAT[("catalog.yml")]
+        RULES[("rules.yml<br/>136 rules + evidence")]
+        DBT[("dbt project<br/>stg_*__checked · stg_* · stg_*__rejected<br/>dim_* · fct_* · agg_*_daily")]
+        DAG[("Airflow DAG<br/>raw_drop_pipeline.py")]
+        WH[("warehouse.duckdb")]
+        LOG[("run_state.json")]
+    end
+
+    subgraph EVAL["Evaluation and monitoring"]
+        DBTRUN["dbt build on DuckDB<br/>dbt_run.py"]
+        PARITY["SQL vs pandas parity<br/>cli.py · sql_vs_pandas"]
+        SCORE["Scorer vs answer key<br/>evaluate.py"]
+        REP[("outputs/<br/>metrics.json · report.md")]
+    end
+
+    RAW -->|"files"| LOAD
+    LOAD -->|"text frames"| DISC
+    PARSE -->|"parse rates, formats"| DISC
+    DISC -->|"types, keys, FKs"| CAT
+    CAT -->|"schema"| VAL
+    LOAD -->|"text frames"| VAL
+    VAL -->|"expectations"| RULES
+    VAL -->|"quarantine rate per table"| GATE
+    GATE -->|"yes"| HALT
+    GATE -->|"no"| BUILD
+    RULES -->|"rules compiled to SQL"| BUILD
+    DESC -.->|"wording only, falls back to rule text"| BUILD
+    BUILD -->|"models + tests"| DBT
+    BUILD -->|"land, validate, build tasks"| DAG
+    BUILD --> LAND
+    LAND -->|"raw.* tables"| WH
+    WH --> DBTRUN
+    DBT --> DBTRUN
+    DBTRUN -->|"run_results.json, retried once"| PARITY
+    PARITY -->|"row-for-row agreement"| REP
+    GT -->|"true types, keys, defect rows"| SCORE
+    RULES -->|"pandas flags"| SCORE
+    SCORE -->|"recall, precision"| REP
+    ORCH -.->|"every state, attempt, duration"| LOG
+    RULES -.->|"person reviews and edits"| CON
+    CON -.->|"contract flag: frozen catalog"| DISC
+    CON -.->|"contract flag: frozen rules"| VAL
+
+    classDef data fill:#7fa8ff,stroke:#3d64c4,color:#0b1020
+    classDef models fill:#b9a2ff,stroke:#6f55c9,color:#0b1020
+    classDef decision fill:#3fd8a8,stroke:#1f8f6c,color:#0b1020
+    classDef evaluation fill:#f2c46d,stroke:#b08528,color:#0b1020
+    classDef risk fill:#ff8a73,stroke:#c4503a,color:#0b1020
+
+    class RAW,CON,GT,LOAD,PARSE,CAT,RULES,DBT,DAG,WH,LOG data
+    class DISC,VAL,DESC models
+    class ORCH,BUILD,LAND decision
+    class DBTRUN,PARITY,SCORE,REP evaluation
+    class GATE,HALT risk
+```
+
+Solid edges are the nightly path; dotted edges are the optional model, the run log, and the review loop that turns one run's rules into the next run's contract.
+
+### Components
+
+| Component | Responsibility | File |
+|---|---|---|
+| Orchestrator | Runs the states DISCOVER → VALIDATE → BUILD → LAND → DBT_BUILD from a `(state, event) → next state` table, owns retries and the quarantine stop, writes `run_state.json` | [orchestrator.py](src/pipeline_builder/orchestrator.py) |
+| Loader and parsers | Reads every file as text; one definition of each logical type, its accepted text forms and date formats, shared by discovery, the pandas checks and the SQL | [discovery.py](src/pipeline_builder/discovery.py), [typing_rules.py](src/pipeline_builder/typing_rules.py) |
+| Discovery agent | Infers types from parse rates (98% threshold), keys from null and distinct rates, foreign keys from name tokens plus 90% row containment | [discovery.py](src/pipeline_builder/discovery.py) |
+| Validation agent | Profiles each column and writes Great Expectations-style rules with evidence and a `block` or `warn` severity; runs them in pandas and summarises quarantine per table | [validation.py](src/pipeline_builder/validation.py) |
+| Builder | Compiles the same rules to DuckDB SQL (`__checked`, `stg_`, `__rejected`), derives `dim_`/`fct_`/`agg_` marts from the relationship graph, writes `schema.yml` tests and the Airflow DAG | [builder.py](src/pipeline_builder/builder.py), [sql.py](src/pipeline_builder/sql.py) |
+| Landing and DAG tasks | Lands each frame into `raw.<table>` as text with its file row position; the generated DAG imports the same land and validate functions | [runtime.py](src/pipeline_builder/runtime.py) |
+| dbt runner | Invokes `dbt build` in-process and reads `run_results.json` into model and test counts | [dbt_run.py](src/pipeline_builder/dbt_run.py) |
+| Description writer | Optional Ollama call for one-line column leads; key, reference and allowed-value facts are always appended by code | [describe.py](src/pipeline_builder/describe.py) |
+| Scorer | Scores types, keys, relationships and defect recall/precision against the answer key, plus the pandas and DuckDB baselines | [evaluate.py](src/pipeline_builder/evaluate.py) |
+| CLI and report | `pipeline-builder run`, SQL vs pandas parity check, `outputs/metrics.json` and `report.md` | [cli.py](src/pipeline_builder/cli.py) |
+| Data generator | Seeded nightly drop with nine defect types injected at known rows, and the answer key | [datagen.py](src/pipeline_builder/datagen.py) |
+
+### Design decisions
+
+Full reasoning in [ADR-0001](docs/adr/0001-deterministic-agents-reviewed-contract.md).
+
+| Decision | Options considered | Chosen | Trade-off |
+|---|---|---|---|
+| Who infers schema and writes SQL | A model; deterministic code with named thresholds | Deterministic code; a model only words descriptions | Reproducible and reviewable line by line, but the parser vocabulary is a fixed list that has to grow by hand |
+| Where later runs get their rules | Re-learn from each drop; freeze a reviewed contract | Reviewed contract via `--contract` | Recall holds at 91% on dirty drops instead of 21%, but the first contract needs a person to read `rules.yml` |
+| Rule format and runtime | Great Expectations as a dependency; own GX-style YAML compiled to dbt SQL | Own YAML, compiled to SQL | One rule source for pandas and SQL without the GX runtime; covers nine expectation types, not GX's catalogue |
+| What happens to a bad row | Drop in staging; quarantine with reasons | `stg_<table>__rejected` with `failed_rules` | More models per table, but the source owner can be told exactly which rows to fix |
+| Mart joins | Inner joins; left joins with warn-level relationship tests | Left joins, warn severity | A quarantined parent does not silently delete children; the cascade is counted (22,619 order lines) instead of hidden |
+| Trusting the scored numbers | Score pandas only; require SQL and pandas to agree | Both, with a row-for-row test | Rules are implemented twice, but the scored recall is a statement about the SQL that would run in production |
+
+### Data contracts
+
+| Stage | Artifact | Shape |
+|---|---|---|
+| Input | raw folder | one file per table (`.csv`, `.json`, `.jsonl`, `.parquet`); table name is the file stem; every value read as text |
+| Discovery out | `catalog.yml` | per table: `name`, `file`, `row_count`, `primary_key: [col]`; per column: `name`, `logical_type` (boolean, integer, decimal, date, timestamp, string), `formats: [strptime]`, `null_rate`, `distinct_ratio`, `is_identifier`, `description`; `foreign_keys`: `table`, `column`, `ref_table`, `ref_column`, `containment`, `named_match` |
+| Validation out | `rules.yml` | per rule: `id`, `table`, `expectation`, `columns: [col]`, `kwargs`, `severity` (block or warn), `evidence` |
+| Validation, in memory | flags and summary | flags: `table`, `row`, `column`, `rule_id`, `expectation`, `severity`; summary: `table`, `rows`, `quarantined`, `quarantine_rate`, `warned` |
+| Landing | `raw.<table>` in DuckDB | `_row_id bigint` (row position in the file) plus every source column as `varchar` |
+| Staging | `stg_<table>__checked`, `stg_<table>`, `stg_<table>__rejected` | typed columns plus `<col>__text` and `failed_rules` (list of rule ids); clean rows are typed, rejected rows keep the raw text |
+| Run log | `run_state.json` | per step: `state`, `attempt`, `event`, `seconds`, `detail` |
+
+### Failure modes and fallbacks
+
+| Situation | What the code does |
+|---|---|
+| Folder empty, or a file named in the contract is missing (for example a late drop) | DISCOVER returns `empty` and the run ends `FAILED`. There is no wait-and-retry for late files. |
+| Any table would quarantine more than 5% of its rows | Run stops at `HALTED` before anything is built (`--force` overrides). The generated DAG's `validate_drop` task raises `QuarantineThresholdError` on the same condition. |
+| A state raises | LAND and DBT_BUILD are retried once (`MAX_ATTEMPTS = 2`); other states fail fast, since a rule that fails on the data fails the same way twice. Any unmapped event goes to `FAILED`. The scheduled DAG retries tasks twice, 5 minutes apart. |
+| dbt writes no `run_results.json` | Recorded as a failed build with that message; run ends `FAILED`. |
+| Description model down, slow or returning junk | 120 s request timeout; the exception is caught and every column falls back to rule-derived text. The build never waits on the model. |
+| Parent rows quarantined | Children are kept by left joins; warn-level relationship tests count the orphans. |
+| Value format outside the parser vocabulary | **Gap:** on a first run the column becomes text without a warning. Under a frozen contract the type rule trips on every row and the gate halts the run. |
+| Source with more than about 1% of a defect on a first run | **Gap:** the rule that would catch it is never written, silently. Fixed on later runs by the reviewed contract; the first contract needs a person. |
+
+### Path to production
+
+This is a mapping, not a deployed system. The orchestrator's transition table already has the shape of an Amazon States Language definition; [docs/aws-mapping.md](docs/aws-mapping.md) has the state-by-state detail.
+
+| Local | Production equivalent |
+|---|---|
+| `data/raw/` folder | S3 prefix with `ObjectCreated` events to SQS, batching one nightly drop into one execution |
+| `orchestrator.py` transition table, `MAX_ATTEMPTS` | Step Functions state machine with `Retry` on `States.TaskFailed` |
+| DISCOVER per file | `Map` state, one Lambda per file, then a reduce step for relationships |
+| `HALTED` gate | `Choice` state into a `.waitForTaskToken` task; a person approves or edits the contract |
+| DuckDB `warehouse.duckdb`, dbt-duckdb | Athena or Redshift with dbt-athena or dbt-redshift; `try_strptime` and `regexp_full_match` become `try(date_parse(...))` and `regexp_like` |
+| `dbt build` in-process | ECS Fargate task |
+| Generated Airflow DAG (`0 3 * * *`) | Managed Airflow (MWAA), or replaced by the Step Functions schedule |
+| Ollama on a laptop | Managed model endpoint, still off the critical path |
+| `run_state.json` | Step Functions execution history |
+| `FAILED` | `Fail` state plus an EventBridge alert |
+| `outputs/metrics.json` quarantine rates | CloudWatch metrics per table with alarms on a rising rate |
+| Re-learning rules | Deliberately manual: a new contract is proposed by a fresh run and merged after review, never adopted automatically |
+
 ## The problem
 
 A data team is told that a new source system is "ready": a shared folder now gets a
